@@ -1,9 +1,9 @@
-<p align="right"><strong>English</strong> | <a href="README.pt-BR.md">Português (Brasil)</a></p>
+<p align="right"><strong>English</strong> | <a href="https://github.com/kwy404/edgegoat/blob/main/README.pt-BR.md">Português (Brasil)</a></p>
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
-    <img src="assets/banner.svg" width="880" alt="edgegoat banner: Ledge the mountain goat standing on a cliff edge next to the tagline, edge case test inputs for JavaScript time zones, daylight saving time, unicode test strings and numbers">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/banner-dark.svg">
+    <img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/banner.svg" width="880" alt="edgegoat banner: Ledge the mountain goat standing on a cliff edge next to the tagline, edge case test inputs for JavaScript time zones, daylight saving time, unicode test strings and numbers">
   </picture>
 </p>
 
@@ -15,7 +15,7 @@
   <a href="https://www.npmjs.com/package/edgegoat"><img height="20" src="https://img.shields.io/npm/v/edgegoat.svg?color=2E9C8A" alt="edgegoat npm version"></a>
   <a href="https://bundlephobia.com/package/edgegoat"><img height="20" src="https://img.shields.io/bundlephobia/minzip/edgegoat?color=2E9C8A" alt="edgegoat bundle size, minified and gzipped"></a>
   <a href="https://github.com/kwy404/edgegoat/actions/workflows/ci.yml"><img height="20" src="https://github.com/kwy404/edgegoat/actions/workflows/ci.yml/badge.svg" alt="CI status: build, typecheck, lint and tests on Node 18, 20 and 22"></a>
-  <a href="LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-2E9C8A.svg" alt="MIT license"></a>
+  <a href="https://github.com/kwy404/edgegoat/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-2E9C8A.svg" alt="MIT license"></a>
   <a href="https://www.typescriptlang.org/"><img height="20" src="https://img.shields.io/badge/types-TypeScript-3178C6.svg" alt="TypeScript types included"></a>
 </p>
 
@@ -33,25 +33,25 @@ test.each(dates({ tags: ['dst'] }))('$label', ({ value, zone }) => {
 <!-- grid:start -->
 <table>
 <tr>
-<td width="33%" valign="top"><img src="assets/icons/dates.svg" width="40" height="40" alt="Calendar icon for date and daylight saving time edge cases"><br><strong>Dates</strong> <code>46 cases</code><br><sub>DST gaps and overlaps, New Year in 7 zones, leap days, before 1970, 2038, year 10000</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/time-zones.svg" width="40" height="40" alt="Globe icon for time zone test cases"><br><strong>Time zones</strong> <code>18 cases</code><br><sub>Curated IANA zones: +05:45, +14:00, -11:00, 30 minute DST, midnight DST</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/strings.svg" width="40" height="40" alt="Text icon for unicode test strings"><br><strong>Strings</strong> <code>49 cases</code><br><sub>Emoji, surrogate pairs, NFC vs NFD, bidi, invisible spaces, Turkish i, newlines</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/dates.svg" width="40" height="40" alt="Calendar icon for date and daylight saving time edge cases"><br><strong>Dates</strong> <code>46 cases</code><br><sub>DST gaps and overlaps, New Year in 7 zones, leap days, before 1970, 2038, year 10000</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/time-zones.svg" width="40" height="40" alt="Globe icon for time zone test cases"><br><strong>Time zones</strong> <code>18 cases</code><br><sub>Curated IANA zones: +05:45, +14:00, -11:00, 30 minute DST, midnight DST</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/strings.svg" width="40" height="40" alt="Text icon for unicode test strings"><br><strong>Strings</strong> <code>49 cases</code><br><sub>Emoji, surrogate pairs, NFC vs NFD, bidi, invisible spaces, Turkish i, newlines</sub></td>
 </tr>
 <tr>
-<td width="33%" valign="top"><img src="assets/icons/numbers.svg" width="40" height="40" alt="Hash icon for JavaScript number edge cases like negative zero and NaN"><br><strong>Numbers</strong> <code>51 cases</code><br><sub>-0, NaN, Infinity, safe integer limits, 0.1 + 0.2, 1e21, numeric strings and BigInt</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/urls.svg" width="40" height="40" alt="Link icon for URL and email edge cases"><br><strong>URLs and emails</strong> <code>54 cases</code><br><sub>WHATWG parser surprises, SSRF and open redirect shapes, RFC 5321 limits</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/paths.svg" width="40" height="40" alt="Folder icon for Windows and POSIX file path edge cases"><br><strong>Paths</strong> <code>30 cases</code><br><sub>Windows vs POSIX, UNC, reserved names, traversal, NFD file names</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/numbers.svg" width="40" height="40" alt="Hash icon for JavaScript number edge cases like negative zero and NaN"><br><strong>Numbers</strong> <code>51 cases</code><br><sub>-0, NaN, Infinity, safe integer limits, 0.1 + 0.2, 1e21, numeric strings and BigInt</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/urls.svg" width="40" height="40" alt="Link icon for URL and email edge cases"><br><strong>URLs and emails</strong> <code>54 cases</code><br><sub>WHATWG parser surprises, SSRF and open redirect shapes, RFC 5321 limits</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/paths.svg" width="40" height="40" alt="Folder icon for Windows and POSIX file path edge cases"><br><strong>Paths</strong> <code>30 cases</code><br><sub>Windows vs POSIX, UNC, reserved names, traversal, NFD file names</sub></td>
 </tr>
 <tr>
-<td width="33%" valign="top"><img src="assets/icons/json.svg" width="40" height="40" alt="Curly braces icon for JSON parsing edge cases"><br><strong>JSON</strong> <code>22 cases</code><br><sub>10000 levels deep, duplicate keys, 2^53 + 1, __proto__, BOM</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/arrays.svg" width="40" height="40" alt="Brackets icon for array edge cases with holes and huge lengths"><br><strong>Arrays</strong> <code>14 cases</code><br><sub>Holes, length 2^32 - 1, NaN membership, default sort, too big to spread</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/helpers.svg" width="40" height="40" alt="Stopwatch icon for the time zone and frozen time test helpers"><br><strong>Helpers</strong> <code>4 functions</code><br><sub>withTimeZone, withFrozenTime, check, assertNoThrow</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/json.svg" width="40" height="40" alt="Curly braces icon for JSON parsing edge cases"><br><strong>JSON</strong> <code>22 cases</code><br><sub>10000 levels deep, duplicate keys, 2^53 + 1, __proto__, BOM</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/arrays.svg" width="40" height="40" alt="Brackets icon for array edge cases with holes and huge lengths"><br><strong>Arrays</strong> <code>14 cases</code><br><sub>Holes, length 2^32 - 1, NaN membership, default sort, too big to spread</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/helpers.svg" width="40" height="40" alt="Stopwatch icon for the time zone and frozen time test helpers"><br><strong>Helpers</strong> <code>4 functions</code><br><sub>withTimeZone, withFrozenTime, check, assertNoThrow</sub></td>
 </tr>
 </table>
 <!-- grid:end -->
 
 <p align="center">
-  <img src="assets/demo.svg" width="760" alt="Animated terminal demo of edgegoat with Vitest: a naive isSameYear passes ordinary dates, then fails on the Pacific/Kiritimati and America/New_York New Year time zone edge cases">
+  <img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/demo.svg" width="760" alt="Animated terminal demo of edgegoat with Vitest: a naive isSameYear passes ordinary dates, then fails on the Pacific/Kiritimati and America/New_York New Year time zone edge cases">
 </p>
 
 ## Table of contents
@@ -140,12 +140,12 @@ const failures = check((s) => truncate(s, 10), strings(), (out) => out.isWellFor
 // [{ label: 'surrogate pair cut by slice(0, 10)', value: 'abcdefghi\u{1F600}', why: '...', result: '...' }]
 ```
 
-Runnable versions of these live in [`examples/`](examples), including two real world style bugs that edgegoat catches: a [New Year time zone bug](examples/real-world/format-date.ts) mirroring github/relative-time-element#384 and a [truncate that splits emoji](examples/real-world/truncate.ts).
+Runnable versions of these live in [`examples/`](https://github.com/kwy404/edgegoat/blob/main/examples), including two real world style bugs that edgegoat catches: a [New Year time zone bug](https://github.com/kwy404/edgegoat/blob/main/examples/real-world/format-date.ts) mirroring github/relative-time-element#384 and a [truncate that splits emoji](https://github.com/kwy404/edgegoat/blob/main/examples/real-world/truncate.ts).
 
 ## What edge cases are included?
 
 <p align="center">
-  <img src="assets/catalog.svg" width="760" alt="edgegoat catalog chart: number of edge cases per generator for dates, time zones, unicode strings, numbers, numeric strings, BigInt, URLs, emails, paths, JSON and arrays">
+  <img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/catalog.svg" width="760" alt="edgegoat catalog chart: number of edge cases per generator for dates, time zones, unicode strings, numbers, numeric strings, BigInt, URLs, emails, paths, JSON and arrays">
 </p>
 
 | Generator | What it covers | Example tags |
@@ -664,8 +664,8 @@ The documentation site is at **[kwy404.github.io/edgegoat](https://kwy404.github
 
 ## How can I contribute?
 
-New cases are welcome when they have broken real code. Every case needs a `why`, and ideally a link to a real bug. See [CONTRIBUTING.md](CONTRIBUTING.md) for the checklist and the [changelog](CHANGELOG.md) for releases.
+New cases are welcome when they have broken real code. Every case needs a `why`, and ideally a link to a real bug. See [CONTRIBUTING.md](https://github.com/kwy404/edgegoat/blob/main/CONTRIBUTING.md) for the checklist and the [changelog](https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md) for releases.
 
 ## License
 
-[MIT](LICENSE) © 2026 Alexandre Kohler. Mascot: Ledge the goat, who walks the edges so your code does not fall off them.
+[MIT](https://github.com/kwy404/edgegoat/blob/main/LICENSE) © 2026 Alexandre Kohler. Mascot: Ledge the goat, who walks the edges so your code does not fall off them.

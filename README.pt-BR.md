@@ -1,9 +1,9 @@
-<p align="right"><a href="README.md">English</a> | <strong>Português (Brasil)</strong></p>
+<p align="right"><a href="https://github.com/kwy404/edgegoat/blob/main/README.md">English</a> | <strong>Português (Brasil)</strong></p>
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
-    <img src="assets/banner.svg" width="880" alt="Banner do edgegoat: Ledge, a cabra montesa, na beira de um penhasco ao lado do slogan, entradas de casos extremos para testar fusos horários, horário de verão, strings unicode e números em JavaScript">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/banner-dark.svg">
+    <img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/banner.svg" width="880" alt="Banner do edgegoat: Ledge, a cabra montesa, na beira de um penhasco ao lado do slogan, entradas de casos extremos para testar fusos horários, horário de verão, strings unicode e números em JavaScript">
   </picture>
 </p>
 
@@ -15,7 +15,7 @@
   <a href="https://www.npmjs.com/package/edgegoat"><img height="20" src="https://img.shields.io/npm/v/edgegoat.svg?color=2E9C8A" alt="versão do edgegoat no npm"></a>
   <a href="https://bundlephobia.com/package/edgegoat"><img height="20" src="https://img.shields.io/bundlephobia/minzip/edgegoat?color=2E9C8A" alt="tamanho do pacote edgegoat minificado e com gzip"></a>
   <a href="https://github.com/kwy404/edgegoat/actions/workflows/ci.yml"><img height="20" src="https://github.com/kwy404/edgegoat/actions/workflows/ci.yml/badge.svg" alt="status do CI: build, typecheck, lint e testes no Node 18, 20 e 22"></a>
-  <a href="LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-2E9C8A.svg" alt="licença MIT"></a>
+  <a href="https://github.com/kwy404/edgegoat/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-2E9C8A.svg" alt="licença MIT"></a>
   <a href="https://www.typescriptlang.org/"><img height="20" src="https://img.shields.io/badge/types-TypeScript-3178C6.svg" alt="tipos TypeScript incluídos"></a>
 </p>
 
@@ -33,25 +33,25 @@ test.each(dates({ tags: ['dst'] }))('$label', ({ value, zone }) => {
 <!-- grid:start -->
 <table>
 <tr>
-<td width="33%" valign="top"><img src="assets/icons/dates.svg" width="40" height="40" alt="Calendar icon for date and daylight saving time edge cases"><br><strong>Datas</strong> <code>46 casos</code><br><sub>Horário de verão (lacunas e sobreposições), Ano Novo em 7 fusos, 29 de fevereiro, antes de 1970, 2038, ano 10000</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/time-zones.svg" width="40" height="40" alt="Globe icon for time zone test cases"><br><strong>Fusos horários</strong> <code>18 casos</code><br><sub>Fusos IANA escolhidos: +05:45, +14:00, -11:00, horário de verão de 30 minutos e à meia-noite</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/strings.svg" width="40" height="40" alt="Text icon for unicode test strings"><br><strong>Strings</strong> <code>49 casos</code><br><sub>Emoji, pares substitutos, NFC vs NFD, bidi, espaços invisíveis, i turco, quebras de linha</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/dates.svg" width="40" height="40" alt="Calendar icon for date and daylight saving time edge cases"><br><strong>Datas</strong> <code>46 casos</code><br><sub>Horário de verão (lacunas e sobreposições), Ano Novo em 7 fusos, 29 de fevereiro, antes de 1970, 2038, ano 10000</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/time-zones.svg" width="40" height="40" alt="Globe icon for time zone test cases"><br><strong>Fusos horários</strong> <code>18 casos</code><br><sub>Fusos IANA escolhidos: +05:45, +14:00, -11:00, horário de verão de 30 minutos e à meia-noite</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/strings.svg" width="40" height="40" alt="Text icon for unicode test strings"><br><strong>Strings</strong> <code>49 casos</code><br><sub>Emoji, pares substitutos, NFC vs NFD, bidi, espaços invisíveis, i turco, quebras de linha</sub></td>
 </tr>
 <tr>
-<td width="33%" valign="top"><img src="assets/icons/numbers.svg" width="40" height="40" alt="Hash icon for JavaScript number edge cases like negative zero and NaN"><br><strong>Números</strong> <code>51 casos</code><br><sub>-0, NaN, Infinity, limites de inteiros seguros, 0.1 + 0.2, 1e21, strings numéricas e BigInt</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/urls.svg" width="40" height="40" alt="Link icon for URL and email edge cases"><br><strong>URLs e emails</strong> <code>54 casos</code><br><sub>Surpresas do parser WHATWG, formatos de SSRF e open redirect, limites da RFC 5321</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/paths.svg" width="40" height="40" alt="Folder icon for Windows and POSIX file path edge cases"><br><strong>Caminhos</strong> <code>30 casos</code><br><sub>Windows vs POSIX, UNC, nomes reservados, travessia com .., nomes em NFD</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/numbers.svg" width="40" height="40" alt="Hash icon for JavaScript number edge cases like negative zero and NaN"><br><strong>Números</strong> <code>51 casos</code><br><sub>-0, NaN, Infinity, limites de inteiros seguros, 0.1 + 0.2, 1e21, strings numéricas e BigInt</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/urls.svg" width="40" height="40" alt="Link icon for URL and email edge cases"><br><strong>URLs e emails</strong> <code>54 casos</code><br><sub>Surpresas do parser WHATWG, formatos de SSRF e open redirect, limites da RFC 5321</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/paths.svg" width="40" height="40" alt="Folder icon for Windows and POSIX file path edge cases"><br><strong>Caminhos</strong> <code>30 casos</code><br><sub>Windows vs POSIX, UNC, nomes reservados, travessia com .., nomes em NFD</sub></td>
 </tr>
 <tr>
-<td width="33%" valign="top"><img src="assets/icons/json.svg" width="40" height="40" alt="Curly braces icon for JSON parsing edge cases"><br><strong>JSON</strong> <code>22 casos</code><br><sub>10000 níveis, chaves duplicadas, 2^53 + 1, __proto__, BOM</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/arrays.svg" width="40" height="40" alt="Brackets icon for array edge cases with holes and huge lengths"><br><strong>Arrays</strong> <code>14 casos</code><br><sub>Buracos, length 2^32 - 1, NaN, sort padrão, grande demais para spread</sub></td>
-<td width="33%" valign="top"><img src="assets/icons/helpers.svg" width="40" height="40" alt="Stopwatch icon for the time zone and frozen time test helpers"><br><strong>Helpers</strong> <code>4 funções</code><br><sub>withTimeZone, withFrozenTime, check, assertNoThrow</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/json.svg" width="40" height="40" alt="Curly braces icon for JSON parsing edge cases"><br><strong>JSON</strong> <code>22 casos</code><br><sub>10000 níveis, chaves duplicadas, 2^53 + 1, __proto__, BOM</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/arrays.svg" width="40" height="40" alt="Brackets icon for array edge cases with holes and huge lengths"><br><strong>Arrays</strong> <code>14 casos</code><br><sub>Buracos, length 2^32 - 1, NaN, sort padrão, grande demais para spread</sub></td>
+<td width="33%" valign="top"><img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/icons/helpers.svg" width="40" height="40" alt="Stopwatch icon for the time zone and frozen time test helpers"><br><strong>Helpers</strong> <code>4 funções</code><br><sub>withTimeZone, withFrozenTime, check, assertNoThrow</sub></td>
 </tr>
 </table>
 <!-- grid:end -->
 
 <p align="center">
-  <img src="assets/demo.svg" width="760" alt="Demonstração animada do edgegoat no Vitest: um isSameYear ingênuo passa nas datas comuns e falha nos casos de Ano Novo em Pacific/Kiritimati e America/New_York">
+  <img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/demo.svg" width="760" alt="Demonstração animada do edgegoat no Vitest: um isSameYear ingênuo passa nas datas comuns e falha nos casos de Ano Novo em Pacific/Kiritimati e America/New_York">
 </p>
 
 ## Sumário
@@ -94,12 +94,12 @@ for (const { label, value } of paths({ tags: ['traversal'] })) {
 const failures = check((s) => truncate(s, 10), strings(), (out) => out.isWellFormed());
 ```
 
-Exemplos executáveis estão em [`examples/`](examples), incluindo dois bugs no estilo do mundo real que o edgegoat pega: um [bug de fuso horário no Ano Novo](examples/real-world/format-date.ts), espelhando github/relative-time-element#384, e um [truncate que corta emoji](examples/real-world/truncate.ts).
+Exemplos executáveis estão em [`examples/`](https://github.com/kwy404/edgegoat/blob/main/examples), incluindo dois bugs no estilo do mundo real que o edgegoat pega: um [bug de fuso horário no Ano Novo](https://github.com/kwy404/edgegoat/blob/main/examples/real-world/format-date.ts), espelhando github/relative-time-element#384, e um [truncate que corta emoji](https://github.com/kwy404/edgegoat/blob/main/examples/real-world/truncate.ts).
 
 ## Quais casos extremos estão incluídos?
 
 <p align="center">
-  <img src="assets/catalog.svg" width="760" alt="Gráfico do catálogo edgegoat: número de casos extremos por gerador para datas, fusos horários, strings unicode, números, BigInt, URLs, emails, caminhos, JSON e arrays">
+  <img src="https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/assets/catalog.svg" width="760" alt="Gráfico do catálogo edgegoat: número de casos extremos por gerador para datas, fusos horários, strings unicode, números, BigInt, URLs, emails, caminhos, JSON e arrays">
 </p>
 
 - `dates()`: lacunas e sobreposições de horário de verão calculadas com `Intl` (Nova York, São Paulo em 2018, Londres, Lord Howe), Ano Novo onde o ano local difere do UTC (Kathmandu +05:45, Kiritimati +14, Pago Pago -11), epoch, antes de 1970 com frações de segundo, 2038, anos 0, 9999 e 10000, data inválida, 29 de fevereiro, fim de mês e semanas ISO.
@@ -108,7 +108,7 @@ Exemplos executáveis estão em [`examples/`](examples), incluindo dois bugs no 
 - `numbers()`, `numericStrings()` e `bigints()`: `-0`, `NaN`, infinitos, limites de inteiros seguros, valores entre -1 e 0, `0.1 + 0.2`, `1e21`, strings em que `Number` e `parseInt` discordam, limites de int64.
 - `urls()`, `emails()`, `paths()`, `json()` e `arrays()`: normalizações do parser WHATWG, endereços válidos que validadores rejeitam, Windows vs POSIX, travessia com `..`, JSON com 10000 níveis, buracos em arrays e mais.
 
-A tabela completa, caso a caso, está no [README em inglês](README.md#full-catalog) e no [catálogo pesquisável](https://kwy404.github.io/edgegoat/#catalog).
+A tabela completa, caso a caso, está no [README em inglês](https://github.com/kwy404/edgegoat/blob/main/README.md#full-catalog) e no [catálogo pesquisável](https://kwy404.github.io/edgegoat/#catalog).
 
 ```ts
 dates({ tags: ['dst'] });                         // só horário de verão
@@ -171,8 +171,8 @@ O site fica em **[kwy404.github.io/edgegoat](https://kwy404.github.io/edgegoat/)
 
 ## Como contribuir?
 
-Novos casos são bem-vindos quando já quebraram código real. Todo caso precisa de um `why` e, de preferência, de um link para um bug real. Veja o [CONTRIBUTING.md](CONTRIBUTING.md).
+Novos casos são bem-vindos quando já quebraram código real. Todo caso precisa de um `why` e, de preferência, de um link para um bug real. Veja o [CONTRIBUTING.md](https://github.com/kwy404/edgegoat/blob/main/CONTRIBUTING.md).
 
 ## Licença
 
-[MIT](LICENSE) © 2026 Alexandre Kohler.
+[MIT](https://github.com/kwy404/edgegoat/blob/main/LICENSE) © 2026 Alexandre Kohler.
