@@ -39,5 +39,10 @@ jobs:
       - run: npm test
       - name: node:test example
         run: npm run examples:node-test
+      - name: Generated docs are up to date
+        if: matrix.node == 22 && matrix.tz == ''
+        run: |
+          node scripts/build-docs.mjs
+          git diff --exit-code -- docs README.md README.pt-BR.md assets/catalog.svg
       - name: Package contents
         run: npm pack --dry-run

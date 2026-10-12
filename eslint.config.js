@@ -2,13 +2,14 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist/', 'node_modules/', 'coverage/', 'docs/'] },
+  { ignores: ["dist/", "node_modules/", "coverage/", "docs/"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
     languageOptions: {
       globals: {
         process: 'readonly',
+        Buffer: 'readonly',
         console: 'readonly',
         globalThis: 'readonly',
         URL: 'readonly',

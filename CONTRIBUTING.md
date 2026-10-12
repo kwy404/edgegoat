@@ -13,7 +13,7 @@ Thanks for helping. edgegoat is a curated list, so every case has to earn its pl
    - **ref** (optional, but strongly preferred): a link to a real bug, fix or spec section that shows the case matters.
 3. If the case makes a claim that can be checked (a parser accepts it, a method returns something surprising), add an assertion for it in `test/`.
 4. Run `npm test`, `npm run lint` and `npm run typecheck`.
-5. Regenerate the docs catalog with `npm run docs:catalog` so the site and the README counts stay in sync.
+5. Regenerate the docs catalog with `npm run docs` so the site and the README counts stay in sync.
 
 ## What makes a good case
 
