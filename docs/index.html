@@ -1,0 +1,1857 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>edgegoat: edge case test inputs for JavaScript (time zones, DST, unicode, -0)</title>
+<meta name="description" content="284 documented edge cases for JavaScript tests: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON. Works with Vitest, Jest and node:test.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="edgegoat: edge case test inputs for JavaScript (time zones, DST, unicode, -0)">
+<meta property="og:description" content="284 documented edge cases for JavaScript tests: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON. Works with Vitest, Jest and node:test.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="edgegoat: edge case test inputs for JavaScript (time zones, DST, unicode, -0)">
+<meta name="twitter:description" content="284 documented edge cases for JavaScript tests: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON. Works with Vitest, Jest and node:test.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "edgegoat",
+  "description": "Edge case test inputs for JavaScript and TypeScript: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON, ready for Vitest, Jest, node:test and Mocha.",
+  "url": "https://kwy404.github.io/edgegoat/",
+  "codeRepository": "https://github.com/kwy404/edgegoat",
+  "programmingLanguage": [
+    "TypeScript",
+    "JavaScript"
+  ],
+  "runtimePlatform": "Node.js 18+, modern browsers",
+  "license": "https://opensource.org/licenses/MIT",
+  "version": "0.1.0",
+  "keywords": "edge cases, edge case testing, javascript edge cases, test timezone javascript, timezone testing, time zones, daylight saving time, daylight saving time jest, dst, mock date, mock date jest, freeze time, dates before 1970, unicode test strings, naughty strings, surrogate pairs, emoji, negative zero, nan, number edge cases, bigint, property based testing, test data, test cases, test.each, jest, vitest, node test, mocha, typescript",
+  "author": {
+    "@type": "Person",
+    "name": "Alexandre Kohler",
+    "url": "https://github.com/kwy404"
+  },
+  "image": "https://kwy404.github.io/edgegoat/og.png"
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<section class="hero">
+  <img class="hero-mascot" src="assets/mascot.svg" width="168" height="168" alt="Ledge, the edgegoat mascot: a mountain goat standing on the edge of a cliff">
+  <div>
+    <h1>edgegoat: edge case test inputs for JavaScript</h1>
+    <p class="tagline">The inputs that break code, ready to drop into your tests.</p>
+    <p>284 curated, documented edge cases for <strong>time zones</strong>, <strong>daylight saving time</strong>, <strong>dates before 1970</strong>, <strong>unicode test strings</strong>, <strong>-0 and NaN</strong>, URLs, paths and JSON. Each one says why it breaks code. Works with Vitest, Jest, node:test and Mocha, in TypeScript or JavaScript, with zero dependencies.</p>
+    <p class="cta"><a class="button" href="#quick-start">Quick start</a> <a class="button ghost" href="https://github.com/kwy404/edgegoat">View on GitHub</a></p>
+  </div>
+</section>
+
+<section id="quick-start">
+  <h2>Quick start</h2>
+  <pre><code class="language-sh">npm install --save-dev edgegoat</code></pre>
+  <pre><code class="language-js">import { test, expect } from 'vitest';
+import { dates, withTimeZone } from 'edgegoat';
+
+test.each(dates({ tags: ['dst'] }))('$label', ({ value, zone }) =&gt; {
+  withTimeZone(zone, () =&gt; expect(addDays(value, 1).getHours()).toBe(value.getHours()));
+});</code></pre>
+  <p>Every generator returns an array of <code>{ label, value, why, tags }</code> objects, so it plugs straight into <code>test.each</code>. Filter with <code>{ tags: [...] }</code> or <code>{ exclude: [...] }</code>, pick zones with <code>dates({ zone: 'Europe/Berlin' })</code>.</p>
+</section>
+
+<section id="categories">
+  <h2>What is in the box</h2>
+  <ul class="grid">
+      <li><img src="assets/icons/dates.svg" width="40" height="40" alt="Calendar icon for date and daylight saving time edge cases"><div><strong>Dates</strong> <span class="count">46 cases</span><p>DST gaps and overlaps, New Year in 7 zones, leap days, before 1970, 2038, year 10000</p></div></li>
+      <li><img src="assets/icons/time-zones.svg" width="40" height="40" alt="Globe icon for time zone test cases"><div><strong>Time zones</strong> <span class="count">18 cases</span><p>Curated IANA zones: +05:45, +14:00, -11:00, 30 minute DST, midnight DST</p></div></li>
+      <li><img src="assets/icons/strings.svg" width="40" height="40" alt="Text icon for unicode test strings"><div><strong>Strings</strong> <span class="count">49 cases</span><p>Emoji, surrogate pairs, NFC vs NFD, bidi, invisible spaces, Turkish i, newlines</p></div></li>
+      <li><img src="assets/icons/numbers.svg" width="40" height="40" alt="Hash icon for JavaScript number edge cases like negative zero and NaN"><div><strong>Numbers</strong> <span class="count">51 cases</span><p>-0, NaN, Infinity, safe integer limits, 0.1 + 0.2, 1e21, numeric strings and BigInt</p></div></li>
+      <li><img src="assets/icons/urls.svg" width="40" height="40" alt="Link icon for URL and email edge cases"><div><strong>URLs and emails</strong> <span class="count">54 cases</span><p>WHATWG parser surprises, SSRF and open redirect shapes, RFC 5321 limits</p></div></li>
+      <li><img src="assets/icons/paths.svg" width="40" height="40" alt="Folder icon for Windows and POSIX file path edge cases"><div><strong>Paths</strong> <span class="count">30 cases</span><p>Windows vs POSIX, UNC, reserved names, traversal, NFD file names</p></div></li>
+      <li><img src="assets/icons/json.svg" width="40" height="40" alt="Curly braces icon for JSON parsing edge cases"><div><strong>JSON</strong> <span class="count">22 cases</span><p>10000 levels deep, duplicate keys, 2^53 + 1, __proto__, BOM</p></div></li>
+      <li><img src="assets/icons/arrays.svg" width="40" height="40" alt="Brackets icon for array edge cases with holes and huge lengths"><div><strong>Arrays</strong> <span class="count">14 cases</span><p>Holes, length 2^32 - 1, NaN membership, default sort, too big to spread</p></div></li>
+      <li><img src="assets/icons/helpers.svg" width="40" height="40" alt="Stopwatch icon for the time zone and frozen time test helpers"><div><strong>Helpers</strong> <span class="count">4 functions</span><p>withTimeZone, withFrozenTime, check, assertNoThrow</p></div></li>
+  </ul>
+</section>
+
+<section id="bugs">
+  <h2>Bugs these inputs found</h2>
+  <p>Real bugs of this kind, fixed upstream by the author of edgegoat in widely used projects. The library packages the inputs that exposed them.</p>
+  <ul class="bugs">
+    <li><a href="https://github.com/github/relative-time-element/pull/384">github/relative-time-element#384</a>: The &quot;is this the current year?&quot; check used UTC instead of the display time zone, so dates near New Year showed or hid the year incorrectly.</li>
+    <li><a href="https://github.com/mozilla/pdf.js/pull/22017">mozilla/pdf.js#22017</a>: util.printf dropped the sign of negative numbers greater than -1, such as -0.5.</li>
+    <li><a href="https://github.com/google/budoux/pull/1411">google/budoux#1411</a>: Text segmentation could split a surrogate pair, producing half an emoji.</li>
+    <li><a href="https://github.com/microsoft/vscode-js-debug/pull/2423">microsoft/vscode-js-debug#2423</a>: trimEnd style truncation could cut a surrogate pair in half.</li>
+    <li><a href="https://github.com/salesforce/tough-cookie/pull/644">salesforce/tough-cookie#644</a>: A cookie with an infinite max-age has to be treated as never expiring.</li>
+    <li><a href="https://github.com/vuejs/core/pull/15618">vuejs/core#15618</a>: A fix in the Vue 3 compat build.</li>
+  </ul>
+</section>
+
+<section id="catalog">
+  <h2>Search the catalog</h2>
+  <p>All 284 cases, generated from the published library. Also available as <a href="catalog.json">catalog.json</a>. Emoji and invisible characters are shown as escaped code points.</p>
+  <form class="filters" role="search" onsubmit="return false">
+    <label for="q">Search cases</label>
+    <input id="q" type="search" placeholder="Try dst, surrogate, -0, traversal" autocomplete="off">
+    <label for="gen">Generator</label>
+    <select id="gen"><option value="">All generators</option><option value="dates">dates() (46)</option><option value="timeZones">timeZones() (18)</option><option value="strings">strings() (49)</option><option value="numbers">numbers() (26)</option><option value="numericStrings">numericStrings() (17)</option><option value="bigints">bigints() (8)</option><option value="urls">urls() (28)</option><option value="emails">emails() (26)</option><option value="paths">paths() (30)</option><option value="json">json() (22)</option><option value="arrays">arrays() (14)</option></select>
+  </form>
+  <p id="status" class="status" aria-live="polite">Showing 284 of 284 cases.</p>
+  <ol id="cases" class="cases">
+<li class="case" data-generator="dates" data-search="dates unix epoch 1970-01-01t00:00:00.000z timestamp 0 is falsy, so `if (!time)` treats a valid date as missing, and west of utc it is still 1969 locally. epoch falsy 1970-01-01t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>unix epoch 1970-01-01T00:00:00.000Z</h3></div>
+  <code class="value">1970-01-01T00:00:00.000Z</code>
+  <p>Timestamp 0 is falsy, so `if (!time)` treats a valid date as missing, and west of UTC it is still 1969 locally.</p>
+  <div class="tags"><span class="tag">epoch</span><span class="tag">falsy</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates 1 ms before the epoch negative timestamps: `ms % 1000` is -1, not 999, so splitting seconds and milliseconds with % and math.floor disagree. epoch pre-1970 negative 1969-12-31t23:59:59.999z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>1 ms before the epoch</h3></div>
+  <code class="value">1969-12-31T23:59:59.999Z</code>
+  <p>Negative timestamps: `ms % 1000` is -1, not 999, so splitting seconds and milliseconds with % and Math.floor disagree.</p>
+  <div class="tags"><span class="tag">epoch</span><span class="tag">pre-1970</span><span class="tag">negative</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates before 1970 with fractional seconds (1969-12-31t23:59:58.500z) truncating -1.5 s toward zero gives 23:59:59 instead of 23:59:58; math.trunc vs math.floor and integer division bugs live here. pre-1970 fractional negative 1969-12-31t23:59:58.500z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>before 1970 with fractional seconds (1969-12-31T23:59:58.500Z)</h3></div>
+  <code class="value">1969-12-31T23:59:58.500Z</code>
+  <p>Truncating -1.5 s toward zero gives 23:59:59 instead of 23:59:58; Math.trunc vs Math.floor and integer division bugs live here.</p>
+  <div class="tags"><span class="tag">pre-1970</span><span class="tag">fractional</span><span class="tag">negative</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates moon landing 1969-07-20t20:17:40.123z negative timestamp with milliseconds: serializers that build &quot;seconds.millis&quot; from a negative value print a wrong or doubly negative fraction. pre-1970 fractional negative 1969-07-20t20:17:40.123z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>moon landing 1969-07-20T20:17:40.123Z</h3></div>
+  <code class="value">1969-07-20T20:17:40.123Z</code>
+  <p>Negative timestamp with milliseconds: serializers that build &quot;seconds.millis&quot; from a negative value print a wrong or doubly negative fraction.</p>
+  <div class="tags"><span class="tag">pre-1970</span><span class="tag">fractional</span><span class="tag">negative</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates local mean time era 1850-01-01t00:00:00z before standard time, zones used local mean time with second level offsets (sao paulo was -03:06:28); gettimezoneoffset() reports whole minutes, so local arithmetic drifts by seconds. pre-1970 lmt timezone 1850-01-01t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>local mean time era 1850-01-01T00:00:00Z</h3></div>
+  <code class="value">1850-01-01T00:00:00.000Z</code>
+  <p>Before standard time, zones used local mean time with second level offsets (Sao Paulo was -03:06:28); getTimezoneOffset() reports whole minutes, so local arithmetic drifts by seconds.</p>
+  <div class="tags"><span class="tag">pre-1970</span><span class="tag">lmt</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates year 0 (0000-01-01t00:00:00z) date.utc(0, 0, 1) and new date(0, 0, 1) map years 0 to 99 to 1900 to 1999, and toisostring() yields &quot;0000&quot;, which &quot;1 bc&quot; formatting must handle. far-past two-digit-year 0000-01-01t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>year 0 (0000-01-01T00:00:00Z)</h3></div>
+  <code class="value">0000-01-01T00:00:00.000Z</code>
+  <p>Date.UTC(0, 0, 1) and new Date(0, 0, 1) map years 0 to 99 to 1900 to 1999, and toISOString() yields &quot;0000&quot;, which &quot;1 BC&quot; formatting must handle.</p>
+  <div class="tags"><span class="tag">far-past</span><span class="tag">two-digit-year</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates negative year (-000001-01-01t00:00:00z) toisostring() produces an expanded, signed year &quot;-000001&quot;; regexes that expect four digits reject it. far-past iso-format -000001-01-01t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>negative year (-000001-01-01T00:00:00Z)</h3></div>
+  <code class="value">-000001-01-01T00:00:00.000Z</code>
+  <p>toISOString() produces an expanded, signed year &quot;-000001&quot;; regexes that expect four digits reject it.</p>
+  <div class="tags"><span class="tag">far-past</span><span class="tag">iso-format</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates year 2038 limit 2038-01-19t03:14:07z last second representable as a signed 32 bit unix time; anything that stores seconds in an int32 (or uses `| 0`) is fine here. y2038 2038-01-19t03:14:07.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>year 2038 limit 2038-01-19T03:14:07Z</h3></div>
+  <code class="value">2038-01-19T03:14:07.000Z</code>
+  <p>Last second representable as a signed 32 bit Unix time; anything that stores seconds in an int32 (or uses `| 0`) is fine here.</p>
+  <div class="tags"><span class="tag">y2038</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates year 2038 overflow 2038-01-19t03:14:08z one second past the int32 limit: `(ms / 1000) | 0` wraps to 1901-12-13, and so do 32 bit database columns. y2038 overflow 2038-01-19t03:14:08.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>year 2038 overflow 2038-01-19T03:14:08Z</h3></div>
+  <code class="value">2038-01-19T03:14:08.000Z</code>
+  <p>One second past the int32 limit: `(ms / 1000) | 0` wraps to 1901-12-13, and so do 32 bit database columns.</p>
+  <div class="tags"><span class="tag">y2038</span><span class="tag">overflow</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates last instant of year 9999 largest instant with a four digit year; one millisecond later toisostring() switches to &quot;+010000&quot;. far-future iso-format 9999-12-31t23:59:59.999z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>last instant of year 9999</h3></div>
+  <code class="value">9999-12-31T23:59:59.999Z</code>
+  <p>Largest instant with a four digit year; one millisecond later toISOString() switches to &quot;+010000&quot;.</p>
+  <div class="tags"><span class="tag">far-future</span><span class="tag">iso-format</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates year 10000 (+010000-01-01t00:00:00.000z) toisostring() returns a six digit signed year; parsers, databases and yyyy format strings break. far-future iso-format +010000-01-01t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>year 10000 (+010000-01-01T00:00:00.000Z)</h3></div>
+  <code class="value">+010000-01-01T00:00:00.000Z</code>
+  <p>toISOString() returns a six digit signed year; parsers, databases and YYYY format strings break.</p>
+  <div class="tags"><span class="tag">far-future</span><span class="tag">iso-format</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates maximum date (+275760-09-13t00:00:00.000z) largest valid date. adding 1 ms produces invalid date, so &quot;end of time&quot; sentinels overflow. far-future limit +275760-09-13t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>maximum Date (+275760-09-13T00:00:00.000Z)</h3></div>
+  <code class="value">+275760-09-13T00:00:00.000Z</code>
+  <p>Largest valid Date. Adding 1 ms produces Invalid Date, so &quot;end of time&quot; sentinels overflow.</p>
+  <div class="tags"><span class="tag">far-future</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates minimum date (-271821-04-20t00:00:00.000z) smallest valid date. subtracting anything produces invalid date, and local offsets west of utc push the local wall clock out of range. far-past limit -271821-04-20t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>minimum Date (-271821-04-20T00:00:00.000Z)</h3></div>
+  <code class="value">-271821-04-20T00:00:00.000Z</code>
+  <p>Smallest valid Date. Subtracting anything produces Invalid Date, and local offsets west of UTC push the local wall clock out of range.</p>
+  <div class="tags"><span class="tag">far-past</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates invalid date gettime() is nan, toisostring() throws rangeerror, json.stringify gives null and every comparison is false. invalid invalid date ">
+  <div class="case-head"><code class="gen">dates()</code><h3>invalid date</h3></div>
+  <code class="value">Invalid Date</code>
+  <p>getTime() is NaN, toISOString() throws RangeError, JSON.stringify gives null and every comparison is false.</p>
+  <div class="tags"><span class="tag">invalid</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates date-only string parsed as utc (new date(&quot;2026-03-01&quot;)) date-only iso strings are utc midnight, while date-time strings without z are local; west of utc this date displays as february 28. parsing timezone 2026-03-01t00:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>date-only string parsed as UTC (new Date(&quot;2026-03-01&quot;))</h3></div>
+  <code class="value">2026-03-01T00:00:00.000Z</code>
+  <p>Date-only ISO strings are UTC midnight, while date-time strings without Z are local; west of UTC this date displays as February 28.</p>
+  <div class="tags"><span class="tag">parsing</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates leap day 2024-02-29 adding a year with setfullyear(y + 1) lands on 2025-03-01 because feb 29 2025 does not exist; birthdays and anniversaries drift. leap arithmetic 2024-02-29t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>leap day 2024-02-29</h3></div>
+  <code class="value">2024-02-29T12:00:00.000Z</code>
+  <p>Adding a year with setFullYear(y + 1) lands on 2025-03-01 because Feb 29 2025 does not exist; birthdays and anniversaries drift.</p>
+  <div class="tags"><span class="tag">leap</span><span class="tag">arithmetic</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates leap day 2000-02-29 (400 year rule) 2000 is a leap year because it is divisible by 400, unlike 1900 and 2100; a &quot;divisible by 100 means not leap&quot; rule rejects it. leap 2000-02-29t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>leap day 2000-02-29 (400 year rule)</h3></div>
+  <code class="value">2000-02-29T12:00:00.000Z</code>
+  <p>2000 is a leap year because it is divisible by 400, unlike 1900 and 2100; a &quot;divisible by 100 means not leap&quot; rule rejects it.</p>
+  <div class="tags"><span class="tag">leap</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates not a leap year 2100-02-28 2100 is not a leap year; `year % 4 === 0` claims feb 29 2100 exists and the day after this is computed wrong. leap 2100-02-28t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>not a leap year 2100-02-28</h3></div>
+  <code class="value">2100-02-28T12:00:00.000Z</code>
+  <p>2100 is not a leap year; `year % 4 === 0` claims Feb 29 2100 exists and the day after this is computed wrong.</p>
+  <div class="tags"><span class="tag">leap</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates month end 2026-01-31 setmonth(month + 1) on january 31 overflows to march 3, because february 31 does not exist. month-end arithmetic 2026-01-31t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>month end 2026-01-31</h3></div>
+  <code class="value">2026-01-31T12:00:00.000Z</code>
+  <p>setMonth(month + 1) on January 31 overflows to March 3, because February 31 does not exist.</p>
+  <div class="tags"><span class="tag">month-end</span><span class="tag">arithmetic</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates month end 2026-03-31 adding one month to march 31 gives may 1, since april has 30 days; &quot;same day next month&quot; needs clamping. month-end arithmetic 2026-03-31t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>month end 2026-03-31</h3></div>
+  <code class="value">2026-03-31T12:00:00.000Z</code>
+  <p>Adding one month to March 31 gives May 1, since April has 30 days; &quot;same day next month&quot; needs clamping.</p>
+  <div class="tags"><span class="tag">month-end</span><span class="tag">arithmetic</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates last millisecond of 2026 (utc) range queries ending at 23:59:59 miss this millisecond; month index 11 plus one must roll over into the next year. month-end year-boundary 2026-12-31t23:59:59.999z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>last millisecond of 2026 (UTC)</h3></div>
+  <code class="value">2026-12-31T23:59:59.999Z</code>
+  <p>Range queries ending at 23:59:59 miss this millisecond; month index 11 plus one must roll over into the next year.</p>
+  <div class="tags"><span class="tag">month-end</span><span class="tag">year-boundary</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates 2027-01-01 is in iso week 53 of 2026 iso week years differ from calendar years: this friday belongs to week 53 of 2026, so `getfullyear()` plus week number is wrong. week 2027-01-01t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>2027-01-01 is in ISO week 53 of 2026</h3></div>
+  <code class="value">2027-01-01T12:00:00.000Z</code>
+  <p>ISO week years differ from calendar years: this Friday belongs to week 53 of 2026, so `getFullYear()` plus week number is wrong.</p>
+  <div class="tags"><span class="tag">week</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates 2024-12-30 is in iso week 1 of 2025 a monday in december that belongs to week 1 of the next iso year; &quot;yyyy-ww&quot; built from the calendar year shows 2024-01. week 2024-12-30t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>2024-12-30 is in ISO week 1 of 2025</h3></div>
+  <code class="value">2024-12-30T12:00:00.000Z</code>
+  <p>A Monday in December that belongs to week 1 of the next ISO year; &quot;yyyy-ww&quot; built from the calendar year shows 2024-01.</p>
+  <div class="tags"><span class="tag">week</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates 2023-01-01 is a sunday in iso week 52 of 2022 iso weeks start on monday, us weeks on sunday: this day is week 52 of 2022 in iso but week 1 of 2023 in us numbering. week 2023-01-01t12:00:00.000z ">
+  <div class="case-head"><code class="gen">dates()</code><h3>2023-01-01 is a Sunday in ISO week 52 of 2022</h3></div>
+  <code class="value">2023-01-01T12:00:00.000Z</code>
+  <p>ISO weeks start on Monday, US weeks on Sunday: this day is week 52 of 2022 in ISO but week 1 of 2023 in US numbering.</p>
+  <div class="tags"><span class="tag">week</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/new_york 2026: 1 ms before spring forward (2026-03-08 01:59 local) last instant before clocks jump from 02:00 to 03:00 (utc-05:00 to utc-04:00); adding 60 minutes of wall time here is not 60 minutes of real time. dst gap timezone 2026-03-08t06:59:59.999z america/new_york">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/New_York 2026: 1 ms before spring forward (2026-03-08 01:59 local)</h3></div>
+  <code class="value">2026-03-08T06:59:59.999Z</code>
+  <p>Last instant before clocks jump from 02:00 to 03:00 (UTC-05:00 to UTC-04:00); adding 60 minutes of wall time here is not 60 minutes of real time.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/new_york 2026: spring forward (2026-03-08 03:00 local) clocks jump from 02:00 to 03:00; local times in between do not exist, so building a date from local fields shifts it and that local day is 23 hours long. dst gap timezone 2026-03-08t07:00:00.000z america/new_york">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/New_York 2026: spring forward (2026-03-08 03:00 local)</h3></div>
+  <code class="value">2026-03-08T07:00:00.000Z</code>
+  <p>Clocks jump from 02:00 to 03:00; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23 hours long.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/new_york 2026: fall back, first 01:30 (2026-11-01) clocks fall back from 02:00 to 01:00, so 01:30 happens twice; this is the first one (utc-04:00). parsing the local time picks one of the two. dst overlap ambiguous timezone 2026-11-01t05:30:00.000z america/new_york">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/New_York 2026: fall back, first 01:30 (2026-11-01)</h3></div>
+  <code class="value">2026-11-01T05:30:00.000Z</code>
+  <p>Clocks fall back from 02:00 to 01:00, so 01:30 happens twice; this is the first one (UTC-04:00). Parsing the local time picks one of the two.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/new_york 2026: fall back, second 01:30 (2026-11-01) same wall clock reading as the first 01:30, 60 minutes later (utc-05:00); sorting or deduplicating by local time breaks and that local day is 25 hours long. dst overlap ambiguous timezone 2026-11-01t06:30:00.000z america/new_york">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/New_York 2026: fall back, second 01:30 (2026-11-01)</h3></div>
+  <code class="value">2026-11-01T06:30:00.000Z</code>
+  <p>Same wall clock reading as the first 01:30, 60 minutes later (UTC-05:00); sorting or deduplicating by local time breaks and that local day is 25 hours long.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/new_york: last instant of 2025 local time local time is 2025-12-31 23:59:59.999 (utc-05:00) but the utc year is already 2026; a year check with getutcfullyear() is off by one. year-boundary timezone 2026-01-01t04:59:59.999z america/new_york">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/New_York: last instant of 2025 local time</h3></div>
+  <code class="value">2026-01-01T04:59:59.999Z</code>
+  <p>Local time is 2025-12-31 23:59:59.999 (UTC-05:00) but the UTC year is already 2026; a year check with getUTCFullYear() is off by one. <a class="ref" href="https://github.com/github/relative-time-element/pull/384">real bug</a></p>
+  <div class="tags"><span class="tag">year-boundary</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/sao_paulo 2018: fall back, first 23:30 (2018-02-17) clocks fall back from 00:00 to 23:00, so 23:30 happens twice; this is the first one (utc-02:00). parsing the local time picks one of the two. dst overlap ambiguous timezone 2018-02-18t01:30:00.000z america/sao_paulo">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/Sao_Paulo 2018: fall back, first 23:30 (2018-02-17)</h3></div>
+  <code class="value">2018-02-18T01:30:00.000Z</code>
+  <p>Clocks fall back from 00:00 to 23:00, so 23:30 happens twice; this is the first one (UTC-02:00). Parsing the local time picks one of the two.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/sao_paulo 2018: fall back, second 23:30 (2018-02-17) same wall clock reading as the first 23:30, 60 minutes later (utc-03:00); sorting or deduplicating by local time breaks and that local day is 25 hours long. dst overlap ambiguous timezone 2018-02-18t02:30:00.000z america/sao_paulo">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/Sao_Paulo 2018: fall back, second 23:30 (2018-02-17)</h3></div>
+  <code class="value">2018-02-18T02:30:00.000Z</code>
+  <p>Same wall clock reading as the first 23:30, 60 minutes later (UTC-03:00); sorting or deduplicating by local time breaks and that local day is 25 hours long.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/sao_paulo 2018: 1 ms before spring forward (2018-11-03 23:59 local) last instant before clocks jump from 00:00 to 01:00 (utc-03:00 to utc-02:00); adding 60 minutes of wall time here is not 60 minutes of real time. dst gap timezone 2018-11-04t02:59:59.999z america/sao_paulo">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/Sao_Paulo 2018: 1 ms before spring forward (2018-11-03 23:59 local)</h3></div>
+  <code class="value">2018-11-04T02:59:59.999Z</code>
+  <p>Last instant before clocks jump from 00:00 to 01:00 (UTC-03:00 to UTC-02:00); adding 60 minutes of wall time here is not 60 minutes of real time.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/sao_paulo 2018: spring forward (2018-11-04 01:00 local) clocks jump from 00:00 to 01:00; local times in between do not exist, so building a date from local fields shifts it and that local day is 23 hours long. midnight does not exist that day, so new date(2018, 10, 4) returns 01:00. dst gap timezone 2018-11-04t03:00:00.000z america/sao_paulo">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/Sao_Paulo 2018: spring forward (2018-11-04 01:00 local)</h3></div>
+  <code class="value">2018-11-04T03:00:00.000Z</code>
+  <p>Clocks jump from 00:00 to 01:00; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23 hours long. Midnight does not exist that day, so new Date(2018, 10, 4) returns 01:00.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates america/sao_paulo: last instant of 2017 local time local time is 2017-12-31 23:59:59.999 (utc-02:00) but the utc year is already 2018; a year check with getutcfullyear() is off by one. year-boundary timezone 2018-01-01t01:59:59.999z america/sao_paulo">
+  <div class="case-head"><code class="gen">dates()</code><h3>America/Sao_Paulo: last instant of 2017 local time</h3></div>
+  <code class="value">2018-01-01T01:59:59.999Z</code>
+  <p>Local time is 2017-12-31 23:59:59.999 (UTC-02:00) but the UTC year is already 2018; a year check with getUTCFullYear() is off by one. <a class="ref" href="https://github.com/github/relative-time-element/pull/384">real bug</a></p>
+  <div class="tags"><span class="tag">year-boundary</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates europe/london 2026: 1 ms before spring forward (2026-03-29 00:59 local) last instant before clocks jump from 01:00 to 02:00 (utc+00:00 to utc+01:00); adding 60 minutes of wall time here is not 60 minutes of real time. dst gap timezone 2026-03-29t00:59:59.999z europe/london">
+  <div class="case-head"><code class="gen">dates()</code><h3>Europe/London 2026: 1 ms before spring forward (2026-03-29 00:59 local)</h3></div>
+  <code class="value">2026-03-29T00:59:59.999Z</code>
+  <p>Last instant before clocks jump from 01:00 to 02:00 (UTC+00:00 to UTC+01:00); adding 60 minutes of wall time here is not 60 minutes of real time.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates europe/london 2026: spring forward (2026-03-29 02:00 local) clocks jump from 01:00 to 02:00; local times in between do not exist, so building a date from local fields shifts it and that local day is 23 hours long. dst gap timezone 2026-03-29t01:00:00.000z europe/london">
+  <div class="case-head"><code class="gen">dates()</code><h3>Europe/London 2026: spring forward (2026-03-29 02:00 local)</h3></div>
+  <code class="value">2026-03-29T01:00:00.000Z</code>
+  <p>Clocks jump from 01:00 to 02:00; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23 hours long.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates europe/london 2026: fall back, first 01:30 (2026-10-25) clocks fall back from 02:00 to 01:00, so 01:30 happens twice; this is the first one (utc+01:00). parsing the local time picks one of the two. dst overlap ambiguous timezone 2026-10-25t00:30:00.000z europe/london">
+  <div class="case-head"><code class="gen">dates()</code><h3>Europe/London 2026: fall back, first 01:30 (2026-10-25)</h3></div>
+  <code class="value">2026-10-25T00:30:00.000Z</code>
+  <p>Clocks fall back from 02:00 to 01:00, so 01:30 happens twice; this is the first one (UTC+01:00). Parsing the local time picks one of the two.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates europe/london 2026: fall back, second 01:30 (2026-10-25) same wall clock reading as the first 01:30, 60 minutes later (utc+00:00); sorting or deduplicating by local time breaks and that local day is 25 hours long. dst overlap ambiguous timezone 2026-10-25t01:30:00.000z europe/london">
+  <div class="case-head"><code class="gen">dates()</code><h3>Europe/London 2026: fall back, second 01:30 (2026-10-25)</h3></div>
+  <code class="value">2026-10-25T01:30:00.000Z</code>
+  <p>Same wall clock reading as the first 01:30, 60 minutes later (UTC+00:00); sorting or deduplicating by local time breaks and that local day is 25 hours long.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates australia/lord_howe 2026: fall back, first 01:45 (2026-04-05) clocks fall back from 02:00 to 01:30, so 01:45 happens twice; this is the first one (utc+11:00). parsing the local time picks one of the two. dst overlap ambiguous timezone unusual-dst 2026-04-04t14:45:00.000z australia/lord_howe">
+  <div class="case-head"><code class="gen">dates()</code><h3>Australia/Lord_Howe 2026: fall back, first 01:45 (2026-04-05)</h3></div>
+  <code class="value">2026-04-04T14:45:00.000Z</code>
+  <p>Clocks fall back from 02:00 to 01:30, so 01:45 happens twice; this is the first one (UTC+11:00). Parsing the local time picks one of the two.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span><span class="tag">unusual-dst</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates australia/lord_howe 2026: fall back, second 01:45 (2026-04-05) same wall clock reading as the first 01:45, 30 minutes later (utc+10:30); sorting or deduplicating by local time breaks and that local day is 24.5 hours long. dst overlap ambiguous timezone unusual-dst 2026-04-04t15:15:00.000z australia/lord_howe">
+  <div class="case-head"><code class="gen">dates()</code><h3>Australia/Lord_Howe 2026: fall back, second 01:45 (2026-04-05)</h3></div>
+  <code class="value">2026-04-04T15:15:00.000Z</code>
+  <p>Same wall clock reading as the first 01:45, 30 minutes later (UTC+10:30); sorting or deduplicating by local time breaks and that local day is 24.5 hours long.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">overlap</span><span class="tag">ambiguous</span><span class="tag">timezone</span><span class="tag">unusual-dst</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates australia/lord_howe 2026: 1 ms before spring forward (2026-10-04 01:59 local) last instant before clocks jump from 02:00 to 02:30 (utc+10:30 to utc+11:00); adding 30 minutes of wall time here is not 30 minutes of real time. dst gap timezone unusual-dst 2026-10-03t15:29:59.999z australia/lord_howe">
+  <div class="case-head"><code class="gen">dates()</code><h3>Australia/Lord_Howe 2026: 1 ms before spring forward (2026-10-04 01:59 local)</h3></div>
+  <code class="value">2026-10-03T15:29:59.999Z</code>
+  <p>Last instant before clocks jump from 02:00 to 02:30 (UTC+10:30 to UTC+11:00); adding 30 minutes of wall time here is not 30 minutes of real time.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span><span class="tag">unusual-dst</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates australia/lord_howe 2026: spring forward (2026-10-04 02:30 local) clocks jump from 02:00 to 02:30; local times in between do not exist, so building a date from local fields shifts it and that local day is 23.5 hours long. dst gap timezone unusual-dst 2026-10-03t15:30:00.000z australia/lord_howe">
+  <div class="case-head"><code class="gen">dates()</code><h3>Australia/Lord_Howe 2026: spring forward (2026-10-04 02:30 local)</h3></div>
+  <code class="value">2026-10-03T15:30:00.000Z</code>
+  <p>Clocks jump from 02:00 to 02:30; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23.5 hours long.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">gap</span><span class="tag">timezone</span><span class="tag">unusual-dst</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates australia/lord_howe: first instant of 2026 local time local time is 2026-01-01 00:00 (utc+11:00) but the utc year is still 2025; a year check with getutcfullyear() is off by one. year-boundary timezone 2025-12-31t13:00:00.000z australia/lord_howe">
+  <div class="case-head"><code class="gen">dates()</code><h3>Australia/Lord_Howe: first instant of 2026 local time</h3></div>
+  <code class="value">2025-12-31T13:00:00.000Z</code>
+  <p>Local time is 2026-01-01 00:00 (UTC+11:00) but the UTC year is still 2025; a year check with getUTCFullYear() is off by one. <a class="ref" href="https://github.com/github/relative-time-element/pull/384">real bug</a></p>
+  <div class="tags"><span class="tag">year-boundary</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates asia/kathmandu: first instant of 2026 local time local time is 2026-01-01 00:00 (utc+05:45) but the utc year is still 2025; a year check with getutcfullyear() is off by one. year-boundary timezone fractional-offset 2025-12-31t18:15:00.000z asia/kathmandu">
+  <div class="case-head"><code class="gen">dates()</code><h3>Asia/Kathmandu: first instant of 2026 local time</h3></div>
+  <code class="value">2025-12-31T18:15:00.000Z</code>
+  <p>Local time is 2026-01-01 00:00 (UTC+05:45) but the UTC year is still 2025; a year check with getUTCFullYear() is off by one. <a class="ref" href="https://github.com/github/relative-time-element/pull/384">real bug</a></p>
+  <div class="tags"><span class="tag">year-boundary</span><span class="tag">timezone</span><span class="tag">fractional-offset</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates pacific/kiritimati: first instant of 2026 local time local time is 2026-01-01 00:00 (utc+14:00) but the utc year is still 2025; a year check with getutcfullyear() is off by one. this zone is among the first places on earth to enter the new year. year-boundary timezone 2025-12-31t10:00:00.000z pacific/kiritimati">
+  <div class="case-head"><code class="gen">dates()</code><h3>Pacific/Kiritimati: first instant of 2026 local time</h3></div>
+  <code class="value">2025-12-31T10:00:00.000Z</code>
+  <p>Local time is 2026-01-01 00:00 (UTC+14:00) but the UTC year is still 2025; a year check with getUTCFullYear() is off by one. This zone is among the first places on Earth to enter the new year. <a class="ref" href="https://github.com/github/relative-time-element/pull/384">real bug</a></p>
+  <div class="tags"><span class="tag">year-boundary</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="dates" data-search="dates pacific/pago_pago: last instant of 2025 local time local time is 2025-12-31 23:59:59.999 (utc-11:00) but the utc year is already 2026; a year check with getutcfullyear() is off by one. this zone is among the last places on earth to leave the old year. year-boundary timezone 2026-01-01t10:59:59.999z pacific/pago_pago">
+  <div class="case-head"><code class="gen">dates()</code><h3>Pacific/Pago_Pago: last instant of 2025 local time</h3></div>
+  <code class="value">2026-01-01T10:59:59.999Z</code>
+  <p>Local time is 2025-12-31 23:59:59.999 (UTC-11:00) but the UTC year is already 2026; a year check with getUTCFullYear() is off by one. This zone is among the last places on Earth to leave the old year. <a class="ref" href="https://github.com/github/relative-time-element/pull/384">real bug</a></p>
+  <div class="tags"><span class="tag">year-boundary</span><span class="tag">timezone</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones utc the control zone: offset 0 all year. bugs that only show up away from utc hide here, which is why ci should not run only in utc. utc control &quot;utc&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>UTC</h3></div>
+  <code class="value">&quot;UTC&quot;</code>
+  <p>The control zone: offset 0 all year. Bugs that only show up away from UTC hide here, which is why CI should not run only in UTC.</p>
+  <div class="tags"><span class="tag">utc</span><span class="tag">control</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones america/new_york utc-05:00 with us dst rules: the classic negative offset where utc midnight is the previous local day. negative dst &quot;america/new_york&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>America/New_York</h3></div>
+  <code class="value">&quot;America/New_York&quot;</code>
+  <p>UTC-05:00 with US DST rules: the classic negative offset where UTC midnight is the previous local day.</p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">dst</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones america/los_angeles utc-08:00: late enough that evening events land on the next utc day. negative dst &quot;america/los_angeles&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>America/Los_Angeles</h3></div>
+  <code class="value">&quot;America/Los_Angeles&quot;</code>
+  <p>UTC-08:00: late enough that evening events land on the next UTC day.</p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">dst</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones america/sao_paulo utc-03:00; used dst with midnight transitions until 2019, so historical dates have days without 00:00. negative historical-dst midnight-dst &quot;america/sao_paulo&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>America/Sao_Paulo</h3></div>
+  <code class="value">&quot;America/Sao_Paulo&quot;</code>
+  <p>UTC-03:00; used DST with midnight transitions until 2019, so historical dates have days without 00:00.</p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">historical-dst</span><span class="tag">midnight-dst</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones america/st_johns utc-03:30: a half hour offset with dst in the americas; code that assumes whole hours breaks. negative fractional-offset dst &quot;america/st_johns&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>America/St_Johns</h3></div>
+  <code class="value">&quot;America/St_Johns&quot;</code>
+  <p>UTC-03:30: a half hour offset with DST in the Americas; code that assumes whole hours breaks.</p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">fractional-offset</span><span class="tag">dst</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones europe/london utc+00:00 in winter but +01:00 in summer: tests that pass in january fail in july. dst zero-offset &quot;europe/london&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Europe/London</h3></div>
+  <code class="value">&quot;Europe/London&quot;</code>
+  <p>UTC+00:00 in winter but +01:00 in summer: tests that pass in January fail in July.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">zero-offset</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones europe/dublin the tz database models irish time with a negative dst save (standard time in summer), which trips code that reads the isdst flag of tz libraries. dst zero-offset &quot;europe/dublin&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Europe/Dublin</h3></div>
+  <code class="value">&quot;Europe/Dublin&quot;</code>
+  <p>The tz database models Irish time with a negative DST save (standard time in summer), which trips code that reads the isDST flag of tz libraries.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">zero-offset</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones africa/casablanca utc+01:00 that drops to +00:00 during ramadan each year, so transitions move with the lunar calendar. dst irregular &quot;africa/casablanca&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Africa/Casablanca</h3></div>
+  <code class="value">&quot;Africa/Casablanca&quot;</code>
+  <p>UTC+01:00 that drops to +00:00 during Ramadan each year, so transitions move with the lunar calendar.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">irregular</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones asia/kolkata utc+05:30, no dst: the most populous half hour offset. positive fractional-offset &quot;asia/kolkata&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Asia/Kolkata</h3></div>
+  <code class="value">&quot;Asia/Kolkata&quot;</code>
+  <p>UTC+05:30, no DST: the most populous half hour offset.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">fractional-offset</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones asia/kathmandu utc+05:45: a quarter hour offset that breaks `offset / 60` rounding and hour only offset pickers. positive fractional-offset &quot;asia/kathmandu&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Asia/Kathmandu</h3></div>
+  <code class="value">&quot;Asia/Kathmandu&quot;</code>
+  <p>UTC+05:45: a quarter hour offset that breaks `offset / 60` rounding and hour only offset pickers.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">fractional-offset</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones asia/tehran utc+03:30; abolished dst in 2022, so historical and current rules differ. positive fractional-offset historical-dst &quot;asia/tehran&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Asia/Tehran</h3></div>
+  <code class="value">&quot;Asia/Tehran&quot;</code>
+  <p>UTC+03:30; abolished DST in 2022, so historical and current rules differ.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">fractional-offset</span><span class="tag">historical-dst</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones australia/adelaide utc+09:30 / +10:30: southern hemisphere dst plus a half hour offset. positive fractional-offset dst southern &quot;australia/adelaide&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Australia/Adelaide</h3></div>
+  <code class="value">&quot;Australia/Adelaide&quot;</code>
+  <p>UTC+09:30 / +10:30: southern hemisphere DST plus a half hour offset.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">fractional-offset</span><span class="tag">dst</span><span class="tag">southern</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones australia/lord_howe utc+10:30 / +11:00: dst shifts by only 30 minutes, so &quot;dst adds one hour&quot; is false. positive fractional-offset dst unusual-dst southern &quot;australia/lord_howe&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Australia/Lord_Howe</h3></div>
+  <code class="value">&quot;Australia/Lord_Howe&quot;</code>
+  <p>UTC+10:30 / +11:00: DST shifts by only 30 minutes, so &quot;DST adds one hour&quot; is false.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">fractional-offset</span><span class="tag">dst</span><span class="tag">unusual-dst</span><span class="tag">southern</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones pacific/chatham utc+12:45 / +13:45: quarter hour offset with dst, far east of the date line. positive fractional-offset dst southern &quot;pacific/chatham&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Pacific/Chatham</h3></div>
+  <code class="value">&quot;Pacific/Chatham&quot;</code>
+  <p>UTC+12:45 / +13:45: quarter hour offset with DST, far east of the date line.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">fractional-offset</span><span class="tag">dst</span><span class="tag">southern</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones pacific/kiritimati utc+14:00, the largest offset: local dates are a full day ahead of most of the americas and the first to reach new year. positive extreme &quot;pacific/kiritimati&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Pacific/Kiritimati</h3></div>
+  <code class="value">&quot;Pacific/Kiritimati&quot;</code>
+  <p>UTC+14:00, the largest offset: local dates are a full day ahead of most of the Americas and the first to reach New Year.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">extreme</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones pacific/apia samoa skipped 2011-12-30 entirely when it moved across the date line; day counting across that date is off by one. positive historical skipped-day &quot;pacific/apia&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Pacific/Apia</h3></div>
+  <code class="value">&quot;Pacific/Apia&quot;</code>
+  <p>Samoa skipped 2011-12-30 entirely when it moved across the date line; day counting across that date is off by one.</p>
+  <div class="tags"><span class="tag">positive</span><span class="tag">historical</span><span class="tag">skipped-day</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones pacific/pago_pago utc-11:00, among the last places to leave a year; local dates lag a day behind most of asia. negative extreme &quot;pacific/pago_pago&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Pacific/Pago_Pago</h3></div>
+  <code class="value">&quot;Pacific/Pago_Pago&quot;</code>
+  <p>UTC-11:00, among the last places to leave a year; local dates lag a day behind most of Asia.</p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">extreme</span></div>
+</li>
+<li class="case" data-generator="timeZones" data-search="timezones antarctica/troll utc+00:00 in winter and +02:00 in summer: a two hour dst jump. dst unusual-dst &quot;antarctica/troll&quot; ">
+  <div class="case-head"><code class="gen">timeZones()</code><h3>Antarctica/Troll</h3></div>
+  <code class="value">&quot;Antarctica/Troll&quot;</code>
+  <p>UTC+00:00 in winter and +02:00 in summer: a two hour DST jump.</p>
+  <div class="tags"><span class="tag">dst</span><span class="tag">unusual-dst</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings empty string falsy, length 0: `if (!name)` and `str[0].touppercase()` both misbehave. empty falsy &quot;&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>empty string</h3></div>
+  <code class="value">&quot;&quot;</code>
+  <p>Falsy, length 0: `if (!name)` and `str[0].toUpperCase()` both misbehave.</p>
+  <div class="tags"><span class="tag">empty</span><span class="tag">falsy</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings single space truthy but blank: passes `if (str)` checks and fails after trim(). whitespace blank &quot; &quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>single space</h3></div>
+  <code class="value">&quot; &quot;</code>
+  <p>Truthy but blank: passes `if (str)` checks and fails after trim().</p>
+  <div class="tags"><span class="tag">whitespace</span><span class="tag">blank</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings mixed ascii whitespace every ascii whitespace character; trim() returns an empty string but `str.length &gt; 0` validators accept it. whitespace blank &quot; \t\n\r\u000b\u000c &quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>mixed ASCII whitespace</h3></div>
+  <code class="value">&quot; \t\n\r\u000B\u000C &quot;</code>
+  <p>Every ASCII whitespace character; trim() returns an empty string but `str.length &gt; 0` validators accept it.</p>
+  <div class="tags"><span class="tag">whitespace</span><span class="tag">blank</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings no-break space (u+00a0) arrives from html &amp;nbsp; and copy paste; \s and trim() treat it as whitespace but split(&quot; &quot;) and many tokenizers do not. whitespace invisible &quot;a\u00a0b&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>no-break space (U+00A0)</h3></div>
+  <code class="value">&quot;a\u00A0b&quot;</code>
+  <p>Arrives from HTML &amp;nbsp; and copy paste; \s and trim() treat it as whitespace but split(&quot; &quot;) and many tokenizers do not.</p>
+  <div class="tags"><span class="tag">whitespace</span><span class="tag">invisible</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings ideographic space (u+3000) full width space used in cjk text; trim() removes it, byte based or ascii only trimming does not. whitespace cjk &quot;\u3000\u65e5\u672c\u3000&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>ideographic space (U+3000)</h3></div>
+  <code class="value">&quot;\u3000\u65E5\u672C\u3000&quot;</code>
+  <p>Full width space used in CJK text; trim() removes it, byte based or ASCII only trimming does not.</p>
+  <div class="tags"><span class="tag">whitespace</span><span class="tag">cjk</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings zero width space (u+200b) invisible and not whitespace for trim() or \s, so it looks identical to &quot;foobar&quot; but is not equal to it. invisible zero-width &quot;foo\u200bbar&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>zero width space (U+200B)</h3></div>
+  <code class="value">&quot;foo\u200Bbar&quot;</code>
+  <p>Invisible and not whitespace for trim() or \s, so it looks identical to &quot;foobar&quot; but is not equal to it.</p>
+  <div class="tags"><span class="tag">invisible</span><span class="tag">zero-width</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings byte order mark prefix (u+feff) left by windows editors at the start of files: csv headers become &quot;\ufeffid&quot; and json.parse of bom prefixed text throws. invisible bom &quot;\ufeffid&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>byte order mark prefix (U+FEFF)</h3></div>
+  <code class="value">&quot;\uFEFFid&quot;</code>
+  <p>Left by Windows editors at the start of files: CSV headers become &quot;\uFEFFid&quot; and JSON.parse of BOM prefixed text throws.</p>
+  <div class="tags"><span class="tag">invisible</span><span class="tag">bom</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings soft hyphen (u+00ad) invisible unless a line breaks there, so search and equality fail on text that looks the same. invisible &quot;co\u00adoperate&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>soft hyphen (U+00AD)</h3></div>
+  <code class="value">&quot;co\u00ADoperate&quot;</code>
+  <p>Invisible unless a line breaks there, so search and equality fail on text that looks the same.</p>
+  <div class="tags"><span class="tag">invisible</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings very long string (100000 chars) exceeds column and header limits, overflows layouts and exposes quadratic algorithms and backtracking regexes. long &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...&quot; (100000 chars) ">
+  <div class="case-head"><code class="gen">strings()</code><h3>very long string (100000 chars)</h3></div>
+  <code class="value">&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...&quot; (100000 chars)</code>
+  <p>Exceeds column and header limits, overflows layouts and exposes quadratic algorithms and backtracking regexes.</p>
+  <div class="tags"><span class="tag">long</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings emoji outside the bmp (u+1f600) one visible character but length 2 (a surrogate pair); charat(0) and str[0] return half of it. emoji surrogate grapheme &quot;\u{1f600}&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>emoji outside the BMP (U+1F600)</h3></div>
+  <code class="value">&quot;\u{1F600}&quot;</code>
+  <p>One visible character but length 2 (a surrogate pair); charAt(0) and str[0] return half of it.</p>
+  <div class="tags"><span class="tag">emoji</span><span class="tag">surrogate</span><span class="tag">grapheme</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings zwj family emoji (man, woman, girl, boy) seven code points joined by zero width joiners render as one glyph with length 11; splitting by code point shows four people. emoji zwj grapheme surrogate &quot;\u{1f468}\u200d\u{1f469}\u200d\u{1f467}\u200d\u{1f466}&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>ZWJ family emoji (man, woman, girl, boy)</h3></div>
+  <code class="value">&quot;\u{1F468}\u200D\u{1F469}\u200D\u{1F467}\u200D\u{1F466}&quot;</code>
+  <p>Seven code points joined by zero width joiners render as one glyph with length 11; splitting by code point shows four people.</p>
+  <div class="tags"><span class="tag">emoji</span><span class="tag">zwj</span><span class="tag">grapheme</span><span class="tag">surrogate</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings flag emoji (regional indicators b and r) a flag is two regional indicator letters; cutting between them leaves letters and reversing them names another country or none. emoji grapheme surrogate &quot;\u{1f1e7}\u{1f1f7}&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>flag emoji (regional indicators B and R)</h3></div>
+  <code class="value">&quot;\u{1F1E7}\u{1F1F7}&quot;</code>
+  <p>A flag is two regional indicator letters; cutting between them leaves letters and reversing them names another country or none.</p>
+  <div class="tags"><span class="tag">emoji</span><span class="tag">grapheme</span><span class="tag">surrogate</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings skin tone modifier (thumbs up, medium) base emoji plus a modifier: one grapheme, two code points, four code units; truncating after the base drops the tone. emoji grapheme surrogate &quot;\u{1f44d}\u{1f3fd}&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>skin tone modifier (thumbs up, medium)</h3></div>
+  <code class="value">&quot;\u{1F44D}\u{1F3FD}&quot;</code>
+  <p>Base emoji plus a modifier: one grapheme, two code points, four code units; truncating after the base drops the tone.</p>
+  <div class="tags"><span class="tag">emoji</span><span class="tag">grapheme</span><span class="tag">surrogate</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings emoji with variation selector (red heart) u+2764 plus u+fe0f: removing &quot;invisible&quot; characters changes emoji presentation, and the base alone is in the bmp. emoji variation-selector grapheme &quot;\u2764\ufe0f&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>emoji with variation selector (red heart)</h3></div>
+  <code class="value">&quot;\u2764\uFE0F&quot;</code>
+  <p>U+2764 plus U+FE0F: removing &quot;invisible&quot; characters changes emoji presentation, and the base alone is in the BMP.</p>
+  <div class="tags"><span class="tag">emoji</span><span class="tag">variation-selector</span><span class="tag">grapheme</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings keycap sequence (digit one) starts with an ascii digit, so /^\d/ matches what renders as a single keycap symbol. emoji grapheme digits &quot;1\ufe0f\u20e3&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>keycap sequence (digit one)</h3></div>
+  <code class="value">&quot;1\uFE0F\u20E3&quot;</code>
+  <p>Starts with an ASCII digit, so /^\d/ matches what renders as a single keycap symbol.</p>
+  <div class="tags"><span class="tag">emoji</span><span class="tag">grapheme</span><span class="tag">digits</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings surrogate pair cut by slice(0, 10) the emoji starts at index 9, so slice(0, 10) keeps only its high surrogate and produces malformed utf-16. surrogate truncation emoji &quot;abcdefghi\u{1f600}&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>surrogate pair cut by slice(0, 10)</h3></div>
+  <code class="value">&quot;abcdefghi\u{1F600}&quot;</code>
+  <p>The emoji starts at index 9, so slice(0, 10) keeps only its high surrogate and produces malformed UTF-16. <a class="ref" href="https://github.com/google/budoux/pull/1411">real bug</a></p>
+  <div class="tags"><span class="tag">surrogate</span><span class="tag">truncation</span><span class="tag">emoji</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings surrogate pair at the end for trimend style truncation truncating &quot;to n code units&quot; from the end lands inside the pair; output ends in a lone surrogate that renders as u+fffd. surrogate truncation emoji &quot;done \u{1f389}&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>surrogate pair at the end for trimEnd style truncation</h3></div>
+  <code class="value">&quot;Done \u{1F389}&quot;</code>
+  <p>Truncating &quot;to N code units&quot; from the end lands inside the pair; output ends in a lone surrogate that renders as U+FFFD. <a class="ref" href="https://github.com/microsoft/vscode-js-debug/pull/2423">real bug</a></p>
+  <div class="tags"><span class="tag">surrogate</span><span class="tag">truncation</span><span class="tag">emoji</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings lone high surrogate malformed utf-16: encodeuricomponent throws urierror, textencoder writes u+fffd and iswellformed() is false. surrogate malformed &quot;a\ud83db&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>lone high surrogate</h3></div>
+  <code class="value">&quot;a\uD83Db&quot;</code>
+  <p>Malformed UTF-16: encodeURIComponent throws URIError, TextEncoder writes U+FFFD and isWellFormed() is false.</p>
+  <div class="tags"><span class="tag">surrogate</span><span class="tag">malformed</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings lone low surrogate a trailing surrogate with no lead: string comparison works but encoding, hashing and json round trips through utf-8 change it. surrogate malformed &quot;\ude00&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>lone low surrogate</h3></div>
+  <code class="value">&quot;\uDE00&quot;</code>
+  <p>A trailing surrogate with no lead: string comparison works but encoding, hashing and JSON round trips through UTF-8 change it.</p>
+  <div class="tags"><span class="tag">surrogate</span><span class="tag">malformed</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings precomposed e acute (nfc) length 4. compare with the decomposed form: same rendering, different code points. normalization combining &quot;caf\u00e9&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>precomposed e acute (NFC)</h3></div>
+  <code class="value">&quot;caf\u00E9&quot;</code>
+  <p>Length 4. Compare with the decomposed form: same rendering, different code points.</p>
+  <div class="tags"><span class="tag">normalization</span><span class="tag">combining</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings decomposed e acute (nfd) length 5 and !== the nfc form; macos file names and some keyboards produce this form. use normalize() before comparing. normalization combining &quot;cafe\u0301&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>decomposed e acute (NFD)</h3></div>
+  <code class="value">&quot;cafe\u0301&quot;</code>
+  <p>Length 5 and !== the NFC form; macOS file names and some keyboards produce this form. Use normalize() before comparing.</p>
+  <div class="tags"><span class="tag">normalization</span><span class="tag">combining</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings stacked combining marks one base letter with ten combining marks: one grapheme, eleven code units, and rendering that escapes its line box. combining grapheme &quot;z\u0351\u036b\u0343\u036a\u0302\u036b\u033d\u034f\u0334\u0319&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>stacked combining marks</h3></div>
+  <code class="value">&quot;Z\u0351\u036B\u0343\u036A\u0302\u036B\u033D\u034F\u0334\u0319&quot;</code>
+  <p>One base letter with ten combining marks: one grapheme, eleven code units, and rendering that escapes its line box.</p>
+  <div class="tags"><span class="tag">combining</span><span class="tag">grapheme</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings leading combining mark a combining mark with nothing to attach to; it combines with whatever precedes the string after concatenation. combining &quot;\u0301abc&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>leading combining mark</h3></div>
+  <code class="value">&quot;\u0301abc&quot;</code>
+  <p>A combining mark with nothing to attach to; it combines with whatever precedes the string after concatenation.</p>
+  <div class="tags"><span class="tag">combining</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings hangul syllables (precomposed) korean syllable blocks. nfd splits each into two or three jamo, so lengths change after normalization. script normalization cjk &quot;\ud55c\uad6d\uc5b4&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>Hangul syllables (precomposed)</h3></div>
+  <code class="value">&quot;\uD55C\uAD6D\uC5B4&quot;</code>
+  <p>Korean syllable blocks. NFD splits each into two or three jamo, so lengths change after normalization.</p>
+  <div class="tags"><span class="tag">script</span><span class="tag">normalization</span><span class="tag">cjk</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings hangul jamo (decomposed) three jamo that render as one syllable and equal the first syllable of the previous case only after nfc normalization. script normalization combining &quot;\u1112\u1161\u11ab&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>Hangul jamo (decomposed)</h3></div>
+  <code class="value">&quot;\u1112\u1161\u11AB&quot;</code>
+  <p>Three jamo that render as one syllable and equal the first syllable of the previous case only after NFC normalization.</p>
+  <div class="tags"><span class="tag">script</span><span class="tag">normalization</span><span class="tag">combining</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings right to left text mixed with latin and digits hebrew mixed with latin and numbers: visual order differs from memory order, which breaks cursor math and naive truncation with ellipsis. rtl bidi script &quot;abc \u05e9\u05dc\u05d5\u05dd 123&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>right to left text mixed with Latin and digits</h3></div>
+  <code class="value">&quot;abc \u05E9\u05DC\u05D5\u05DD 123&quot;</code>
+  <p>Hebrew mixed with Latin and numbers: visual order differs from memory order, which breaks cursor math and naive truncation with ellipsis.</p>
+  <div class="tags"><span class="tag">rtl</span><span class="tag">bidi</span><span class="tag">script</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings arabic text right to left script with contextual letter shapes; per code point styling or splitting breaks the joining. rtl script &quot;\u0645\u0631\u062d\u0628\u0627&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>Arabic text</h3></div>
+  <code class="value">&quot;\u0645\u0631\u062D\u0628\u0627&quot;</code>
+  <p>Right to left script with contextual letter shapes; per code point styling or splitting breaks the joining.</p>
+  <div class="tags"><span class="tag">rtl</span><span class="tag">script</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings right to left override (u+202e) displays as &quot;invoiceexe.txt&quot;: the trojan source trick (cve-2021-42574) for file names and code review. bidi security invisible &quot;invoice\u202etxt.exe&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>right to left override (U+202E)</h3></div>
+  <code class="value">&quot;invoice\u202Etxt.exe&quot;</code>
+  <p>Displays as &quot;invoiceexe.txt&quot;: the Trojan Source trick (CVE-2021-42574) for file names and code review.</p>
+  <div class="tags"><span class="tag">bidi</span><span class="tag">security</span><span class="tag">invisible</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings bidi isolate controls (u+2067, u+2069) invisible directional isolates change display order; strip or escape them in identifiers and logs. bidi invisible security &quot;user\u2067admin\u2069&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>bidi isolate controls (U+2067, U+2069)</h3></div>
+  <code class="value">&quot;user\u2067admin\u2069&quot;</code>
+  <p>Invisible directional isolates change display order; strip or escape them in identifiers and logs.</p>
+  <div class="tags"><span class="tag">bidi</span><span class="tag">invisible</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings turkish dotted and dotless i capital dotted i lowercases to i plus u+0307 (length grows), and tolocalelowercase(&quot;tr&quot;) maps i to dotless i; case insensitive keys break. casing locale &quot;i\u0130\u0131i&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>Turkish dotted and dotless i</h3></div>
+  <code class="value">&quot;I\u0130\u0131i&quot;</code>
+  <p>Capital dotted I lowercases to i plus U+0307 (length grows), and toLocaleLowerCase(&quot;tr&quot;) maps I to dotless i; case insensitive keys break.</p>
+  <div class="tags"><span class="tag">casing</span><span class="tag">locale</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings german sharp s touppercase() gives &quot;strasse&quot; (length 6 to 7), so upper and lower case comparisons disagree and length based layouts shift. casing locale &quot;stra\u00dfe&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>German sharp s</h3></div>
+  <code class="value">&quot;stra\u00DFe&quot;</code>
+  <p>toUpperCase() gives &quot;STRASSE&quot; (length 6 to 7), so upper and lower case comparisons disagree and length based layouts shift.</p>
+  <div class="tags"><span class="tag">casing</span><span class="tag">locale</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings greek final sigma lowercasing the whole word yields a final sigma at the end; lowercasing letter by letter does not, so results differ. casing script &quot;\u039f\u0394\u039f\u03a3&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>Greek final sigma</h3></div>
+  <code class="value">&quot;\u039F\u0394\u039F\u03A3&quot;</code>
+  <p>Lowercasing the whole word yields a final sigma at the end; lowercasing letter by letter does not, so results differ.</p>
+  <div class="tags"><span class="tag">casing</span><span class="tag">script</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings null character terminates c strings, is rejected by postgresql text columns and disappears in some loggers. control null &quot;a\u0000b&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>null character</h3></div>
+  <code class="value">&quot;a\u0000b&quot;</code>
+  <p>Terminates C strings, is rejected by PostgreSQL text columns and disappears in some loggers.</p>
+  <div class="tags"><span class="tag">control</span><span class="tag">null</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings crlf newline split(&quot;\n&quot;) leaves a trailing &quot;\r&quot; on each line; windows files and http headers use this form. newline &quot;line1\r\nline2&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>CRLF newline</h3></div>
+  <code class="value">&quot;line1\r\nline2&quot;</code>
+  <p>split(&quot;\n&quot;) leaves a trailing &quot;\r&quot; on each line; Windows files and HTTP headers use this form.</p>
+  <div class="tags"><span class="tag">newline</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings cr only newline classic mac line ending: code that only looks for \n sees one line. newline &quot;line1\rline2&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>CR only newline</h3></div>
+  <code class="value">&quot;line1\rline2&quot;</code>
+  <p>Classic Mac line ending: code that only looks for \n sees one line.</p>
+  <div class="tags"><span class="tag">newline</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings line separator (u+2028) a javascript line terminator: `.` in a regex does not match it, and it broke inline scripts and jsonp before es2019. newline invisible &quot;a\u2028b&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>line separator (U+2028)</h3></div>
+  <code class="value">&quot;a\u2028b&quot;</code>
+  <p>A JavaScript line terminator: `.` in a regex does not match it, and it broke inline scripts and JSONP before ES2019.</p>
+  <div class="tags"><span class="tag">newline</span><span class="tag">invisible</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings paragraph separator (u+2029) another javascript line terminator that most text editors render as nothing; line counting tools disagree about it. newline invisible &quot;a\u2029b&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>paragraph separator (U+2029)</h3></div>
+  <code class="value">&quot;a\u2029b&quot;</code>
+  <p>Another JavaScript line terminator that most text editors render as nothing; line counting tools disagree about it.</p>
+  <div class="tags"><span class="tag">newline</span><span class="tag">invisible</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings vertical tab and form feed rarely seen whitespace that xml 1.0 forbids and some json encoders escape inconsistently. control whitespace &quot;a\u000bb\u000cc&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>vertical tab and form feed</h3></div>
+  <code class="value">&quot;a\u000Bb\u000Cc&quot;</code>
+  <p>Rarely seen whitespace that XML 1.0 forbids and some JSON encoders escape inconsistently.</p>
+  <div class="tags"><span class="tag">control</span><span class="tag">whitespace</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings html markup as text must render as literal text; any innerhtml or template without escaping executes it. injection html &quot;&lt;script&gt;alert(\&quot;x\&quot;)&lt;/script&gt;&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>HTML markup as text</h3></div>
+  <code class="value">&quot;&lt;script&gt;alert(\&quot;x\&quot;)&lt;/script&gt;&quot;</code>
+  <p>Must render as literal text; any innerHTML or template without escaping executes it.</p>
+  <div class="tags"><span class="tag">injection</span><span class="tag">html</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings already escaped html escaping twice shows &quot;&amp;amp;lt;&quot; to users; unescaping on input then escaping on output corrupts it. injection html &quot;&amp;lt;b&amp;gt; &amp;amp;amp;&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>already escaped HTML</h3></div>
+  <code class="value">&quot;&amp;lt;b&amp;gt; &amp;amp;amp;&quot;</code>
+  <p>Escaping twice shows &quot;&amp;amp;lt;&quot; to users; unescaping on input then escaping on output corrupts it.</p>
+  <div class="tags"><span class="tag">injection</span><span class="tag">html</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings sql quote and comment a quote ends a string literal in hand built sql; also tests that names with apostrophes survive a round trip. injection sql &quot;robert'); drop table students;--&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>SQL quote and comment</h3></div>
+  <code class="value">&quot;Robert'); DROP TABLE Students;--&quot;</code>
+  <p>A quote ends a string literal in hand built SQL; also tests that names with apostrophes survive a round trip.</p>
+  <div class="tags"><span class="tag">injection</span><span class="tag">sql</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings regex metacharacters passing user text to new regexp() throws on &quot;(&quot; or matches everything with &quot;.*&quot;; escape it first. injection regex &quot;.*+?^${}()|[]\\&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>regex metacharacters</h3></div>
+  <code class="value">&quot;.*+?^${}()|[]\\&quot;</code>
+  <p>Passing user text to new RegExp() throws on &quot;(&quot; or matches everything with &quot;.*&quot;; escape it first.</p>
+  <div class="tags"><span class="tag">injection</span><span class="tag">regex</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings template placeholders text that looks like template or printf syntax; any second pass through a formatter changes it. injection template &quot;${7*7} {{7*7}} %s %d&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>template placeholders</h3></div>
+  <code class="value">&quot;${7*7} {{7*7}} %s %d&quot;</code>
+  <p>Text that looks like template or printf syntax; any second pass through a formatter changes it.</p>
+  <div class="tags"><span class="tag">injection</span><span class="tag">template</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings __proto__ as a key used as an object key it sets the prototype instead of a property; use map or object.create(null) for user keys. injection prototype &quot;__proto__&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>__proto__ as a key</h3></div>
+  <code class="value">&quot;__proto__&quot;</code>
+  <p>Used as an object key it sets the prototype instead of a property; use Map or Object.create(null) for user keys.</p>
+  <div class="tags"><span class="tag">injection</span><span class="tag">prototype</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings the word null a real surname and a common placeholder: systems that treat &quot;null&quot; as missing lose data. falsy-text &quot;null&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>the word null</h3></div>
+  <code class="value">&quot;null&quot;</code>
+  <p>A real surname and a common placeholder: systems that treat &quot;null&quot; as missing lose data.</p>
+  <div class="tags"><span class="tag">falsy-text</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings arabic-indic digits unicode digits: number() and parseint return nan and \d only matches ascii 0 to 9, yet users type these. digits rtl &quot;\u0663\u0664&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>Arabic-Indic digits</h3></div>
+  <code class="value">&quot;\u0663\u0664&quot;</code>
+  <p>Unicode digits: Number() and parseInt return NaN and \d only matches ASCII 0 to 9, yet users type these.</p>
+  <div class="tags"><span class="tag">digits</span><span class="tag">rtl</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings full width digits typed by cjk input methods; look like 123 but fail /^\d+$/ and number(). digits cjk &quot;\uff11\uff12\uff13&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>full width digits</h3></div>
+  <code class="value">&quot;\uFF11\uFF12\uFF13&quot;</code>
+  <p>Typed by CJK input methods; look like 123 but fail /^\d+$/ and Number().</p>
+  <div class="tags"><span class="tag">digits</span><span class="tag">cjk</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings thai without spaces thai writes words without spaces and uses combining vowels; word wrapping and counting need intl.segmenter. script combining &quot;\u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>Thai without spaces</h3></div>
+  <code class="value">&quot;\u0E20\u0E32\u0E29\u0E32\u0E44\u0E17\u0E22&quot;</code>
+  <p>Thai writes words without spaces and uses combining vowels; word wrapping and counting need Intl.Segmenter.</p>
+  <div class="tags"><span class="tag">script</span><span class="tag">combining</span></div>
+</li>
+<li class="case" data-generator="strings" data-search="strings wide cjk characters each character takes two terminal columns, so padend based tables and fixed width output misalign. cjk script &quot;\u4f60\u597d\uff01&quot; ">
+  <div class="case-head"><code class="gen">strings()</code><h3>wide CJK characters</h3></div>
+  <code class="value">&quot;\u4F60\u597D\uFF01&quot;</code>
+  <p>Each character takes two terminal columns, so padEnd based tables and fixed width output misalign.</p>
+  <div class="tags"><span class="tag">cjk</span><span class="tag">script</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers zero falsy: `if (!count)` and `value || defaultvalue` replace a legitimate 0. zero falsy 0 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>zero</h3></div>
+  <code class="value">0</code>
+  <p>Falsy: `if (!count)` and `value || defaultValue` replace a legitimate 0.</p>
+  <div class="tags"><span class="tag">zero</span><span class="tag">falsy</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers negative zero -0 === 0 is true, but object.is(-0, 0) is false, 1 / -0 is -infinity and string(-0) is &quot;0&quot;, so the sign silently disappears. zero negative sign -0 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>negative zero</h3></div>
+  <code class="value">-0</code>
+  <p>-0 === 0 is true, but Object.is(-0, 0) is false, 1 / -0 is -Infinity and String(-0) is &quot;0&quot;, so the sign silently disappears.</p>
+  <div class="tags"><span class="tag">zero</span><span class="tag">negative</span><span class="tag">sign</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers nan nan !== nan, indexof cannot find it, json.stringify writes null and every comparison is false, so sorting with it is unstable. nan falsy nan ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>NaN</h3></div>
+  <code class="value">NaN</code>
+  <p>NaN !== NaN, indexOf cannot find it, JSON.stringify writes null and every comparison is false, so sorting with it is unstable.</p>
+  <div class="tags"><span class="tag">nan</span><span class="tag">falsy</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers infinity json.stringify writes null, tofixed returns &quot;infinity&quot; and a max-age or timeout of infinity can mean &quot;never&quot; or overflow a timer. infinity infinity ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>Infinity</h3></div>
+  <code class="value">Infinity</code>
+  <p>JSON.stringify writes null, toFixed returns &quot;Infinity&quot; and a max-age or timeout of Infinity can mean &quot;never&quot; or overflow a timer. <a class="ref" href="https://github.com/salesforce/tough-cookie/pull/644">real bug</a></p>
+  <div class="tags"><span class="tag">infinity</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers -infinity math.max() of an empty list; a common reducer seed that leaks into output as &quot;-infinity&quot;. infinity negative -infinity ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>-Infinity</h3></div>
+  <code class="value">-Infinity</code>
+  <p>Math.max() of an empty list; a common reducer seed that leaks into output as &quot;-Infinity&quot;.</p>
+  <div class="tags"><span class="tag">infinity</span><span class="tag">negative</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers max_safe_integer 2^53 - 1, the largest integer where n + 1 is exact; ids and counters past it stop being unique. integer limit 9007199254740991 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>MAX_SAFE_INTEGER</h3></div>
+  <code class="value">9007199254740991</code>
+  <p>2^53 - 1, the largest integer where n + 1 is exact; IDs and counters past it stop being unique.</p>
+  <div class="tags"><span class="tag">integer</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers max_safe_integer + 1 2^53: here n + 1 === n, so loops never advance and 64 bit ids from json collide. integer limit precision 9007199254740992 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>MAX_SAFE_INTEGER + 1</h3></div>
+  <code class="value">9007199254740992</code>
+  <p>2^53: here n + 1 === n, so loops never advance and 64 bit IDs from JSON collide.</p>
+  <div class="tags"><span class="tag">integer</span><span class="tag">limit</span><span class="tag">precision</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers max_safe_integer + 2 is not representable: the literal 9007199254740993 rounds to 9007199254740992 before your code ever sees it. integer limit precision 9007199254740992 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>MAX_SAFE_INTEGER + 2</h3></div>
+  <code class="value">9007199254740992</code>
+  <p>Is not representable: the literal 9007199254740993 rounds to 9007199254740992 before your code ever sees it.</p>
+  <div class="tags"><span class="tag">integer</span><span class="tag">limit</span><span class="tag">precision</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers min_safe_integer -(2^53 - 1), the negative safe integer limit; mirrors the positive overflow bugs. integer limit negative -9007199254740991 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>MIN_SAFE_INTEGER</h3></div>
+  <code class="value">-9007199254740991</code>
+  <p>-(2^53 - 1), the negative safe integer limit; mirrors the positive overflow bugs.</p>
+  <div class="tags"><span class="tag">integer</span><span class="tag">limit</span><span class="tag">negative</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers min_safe_integer - 1 first unsafe negative integer: number.issafeinteger is false and decrementing it is not exact. integer limit negative precision -9007199254740992 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>MIN_SAFE_INTEGER - 1</h3></div>
+  <code class="value">-9007199254740992</code>
+  <p>First unsafe negative integer: Number.isSafeInteger is false and decrementing it is not exact.</p>
+  <div class="tags"><span class="tag">integer</span><span class="tag">limit</span><span class="tag">negative</span><span class="tag">precision</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers max_value largest finite double; doubling it or adding a large value gives infinity. limit overflow 1.7976931348623157e+308 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>MAX_VALUE</h3></div>
+  <code class="value">1.7976931348623157e+308</code>
+  <p>Largest finite double; doubling it or adding a large value gives Infinity.</p>
+  <div class="tags"><span class="tag">limit</span><span class="tag">overflow</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers min_value smallest positive double (5e-324), not the most negative number; code that uses it as &quot;minus infinity&quot; is wrong. limit subnormal 5e-324 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>MIN_VALUE</h3></div>
+  <code class="value">5e-324</code>
+  <p>Smallest positive double (5e-324), not the most negative number; code that uses it as &quot;minus infinity&quot; is wrong.</p>
+  <div class="tags"><span class="tag">limit</span><span class="tag">subnormal</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers epsilon gap between 1 and the next double; only meaningful as a tolerance near 1, not for large or tiny values. limit precision 2.220446049250313e-16 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>EPSILON</h3></div>
+  <code class="value">2.220446049250313e-16</code>
+  <p>Gap between 1 and the next double; only meaningful as a tolerance near 1, not for large or tiny values.</p>
+  <div class="tags"><span class="tag">limit</span><span class="tag">precision</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 2^32 breaks `x | 0` and `x &gt;&gt;&gt; 0` truncation, array index limits and 32 bit counters. integer overflow 4294967296 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>2^32</h3></div>
+  <code class="value">4294967296</code>
+  <p>Breaks `x | 0` and `x &gt;&gt;&gt; 0` truncation, array index limits and 32 bit counters.</p>
+  <div class="tags"><span class="tag">integer</span><span class="tag">overflow</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 2^31 overflows signed 32 bit math: `(2 ** 31) | 0` is -2147483648. integer overflow 2147483648 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>2^31</h3></div>
+  <code class="value">2147483648</code>
+  <p>Overflows signed 32 bit math: `(2 ** 31) | 0` is -2147483648.</p>
+  <div class="tags"><span class="tag">integer</span><span class="tag">overflow</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers -0.5 between -1 and 0: math.trunc gives -0, math.round gives -0, and code that formats the integer part then the fraction drops the minus sign. negative sign fraction -0.5 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>-0.5</h3></div>
+  <code class="value">-0.5</code>
+  <p>Between -1 and 0: Math.trunc gives -0, Math.round gives -0, and code that formats the integer part then the fraction drops the minus sign. <a class="ref" href="https://github.com/mozilla/pdf.js/pull/22017">real bug</a></p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">sign</span><span class="tag">fraction</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers -0.0001 a small negative between -1 and 0: formatting with tofixed(2) gives &quot;-0.00&quot;, and splitting into integer and fraction parts loses the sign. negative sign fraction -0.0001 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>-0.0001</h3></div>
+  <code class="value">-0.0001</code>
+  <p>A small negative between -1 and 0: formatting with toFixed(2) gives &quot;-0.00&quot;, and splitting into integer and fraction parts loses the sign. <a class="ref" href="https://github.com/mozilla/pdf.js/pull/22017">real bug</a></p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">sign</span><span class="tag">fraction</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers -1e-7 very small negative: string() gives &quot;-1e-7&quot;, so string based number formatting and regexes for digits fail. negative exponent fraction -1e-7 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>-1e-7</h3></div>
+  <code class="value">-1e-7</code>
+  <p>Very small negative: String() gives &quot;-1e-7&quot;, so string based number formatting and regexes for digits fail.</p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">exponent</span><span class="tag">fraction</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 1e-7 smallest magnitude where string() switches to exponent notation (&quot;1e-7&quot;), while 0.000001 still prints in full. exponent fraction 1e-7 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>1e-7</h3></div>
+  <code class="value">1e-7</code>
+  <p>Smallest magnitude where String() switches to exponent notation (&quot;1e-7&quot;), while 0.000001 still prints in full.</p>
+  <div class="tags"><span class="tag">exponent</span><span class="tag">fraction</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 0.1 + 0.2 0.30000000000000004, not 0.3: exact equality on money and percentages fails; compare with a tolerance or use integers. float precision 0.30000000000000004 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>0.1 + 0.2</h3></div>
+  <code class="value">0.30000000000000004</code>
+  <p>0.30000000000000004, not 0.3: exact equality on money and percentages fails; compare with a tolerance or use integers.</p>
+  <div class="tags"><span class="tag">float</span><span class="tag">precision</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 1.005 stored as 1.00499999999999989..., so (1.005).tofixed(2) is &quot;1.00&quot; and math.round(1.005 * 100) / 100 is 1. float rounding 1.005 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>1.005</h3></div>
+  <code class="value">1.005</code>
+  <p>Stored as 1.00499999999999989..., so (1.005).toFixed(2) is &quot;1.00&quot; and Math.round(1.005 * 100) / 100 is 1.</p>
+  <div class="tags"><span class="tag">float</span><span class="tag">rounding</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 0.5 (round half) math.round(0.5) is 1 but math.round(-0.5) is -0 and tofixed uses a different rule: half rounding is not symmetric. float rounding 0.5 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>0.5 (round half)</h3></div>
+  <code class="value">0.5</code>
+  <p>Math.round(0.5) is 1 but Math.round(-0.5) is -0 and toFixed uses a different rule: half rounding is not symmetric.</p>
+  <div class="tags"><span class="tag">float</span><span class="tag">rounding</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 1e21 first integer where string() uses exponent notation (&quot;1e+21&quot;); tofixed also falls back to exponent form, breaking digit only checks. exponent integer 1e+21 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>1e21</h3></div>
+  <code class="value">1e+21</code>
+  <p>First integer where String() uses exponent notation (&quot;1e+21&quot;); toFixed also falls back to exponent form, breaking digit only checks.</p>
+  <div class="tags"><span class="tag">exponent</span><span class="tag">integer</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers 999999999999999900000 largest round number below 1e21 that still prints all its digits; one step up the format changes. exponent integer 999999999999999900000 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>999999999999999900000</h3></div>
+  <code class="value">999999999999999900000</code>
+  <p>Largest round number below 1e21 that still prints all its digits; one step up the format changes.</p>
+  <div class="tags"><span class="tag">exponent</span><span class="tag">integer</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers negative integer modulo keeps the sign (-42 % 5 is -2), so &quot;positive modulo&quot; wraparound for indexes and calendars is wrong. negative integer -42 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>negative integer</h3></div>
+  <code class="value">-42</code>
+  <p>Modulo keeps the sign (-42 % 5 is -2), so &quot;positive modulo&quot; wraparound for indexes and calendars is wrong.</p>
+  <div class="tags"><span class="tag">negative</span><span class="tag">integer</span></div>
+</li>
+<li class="case" data-generator="numbers" data-search="numbers non-integer array index arr[1.5] is undefined and creates a string property on write; number.isinteger guards are often missing. fraction 1.5 ">
+  <div class="case-head"><code class="gen">numbers()</code><h3>non-integer array index</h3></div>
+  <code class="value">1.5</code>
+  <p>arr[1.5] is undefined and creates a string property on write; Number.isInteger guards are often missing.</p>
+  <div class="tags"><span class="tag">fraction</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings empty string number(&quot;&quot;) is 0, not nan, so empty form fields become zero. empty coercion &quot;&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>empty string</h3></div>
+  <code class="value">&quot;&quot;</code>
+  <p>Number(&quot;&quot;) is 0, not NaN, so empty form fields become zero.</p>
+  <div class="tags"><span class="tag">empty</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings whitespace only number(&quot;  &quot;) is 0 as well; parsefloat returns nan, so the two parsers disagree. whitespace coercion &quot;  \n\t &quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>whitespace only</h3></div>
+  <code class="value">&quot;  \n\t &quot;</code>
+  <p>Number(&quot;  &quot;) is 0 as well; parseFloat returns NaN, so the two parsers disagree.</p>
+  <div class="tags"><span class="tag">whitespace</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings padded number number trims whitespace and accepts it; strict validators and parseint with a regex may not. whitespace &quot;  42  &quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>padded number</h3></div>
+  <code class="value">&quot;  42  &quot;</code>
+  <p>Number trims whitespace and accepts it; strict validators and parseInt with a regex may not.</p>
+  <div class="tags"><span class="tag">whitespace</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings negative zero string number(&quot;-0&quot;) is -0, which then prints as &quot;0&quot;; round trips lose the sign. sign zero &quot;-0&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>negative zero string</h3></div>
+  <code class="value">&quot;-0&quot;</code>
+  <p>Number(&quot;-0&quot;) is -0, which then prints as &quot;0&quot;; round trips lose the sign.</p>
+  <div class="tags"><span class="tag">sign</span><span class="tag">zero</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings leading zeros decimal 7 for number and parseint, but octal in some legacy parsers and a string id that must keep its zeros. leading-zero &quot;007&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>leading zeros</h3></div>
+  <code class="value">&quot;007&quot;</code>
+  <p>Decimal 7 for Number and parseInt, but octal in some legacy parsers and a string ID that must keep its zeros.</p>
+  <div class="tags"><span class="tag">leading-zero</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings hex string number(&quot;0x1a&quot;) is 26 and parseint(&quot;0x1a&quot;) is 26, but parsefloat(&quot;0x1a&quot;) is 0. radix coercion &quot;0x1a&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>hex string</h3></div>
+  <code class="value">&quot;0x1A&quot;</code>
+  <p>Number(&quot;0x1A&quot;) is 26 and parseInt(&quot;0x1A&quot;) is 26, but parseFloat(&quot;0x1A&quot;) is 0.</p>
+  <div class="tags"><span class="tag">radix</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings binary and octal prefixes number(&quot;0b101&quot;) is 5 while parseint(&quot;0b101&quot;) is 0; prefixes are accepted by one parser only. radix coercion &quot;0b101&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>binary and octal prefixes</h3></div>
+  <code class="value">&quot;0b101&quot;</code>
+  <p>Number(&quot;0b101&quot;) is 5 while parseInt(&quot;0b101&quot;) is 0; prefixes are accepted by one parser only.</p>
+  <div class="tags"><span class="tag">radix</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings exponent notation number gives 1000 but parseint gives 1, so &quot;digits only&quot; assumptions break. exponent coercion &quot;1e3&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>exponent notation</h3></div>
+  <code class="value">&quot;1e3&quot;</code>
+  <p>Number gives 1000 but parseInt gives 1, so &quot;digits only&quot; assumptions break.</p>
+  <div class="tags"><span class="tag">exponent</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings trailing garbage parseint and parsefloat return 12, number returns nan; lenient parsing hides bad input. coercion &quot;12px&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>trailing garbage</h3></div>
+  <code class="value">&quot;12px&quot;</code>
+  <p>parseInt and parseFloat return 12, Number returns NaN; lenient parsing hides bad input.</p>
+  <div class="tags"><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings comma decimal separator decimal comma used in most of europe and brazil: parsefloat gives 1 and number gives nan. locale &quot;1,5&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>comma decimal separator</h3></div>
+  <code class="value">&quot;1,5&quot;</code>
+  <p>Decimal comma used in most of Europe and Brazil: parseFloat gives 1 and Number gives NaN.</p>
+  <div class="tags"><span class="tag">locale</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings thousands separators grouped digits from formatted output; parsefloat stops at the first comma and returns 1. locale &quot;1,234,567.89&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>thousands separators</h3></div>
+  <code class="value">&quot;1,234,567.89&quot;</code>
+  <p>Grouped digits from formatted output; parseFloat stops at the first comma and returns 1.</p>
+  <div class="tags"><span class="tag">locale</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings numeric separator literal valid in javascript source but number(&quot;1_000&quot;) is nan. coercion &quot;1_000&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>numeric separator literal</h3></div>
+  <code class="value">&quot;1_000&quot;</code>
+  <p>Valid in JavaScript source but Number(&quot;1_000&quot;) is NaN.</p>
+  <div class="tags"><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings infinity string number(&quot;infinity&quot;) is infinity, so numeric validation accepts a word; json cannot represent it. infinity coercion &quot;infinity&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>Infinity string</h3></div>
+  <code class="value">&quot;Infinity&quot;</code>
+  <p>Number(&quot;Infinity&quot;) is Infinity, so numeric validation accepts a word; JSON cannot represent it.</p>
+  <div class="tags"><span class="tag">infinity</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings nan string number(&quot;nan&quot;) is nan, which passes typeof === &quot;number&quot; checks after conversion. nan coercion &quot;nan&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>NaN string</h3></div>
+  <code class="value">&quot;NaN&quot;</code>
+  <p>Number(&quot;NaN&quot;) is NaN, which passes typeof === &quot;number&quot; checks after conversion.</p>
+  <div class="tags"><span class="tag">nan</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings unsafe integer string parses to 9007199254740992: ids from json or databases silently change; parse as bigint or keep as string. precision integer &quot;9007199254740993&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>unsafe integer string</h3></div>
+  <code class="value">&quot;9007199254740993&quot;</code>
+  <p>Parses to 9007199254740992: IDs from JSON or databases silently change; parse as BigInt or keep as string.</p>
+  <div class="tags"><span class="tag">precision</span><span class="tag">integer</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings plus sign accepted by number but rejected by many /^\d+$/ validators, and vice versa for ui masks. sign &quot;+5&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>plus sign</h3></div>
+  <code class="value">&quot;+5&quot;</code>
+  <p>Accepted by Number but rejected by many /^\d+$/ validators, and vice versa for UI masks.</p>
+  <div class="tags"><span class="tag">sign</span></div>
+</li>
+<li class="case" data-generator="numericStrings" data-search="numericstrings arabic-indic digits real digits for many users, but number returns nan; normalize with intl or a digit map first. unicode digits &quot;\u0664\u0662&quot; ">
+  <div class="case-head"><code class="gen">numericStrings()</code><h3>Arabic-Indic digits</h3></div>
+  <code class="value">&quot;\u0664\u0662&quot;</code>
+  <p>Real digits for many users, but Number returns NaN; normalize with Intl or a digit map first.</p>
+  <div class="tags"><span class="tag">unicode</span><span class="tag">digits</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints 0n falsy like 0, and -0n is just 0n (bigint has no negative zero), so sign preserving code paths diverge from number. zero falsy 0n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>0n</h3></div>
+  <code class="value">0n</code>
+  <p>Falsy like 0, and -0n is just 0n (BigInt has no negative zero), so sign preserving code paths diverge from Number.</p>
+  <div class="tags"><span class="tag">zero</span><span class="tag">falsy</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints -1n bigint division truncates toward zero (-1n / 2n is 0n) and % keeps the sign. negative -1n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>-1n</h3></div>
+  <code class="value">-1n</code>
+  <p>BigInt division truncates toward zero (-1n / 2n is 0n) and % keeps the sign.</p>
+  <div class="tags"><span class="tag">negative</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints 2^53 + 1 (first integer number cannot hold) number(2n ** 53n + 1n) rounds to 2^53; converting back to number for math or json loses it. precision number-boundary 9007199254740993n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>2^53 + 1 (first integer Number cannot hold)</h3></div>
+  <code class="value">9007199254740993n</code>
+  <p>Number(2n ** 53n + 1n) rounds to 2^53; converting back to Number for math or JSON loses it.</p>
+  <div class="tags"><span class="tag">precision</span><span class="tag">number-boundary</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints int64 max largest signed 64 bit integer (postgresql bigint, java long); one more overflows the column. int64 limit 9223372036854775807n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>int64 max</h3></div>
+  <code class="value">9223372036854775807n</code>
+  <p>Largest signed 64 bit integer (PostgreSQL bigint, Java long); one more overflows the column.</p>
+  <div class="tags"><span class="tag">int64</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints int64 min smallest signed 64 bit integer; its absolute value does not fit in int64. int64 limit negative -9223372036854775808n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>int64 min</h3></div>
+  <code class="value">-9223372036854775808n</code>
+  <p>Smallest signed 64 bit integer; its absolute value does not fit in int64.</p>
+  <div class="tags"><span class="tag">int64</span><span class="tag">limit</span><span class="tag">negative</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints uint64 max largest unsigned 64 bit integer; bigint.asintn(64, n) turns it into -1n. uint64 limit 18446744073709551615n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>uint64 max</h3></div>
+  <code class="value">18446744073709551615n</code>
+  <p>Largest unsigned 64 bit integer; BigInt.asIntN(64, n) turns it into -1n.</p>
+  <div class="tags"><span class="tag">uint64</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints 2^64 (overflows uint64) wraps to 0n with bigint.asuintn(64, n); database drivers reject it. uint64 overflow 18446744073709551616n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>2^64 (overflows uint64)</h3></div>
+  <code class="value">18446744073709551616n</code>
+  <p>Wraps to 0n with BigInt.asUintN(64, n); database drivers reject it.</p>
+  <div class="tags"><span class="tag">uint64</span><span class="tag">overflow</span></div>
+</li>
+<li class="case" data-generator="bigints" data-search="bigints 1e30 as bigint far beyond any number integer: json.stringify throws typeerror for any bigint, and mixing with number in + throws. large json 1000000000000000000000000000000n ">
+  <div class="case-head"><code class="gen">bigints()</code><h3>1e30 as BigInt</h3></div>
+  <code class="value">1000000000000000000000000000000n</code>
+  <p>Far beyond any Number integer: JSON.stringify throws TypeError for any BigInt, and mixing with Number in + throws.</p>
+  <div class="tags"><span class="tag">large</span><span class="tag">json</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls localhost with port no dot in the host: &quot;must contain a tld&quot; validators reject development urls. valid host &quot;http://localhost:3000/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>localhost with port</h3></div>
+  <code class="value">&quot;http://localhost:3000/&quot;</code>
+  <p>No dot in the host: &quot;must contain a TLD&quot; validators reject development URLs.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">host</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls credentials in url userinfo with an encoded @; naive parsers split on the first @ and leak or mangle the password. valid userinfo security &quot;https://user:p%40ss@example.com/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>credentials in URL</h3></div>
+  <code class="value">&quot;https://user:p%40ss@example.com/&quot;</code>
+  <p>Userinfo with an encoded @; naive parsers split on the first @ and leak or mangle the password.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">userinfo</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls ipv6 host with port hostname is &quot;[::1]&quot; with brackets; splitting host and port on &quot;:&quot; breaks. valid ip host &quot;http://[::1]:8080/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>IPv6 host with port</h3></div>
+  <code class="value">&quot;http://[::1]:8080/&quot;</code>
+  <p>hostname is &quot;[::1]&quot; with brackets; splitting host and port on &quot;:&quot; breaks.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">ip</span><span class="tag">host</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls shorthand ipv4 (127.1) the parser normalizes it to 127.0.0.1, so ssrf block lists that compare strings miss it. valid ip security &quot;http://127.1/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>shorthand IPv4 (127.1)</h3></div>
+  <code class="value">&quot;http://127.1/&quot;</code>
+  <p>The parser normalizes it to 127.0.0.1, so SSRF block lists that compare strings miss it.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">ip</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls hex ipv4 (0x7f.0.0.1) also loopback after normalization; another ssrf filter bypass. valid ip security &quot;http://0x7f.0.0.1/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>hex IPv4 (0x7f.0.0.1)</h3></div>
+  <code class="value">&quot;http://0x7f.0.0.1/&quot;</code>
+  <p>Also loopback after normalization; another SSRF filter bypass.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">ip</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls internationalized domain hostname becomes punycode (&quot;xn--r8jz45g.jp&quot;), so comparing the input string with url.hostname fails. valid idn unicode host &quot;https://\u4f8b\u3048.jp/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>internationalized domain</h3></div>
+  <code class="value">&quot;https://\u4F8B\u3048.jp/&quot;</code>
+  <p>hostname becomes punycode (&quot;xn--r8jz45g.jp&quot;), so comparing the input string with url.hostname fails.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">idn</span><span class="tag">unicode</span><span class="tag">host</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls trailing dot in host a fully qualified name that is a different origin from example.com for cookies, cors and allow lists. valid host &quot;https://example.com./&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>trailing dot in host</h3></div>
+  <code class="value">&quot;https://example.com./&quot;</code>
+  <p>A fully qualified name that is a different origin from example.com for cookies, CORS and allow lists.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">host</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls uppercase scheme and host scheme and host are lowercased but the path keeps its case; string compares of urls disagree with the parser. valid case &quot;https://example.com/path&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>uppercase scheme and host</h3></div>
+  <code class="value">&quot;HTTPS://EXAMPLE.COM/Path&quot;</code>
+  <p>Scheme and host are lowercased but the path keeps its case; string compares of URLs disagree with the parser.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">case</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls explicit default port url.port is &quot;&quot; because the default port is dropped; code expecting &quot;443&quot; breaks. valid port &quot;https://example.com:443/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>explicit default port</h3></div>
+  <code class="value">&quot;https://example.com:443/&quot;</code>
+  <p>url.port is &quot;&quot; because the default port is dropped; code expecting &quot;443&quot; breaks.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">port</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls port out of range ports above 65535 make the url invalid; regex validators accept any digits. invalid port &quot;http://example.com:65536/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>port out of range</h3></div>
+  <code class="value">&quot;http://example.com:65536/&quot;</code>
+  <p>Ports above 65535 make the URL invalid; regex validators accept any digits.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">port</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls encoded slash in path servers and routers disagree on whether %2f is a path separator; decode once at the right layer. valid encoding path &quot;https://example.com/a%2fb&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>encoded slash in path</h3></div>
+  <code class="value">&quot;https://example.com/a%2Fb&quot;</code>
+  <p>Servers and routers disagree on whether %2F is a path separator; decode once at the right layer.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">encoding</span><span class="tag">path</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls plus and space in query urlsearchparams decodes &quot;+&quot; as a space but decodeuricomponent does not; the key also repeats. valid encoding query &quot;https://example.com/?q=a+b&amp;q=%20c&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>plus and space in query</h3></div>
+  <code class="value">&quot;https://example.com/?q=a+b&amp;q=%20c&quot;</code>
+  <p>URLSearchParams decodes &quot;+&quot; as a space but decodeURIComponent does not; the key also repeats.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">encoding</span><span class="tag">query</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls double encoded space decoding twice turns %2520 into a space; decoding once gives &quot;%20&quot; literally. valid encoding &quot;https://example.com/file%2520name&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>double encoded space</h3></div>
+  <code class="value">&quot;https://example.com/file%2520name&quot;</code>
+  <p>Decoding twice turns %2520 into a space; decoding once gives &quot;%20&quot; literally.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">encoding</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls empty fragment url.hash is &quot;&quot; even though href ends with &quot;#&quot;, so hash based checks see no fragment. valid fragment &quot;https://example.com/#&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>empty fragment</h3></div>
+  <code class="value">&quot;https://example.com/#&quot;</code>
+  <p>url.hash is &quot;&quot; even though href ends with &quot;#&quot;, so hash based checks see no fragment.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">fragment</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls dot segments in path normalized to /secret by the parser; checks done on the raw string allow traversal. valid path security &quot;http://example.com/public/../secret&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>dot segments in path</h3></div>
+  <code class="value">&quot;http://example.com/public/../secret&quot;</code>
+  <p>Normalized to /secret by the parser; checks done on the raw string allow traversal.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">path</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls non ascii path and query the parser percent encodes both as utf-8, so href no longer equals the input. valid unicode encoding &quot;https://example.com/\u{1f600}?q=caf\u00e9&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>non ASCII path and query</h3></div>
+  <code class="value">&quot;https://example.com/\u{1F600}?q=caf\u00E9&quot;</code>
+  <p>The parser percent encodes both as UTF-8, so href no longer equals the input.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">unicode</span><span class="tag">encoding</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls very long url (8000 char path) exceeds common 2048 character limits and 8 kb request line limits in proxies and servers. valid long &quot;https://example.com/aaaaaaaaaaaaaaaaaaaa...&quot; (8020 chars) ">
+  <div class="case-head"><code class="gen">urls()</code><h3>very long URL (8000 char path)</h3></div>
+  <code class="value">&quot;https://example.com/aaaaaaaaaaaaaaaaaaaa...&quot; (8020 chars)</code>
+  <p>Exceeds common 2048 character limits and 8 KB request line limits in proxies and servers.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">long</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls javascript: scheme a valid url that runs code when used as an href; allow list schemes instead of block listing. valid scheme security &quot;javascript:alert(1)&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>javascript: scheme</h3></div>
+  <code class="value">&quot;javascript:alert(1)&quot;</code>
+  <p>A valid URL that runs code when used as an href; allow list schemes instead of block listing.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">scheme</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls javascript: with a newline inside the parser removes tabs and newlines, so this is javascript:alert(1); block lists that match the raw string miss it. valid scheme security &quot;java\nscript:alert(1)&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>javascript: with a newline inside</h3></div>
+  <code class="value">&quot;java\nscript:alert(1)&quot;</code>
+  <p>The parser removes tabs and newlines, so this is javascript:alert(1); block lists that match the raw string miss it.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">scheme</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls data: url with html valid and executable in some contexts; never forward user supplied data urls to href or src. valid scheme security &quot;data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>data: URL with HTML</h3></div>
+  <code class="value">&quot;data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;&quot;</code>
+  <p>Valid and executable in some contexts; never forward user supplied data URLs to href or src.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">scheme</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls file url with windows drive host is empty and pathname is &quot;/c:/windows/win.ini&quot; with a leading slash before the drive letter. valid scheme windows &quot;file:///c:/windows/win.ini&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>file URL with Windows drive</h3></div>
+  <code class="value">&quot;file:///C:/Windows/win.ini&quot;</code>
+  <p>host is empty and pathname is &quot;/C:/Windows/win.ini&quot; with a leading slash before the drive letter.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">scheme</span><span class="tag">windows</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls mailto url no host at all: url.host is &quot;&quot; and url.origin is &quot;null&quot;. valid scheme &quot;mailto:user@example.com&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>mailto URL</h3></div>
+  <code class="value">&quot;mailto:user@example.com&quot;</code>
+  <p>No host at all: url.host is &quot;&quot; and url.origin is &quot;null&quot;.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">scheme</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls surrounding spaces the parser strips leading and trailing spaces, so it is valid, but the stored string is not. valid whitespace &quot;  https://example.com/  &quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>surrounding spaces</h3></div>
+  <code class="value">&quot;  https://example.com/  &quot;</code>
+  <p>The parser strips leading and trailing spaces, so it is valid, but the stored string is not.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">whitespace</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls protocol relative invalid without a base, but resolves to another host with one: &quot;starts with /&quot; open redirect checks pass it. invalid relative security &quot;//example.com/path&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>protocol relative</h3></div>
+  <code class="value">&quot;//example.com/path&quot;</code>
+  <p>Invalid without a base, but resolves to another host with one: &quot;starts with /&quot; open redirect checks pass it.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">relative</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls backslash relative browsers treat &quot;\&quot; as &quot;/&quot; in http urls, so this resolves to //example.com: a classic open redirect. invalid relative security &quot;/\\example.com&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>backslash relative</h3></div>
+  <code class="value">&quot;/\\example.com&quot;</code>
+  <p>Browsers treat &quot;\&quot; as &quot;/&quot; in http URLs, so this resolves to //example.com: a classic open redirect.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">relative</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls bare domain without scheme what users type, but not a url: new url throws and links become relative paths. invalid relative &quot;example.com&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>bare domain without scheme</h3></div>
+  <code class="value">&quot;example.com&quot;</code>
+  <p>What users type, but not a URL: new URL throws and links become relative paths.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">relative</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls space in host forbidden host code point; new url throws. invalid host &quot;http://exa mple.com/&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>space in host</h3></div>
+  <code class="value">&quot;http://exa mple.com/&quot;</code>
+  <p>Forbidden host code point; new URL throws.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">host</span></div>
+</li>
+<li class="case" data-generator="urls" data-search="urls empty string new url(&quot;&quot;) throws; optional url fields must be checked before parsing. invalid empty &quot;&quot; ">
+  <div class="case-head"><code class="gen">urls()</code><h3>empty string</h3></div>
+  <code class="value">&quot;&quot;</code>
+  <p>new URL(&quot;&quot;) throws; optional URL fields must be checked before parsing.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">empty</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails plus addressing gmail and others deliver it to &quot;user&quot;; validators that reject &quot;+&quot; lose real users. valid local-part &quot;user+tag@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>plus addressing</h3></div>
+  <code class="value">&quot;user+tag@example.com&quot;</code>
+  <p>Gmail and others deliver it to &quot;user&quot;; validators that reject &quot;+&quot; lose real users.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">local-part</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails dots in local part valid and common; some providers ignore the dots, so deduplication by string misses duplicates. valid local-part &quot;first.last@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>dots in local part</h3></div>
+  <code class="value">&quot;first.last@example.com&quot;</code>
+  <p>Valid and common; some providers ignore the dots, so deduplication by string misses duplicates.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">local-part</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails apostrophe in local part valid; breaks sql built by concatenation and regexes limited to [a-z0-9._]. valid local-part &quot;o'brien@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>apostrophe in local part</h3></div>
+  <code class="value">&quot;o'brien@example.com&quot;</code>
+  <p>Valid; breaks SQL built by concatenation and regexes limited to [a-z0-9._].</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">local-part</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails quoted local part with space a quoted string may contain spaces; nearly every regex rejects it and naive splitting on spaces breaks. valid quoted &quot;\&quot;john doe\&quot;@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>quoted local part with space</h3></div>
+  <code class="value">&quot;\&quot;john doe\&quot;@example.com&quot;</code>
+  <p>A quoted string may contain spaces; nearly every regex rejects it and naive splitting on spaces breaks.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">quoted</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails quoted local part with @ splitting on the first &quot;@&quot; yields the wrong domain; use the last &quot;@&quot;. valid quoted &quot;\&quot;a@b\&quot;@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>quoted local part with @</h3></div>
+  <code class="value">&quot;\&quot;a@b\&quot;@example.com&quot;</code>
+  <p>Splitting on the first &quot;@&quot; yields the wrong domain; use the last &quot;@&quot;.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">quoted</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails ip address literal domain domain literal in brackets; dns based checks and domain allow lists do not expect it. valid domain &quot;user@[192.168.0.1]&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>IP address literal domain</h3></div>
+  <code class="value">&quot;user@[192.168.0.1]&quot;</code>
+  <p>Domain literal in brackets; DNS based checks and domain allow lists do not expect it.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">domain</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails dotless domain valid syntax used on intranets and in tests, rejected by &quot;needs a tld&quot; rules. valid domain &quot;user@localhost&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>dotless domain</h3></div>
+  <code class="value">&quot;user@localhost&quot;</code>
+  <p>Valid syntax used on intranets and in tests, rejected by &quot;needs a TLD&quot; rules.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">domain</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails uppercase address domains are case insensitive, local parts technically are not; lowercasing everything can merge different mailboxes, not lowercasing creates duplicates. valid case &quot;user@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>uppercase address</h3></div>
+  <code class="value">&quot;USER@EXAMPLE.COM&quot;</code>
+  <p>Domains are case insensitive, local parts technically are not; lowercasing everything can merge different mailboxes, not lowercasing creates duplicates.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">case</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails subdomains and long tld multi label domains and two part public suffixes; &quot;last two labels&quot; logic picks co.uk. valid domain &quot;user@mail.sub.example.co.uk&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>subdomains and long TLD</h3></div>
+  <code class="value">&quot;user@mail.sub.example.co.uk&quot;</code>
+  <p>Multi label domains and two part public suffixes; &quot;last two labels&quot; logic picks co.uk.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">domain</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails new generic tld tlds longer than 4 letters exist; {2,4} quantifiers reject them. valid domain &quot;user@example.photography&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>new generic TLD</h3></div>
+  <code class="value">&quot;user@example.photography&quot;</code>
+  <p>TLDs longer than 4 letters exist; {2,4} quantifiers reject them.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">domain</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails shortest realistic address single character local part and short domain; minimum length rules are often too strict. valid short &quot;a@b.co&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>shortest realistic address</h3></div>
+  <code class="value">&quot;a@b.co&quot;</code>
+  <p>Single character local part and short domain; minimum length rules are often too strict.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">short</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails 64 character local part (maximum) the longest local part rfc 5321 allows; storage columns sized at 50 truncate it. valid long limit &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>64 character local part (maximum)</h3></div>
+  <code class="value">&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com&quot;</code>
+  <p>The longest local part RFC 5321 allows; storage columns sized at 50 truncate it.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">long</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails internationalized local part valid with smtputf8 (rfc 6531) but rejected by ascii only servers; decide explicitly what you accept. valid smtputf8 unicode &quot;jos\u00e9@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>internationalized local part</h3></div>
+  <code class="value">&quot;jos\u00E9@example.com&quot;</code>
+  <p>Valid with SMTPUTF8 (RFC 6531) but rejected by ASCII only servers; decide explicitly what you accept.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">smtputf8</span><span class="tag">unicode</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails internationalized domain the domain must be converted to punycode for dns and smtp; comparing raw strings fails. valid smtputf8 unicode idn &quot;user@\u4f8b\u3048.jp&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>internationalized domain</h3></div>
+  <code class="value">&quot;user@\u4F8B\u3048.jp&quot;</code>
+  <p>The domain must be converted to punycode for DNS and SMTP; comparing raw strings fails.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">smtputf8</span><span class="tag">unicode</span><span class="tag">idn</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails 65 character local part (too long) one over the rfc 5321 limit; lenient validators accept it and the smtp server rejects it later. invalid long limit &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>65 character local part (too long)</h3></div>
+  <code class="value">&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com&quot;</code>
+  <p>One over the RFC 5321 limit; lenient validators accept it and the SMTP server rejects it later.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">long</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails missing @ no separator at all; code that splits on &quot;@&quot; gets one part and reads undefined. invalid &quot;plainaddress&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>missing @</h3></div>
+  <code class="value">&quot;plainaddress&quot;</code>
+  <p>No separator at all; code that splits on &quot;@&quot; gets one part and reads undefined.</p>
+  <div class="tags"><span class="tag">invalid</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails missing local part empty local part; split(&quot;@&quot;)[0] is &quot;&quot;. invalid empty &quot;@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>missing local part</h3></div>
+  <code class="value">&quot;@example.com&quot;</code>
+  <p>Empty local part; split(&quot;@&quot;)[0] is &quot;&quot;.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">empty</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails missing domain empty domain; split(&quot;@&quot;)[1] is &quot;&quot;. invalid empty &quot;user@&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>missing domain</h3></div>
+  <code class="value">&quot;user@&quot;</code>
+  <p>Empty domain; split(&quot;@&quot;)[1] is &quot;&quot;.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">empty</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails two @ signs unquoted second &quot;@&quot; is invalid; splitting gives three parts. invalid &quot;user@@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>two @ signs</h3></div>
+  <code class="value">&quot;user@@example.com&quot;</code>
+  <p>Unquoted second &quot;@&quot; is invalid; splitting gives three parts.</p>
+  <div class="tags"><span class="tag">invalid</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails leading dot a dot may not start the local part. invalid local-part &quot;.user@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>leading dot</h3></div>
+  <code class="value">&quot;.user@example.com&quot;</code>
+  <p>A dot may not start the local part.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">local-part</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails trailing dot in local part a dot may not end the local part (some providers accept it anyway). invalid local-part &quot;user.@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>trailing dot in local part</h3></div>
+  <code class="value">&quot;user.@example.com&quot;</code>
+  <p>A dot may not end the local part (some providers accept it anyway).</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">local-part</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails consecutive dots consecutive dots are not allowed unquoted. invalid local-part &quot;us..er@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>consecutive dots</h3></div>
+  <code class="value">&quot;us..er@example.com&quot;</code>
+  <p>Consecutive dots are not allowed unquoted.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">local-part</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails consecutive dots in domain empty domain label; dns lookups fail. invalid domain &quot;user@example..com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>consecutive dots in domain</h3></div>
+  <code class="value">&quot;user@example..com&quot;</code>
+  <p>Empty domain label; DNS lookups fail.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">domain</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails domain label starting with hyphen host labels may not start with a hyphen. invalid domain &quot;user@-example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>domain label starting with hyphen</h3></div>
+  <code class="value">&quot;user@-example.com&quot;</code>
+  <p>Host labels may not start with a hyphen.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">domain</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails unquoted space spaces need quoting; forms that do not trim also produce trailing spaces. invalid whitespace &quot;john doe@example.com&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>unquoted space</h3></div>
+  <code class="value">&quot;john doe@example.com&quot;</code>
+  <p>Spaces need quoting; forms that do not trim also produce trailing spaces.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">whitespace</span></div>
+</li>
+<li class="case" data-generator="emails" data-search="emails display name format a valid mailbox header, not a bare address; pasted from mail clients into address fields. invalid header &quot;john doe &lt;john@example.com&gt;&quot; ">
+  <div class="case-head"><code class="gen">emails()</code><h3>display name format</h3></div>
+  <code class="value">&quot;John Doe &lt;john@example.com&gt;&quot;</code>
+  <p>A valid mailbox header, not a bare address; pasted from mail clients into address fields.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">header</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths windows absolute path backslash separators: splitting on &quot;/&quot; returns one segment, and on posix this is a relative file name containing backslashes. windows absolute &quot;c:\\users\\ana\\file.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>Windows absolute path</h3></div>
+  <code class="value">&quot;C:\\Users\\Ana\\file.txt&quot;</code>
+  <p>Backslash separators: splitting on &quot;/&quot; returns one segment, and on POSIX this is a relative file name containing backslashes.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">absolute</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths windows path with forward slashes windows accepts it, path.win32 understands it, path.posix treats it as relative. windows absolute mixed &quot;c:/users/ana/file.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>Windows path with forward slashes</h3></div>
+  <code class="value">&quot;C:/Users/Ana/file.txt&quot;</code>
+  <p>Windows accepts it, path.win32 understands it, path.posix treats it as relative.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">absolute</span><span class="tag">mixed</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths drive relative path relative to the current directory of drive c, not the root; path.win32.isabsolute returns false. windows relative &quot;c:file.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>drive relative path</h3></div>
+  <code class="value">&quot;C:file.txt&quot;</code>
+  <p>Relative to the current directory of drive C, not the root; path.win32.isAbsolute returns false.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">relative</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths root relative on windows absolute on the current drive only; the result depends on process.cwd() drive. windows absolute &quot;\\temp\\file.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>root relative on Windows</h3></div>
+  <code class="value">&quot;\\temp\\file.txt&quot;</code>
+  <p>Absolute on the current drive only; the result depends on process.cwd() drive.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">absolute</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths unc share path starts with two backslashes; the &quot;root&quot; is \\server\share\, so dirname and parent walking stop there. windows absolute unc &quot;\\\\server\\share\\folder\\file.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>UNC share path</h3></div>
+  <code class="value">&quot;\\\\server\\share\\folder\\file.txt&quot;</code>
+  <p>Starts with two backslashes; the &quot;root&quot; is \\server\share\, so dirname and parent walking stop there.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">absolute</span><span class="tag">unc</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths long path prefix disables normalization: &quot;/&quot; is not a separator and &quot;..&quot; is literal; needed beyond 260 characters. windows absolute long &quot;\\\\?\\c:\\very\\long\\path&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>long path prefix</h3></div>
+  <code class="value">&quot;\\\\?\\C:\\very\\long\\path&quot;</code>
+  <p>Disables normalization: &quot;/&quot; is not a separator and &quot;..&quot; is literal; needed beyond 260 characters.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">absolute</span><span class="tag">long</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths path longer than 260 characters exceeds the classic max_path limit; many windows tools fail without long path support. windows long limit &quot;c:\\segment\\segment\\segment\\segment\\segme...&quot; (291 chars) ">
+  <div class="case-head"><code class="gen">paths()</code><h3>path longer than 260 characters</h3></div>
+  <code class="value">&quot;C:\\segment\\segment\\segment\\segment\\segme...&quot; (291 chars)</code>
+  <p>Exceeds the classic MAX_PATH limit; many Windows tools fail without long path support.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">long</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths reserved device name con, prn, aux, nul, com1 and lpt1 cannot be file names on windows, with any extension. windows reserved &quot;con&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>reserved device name</h3></div>
+  <code class="value">&quot;CON&quot;</code>
+  <p>CON, PRN, AUX, NUL, COM1 and LPT1 cannot be file names on Windows, with any extension.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">reserved</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths reserved name with extension still the aux device on windows; repositories with this file cannot be checked out there. windows reserved &quot;aux.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>reserved name with extension</h3></div>
+  <code class="value">&quot;aux.txt&quot;</code>
+  <p>Still the AUX device on Windows; repositories with this file cannot be checked out there.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">reserved</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths trailing dot windows strips trailing dots, so &quot;file.&quot; and &quot;file&quot; are the same file there but different on posix. windows trailing &quot;file.&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>trailing dot</h3></div>
+  <code class="value">&quot;file.&quot;</code>
+  <p>Windows strips trailing dots, so &quot;file.&quot; and &quot;file&quot; are the same file there but different on POSIX.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">trailing</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths trailing space windows strips trailing spaces as well; invisible in most uis. windows trailing whitespace &quot;file &quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>trailing space</h3></div>
+  <code class="value">&quot;file &quot;</code>
+  <p>Windows strips trailing spaces as well; invisible in most UIs.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">trailing</span><span class="tag">whitespace</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths case only difference case insensitive on default windows and macos file systems, so readme.md and readme.md collide. windows posix case &quot;readme.md&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>case only difference</h3></div>
+  <code class="value">&quot;README.md&quot;</code>
+  <p>Case insensitive on default Windows and macOS file systems, so readme.md and README.md collide.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">posix</span><span class="tag">case</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths posix absolute path absolute on posix; on windows path.win32 treats it as root relative on the current drive. posix absolute &quot;/usr/local/bin&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>POSIX absolute path</h3></div>
+  <code class="value">&quot;/usr/local/bin&quot;</code>
+  <p>Absolute on POSIX; on Windows path.win32 treats it as root relative on the current drive.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">absolute</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths trailing slash basename(&quot;dir/sub/&quot;) is &quot;sub&quot;, but split(&quot;/&quot;).pop() is &quot;&quot;; joining adds a double slash. posix trailing &quot;dir/sub/&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>trailing slash</h3></div>
+  <code class="value">&quot;dir/sub/&quot;</code>
+  <p>basename(&quot;dir/sub/&quot;) is &quot;sub&quot;, but split(&quot;/&quot;).pop() is &quot;&quot;; joining adds a double slash.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">trailing</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths repeated slashes equivalent to /a/b/c after normalization; string comparisons and cache keys disagree. posix normalization &quot;/a//b///c&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>repeated slashes</h3></div>
+  <code class="value">&quot;/a//b///c&quot;</code>
+  <p>Equivalent to /a/b/c after normalization; string comparisons and cache keys disagree.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">normalization</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths root only dirname(&quot;/&quot;) is &quot;/&quot; and basename is &quot;&quot;; loops that walk up until dirname changes must stop here. posix absolute root &quot;/&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>root only</h3></div>
+  <code class="value">&quot;/&quot;</code>
+  <p>dirname(&quot;/&quot;) is &quot;/&quot; and basename is &quot;&quot;; loops that walk up until dirname changes must stop here.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">absolute</span><span class="tag">root</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths empty path path.join(&quot;&quot;, &quot;&quot;) is &quot;.&quot; and path.resolve(&quot;&quot;) is the cwd; empty is not &quot;no path&quot;. posix windows empty &quot;&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>empty path</h3></div>
+  <code class="value">&quot;&quot;</code>
+  <p>path.join(&quot;&quot;, &quot;&quot;) is &quot;.&quot; and path.resolve(&quot;&quot;) is the cwd; empty is not &quot;no path&quot;.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">windows</span><span class="tag">empty</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths current directory a path that refers to the cwd; extname(&quot;.&quot;) is &quot;&quot; and basename is &quot;.&quot;. posix windows relative &quot;.&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>current directory</h3></div>
+  <code class="value">&quot;.&quot;</code>
+  <p>A path that refers to the cwd; extname(&quot;.&quot;) is &quot;&quot; and basename is &quot;.&quot;.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">windows</span><span class="tag">relative</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths parent directory traversal escapes the base directory after join; validate with path.relative after resolving. posix traversal security &quot;../../etc/passwd&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>parent directory traversal</h3></div>
+  <code class="value">&quot;../../etc/passwd&quot;</code>
+  <p>Escapes the base directory after join; validate with path.relative after resolving.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">traversal</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths traversal hidden inside a path looks rooted in uploads/ but normalizes outside it. posix traversal security &quot;uploads/./a/../../../secret&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>traversal hidden inside a path</h3></div>
+  <code class="value">&quot;uploads/./a/../../../secret&quot;</code>
+  <p>Looks rooted in uploads/ but normalizes outside it.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">traversal</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths windows traversal with backslashes checks that only look for &quot;../&quot; miss backslash traversal on windows. windows traversal security &quot;..\\..\\windows\\win.ini&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>Windows traversal with backslashes</h3></div>
+  <code class="value">&quot;..\\..\\Windows\\win.ini&quot;</code>
+  <p>Checks that only look for &quot;../&quot; miss backslash traversal on Windows.</p>
+  <div class="tags"><span class="tag">windows</span><span class="tag">traversal</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths dotfile extname(&quot;.env&quot;) is &quot;&quot;, not &quot;.env&quot;; hidden on posix and easy to leak in static servers. posix extension hidden &quot;.env&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>dotfile</h3></div>
+  <code class="value">&quot;.env&quot;</code>
+  <p>extname(&quot;.env&quot;) is &quot;&quot;, not &quot;.env&quot;; hidden on POSIX and easy to leak in static servers.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">extension</span><span class="tag">hidden</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths double extension extname gives &quot;.gz&quot;; type detection and &quot;strip the extension&quot; give &quot;archive.tar&quot;. posix windows extension &quot;archive.tar.gz&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>double extension</h3></div>
+  <code class="value">&quot;archive.tar.gz&quot;</code>
+  <p>extname gives &quot;.gz&quot;; type detection and &quot;strip the extension&quot; give &quot;archive.tar&quot;.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">windows</span><span class="tag">extension</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths spaces in names breaks unquoted shell commands and url building without encoding. posix windows whitespace &quot;my documents/file name.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>spaces in names</h3></div>
+  <code class="value">&quot;My Documents/file name.txt&quot;</code>
+  <p>Breaks unquoted shell commands and URL building without encoding.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">windows</span><span class="tag">whitespace</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths backslash in a posix file name a legal single file name on linux that becomes two segments on windows. posix mixed &quot;a\\b.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>backslash in a POSIX file name</h3></div>
+  <code class="value">&quot;a\\b.txt&quot;</code>
+  <p>A legal single file name on Linux that becomes two segments on Windows.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">mixed</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths nfc unicode name precomposed form, as typed on windows and linux. posix windows unicode normalization &quot;caf\u00e9.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>NFC unicode name</h3></div>
+  <code class="value">&quot;caf\u00E9.txt&quot;</code>
+  <p>Precomposed form, as typed on Windows and Linux.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">windows</span><span class="tag">unicode</span><span class="tag">normalization</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths nfd unicode name decomposed form produced by older macos file systems; looks the same as the nfc name but does not match it. posix unicode normalization &quot;cafe\u0301.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>NFD unicode name</h3></div>
+  <code class="value">&quot;cafe\u0301.txt&quot;</code>
+  <p>Decomposed form produced by older macOS file systems; looks the same as the NFC name but does not match it.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">unicode</span><span class="tag">normalization</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths emoji in file name surrogate pairs in a path: byte limits, truncation and some archive tools mishandle them. posix windows unicode emoji &quot;notes \u{1f4dd}.md&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>emoji in file name</h3></div>
+  <code class="value">&quot;notes \u{1F4DD}.md&quot;</code>
+  <p>Surrogate pairs in a path: byte limits, truncation and some archive tools mishandle them.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">windows</span><span class="tag">unicode</span><span class="tag">emoji</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths leading dash interpreted as an option by command line tools unless passed after &quot;--&quot;. posix security &quot;-rf&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>leading dash</h3></div>
+  <code class="value">&quot;-rf&quot;</code>
+  <p>Interpreted as an option by command line tools unless passed after &quot;--&quot;.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="paths" data-search="paths newline in file name legal on linux; breaks line based tools such as `find | xargs` and log parsing. posix control &quot;a\nb.txt&quot; ">
+  <div class="case-head"><code class="gen">paths()</code><h3>newline in file name</h3></div>
+  <code class="value">&quot;a\nb.txt&quot;</code>
+  <p>Legal on Linux; breaks line based tools such as `find | xargs` and log parsing.</p>
+  <div class="tags"><span class="tag">posix</span><span class="tag">control</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json deeply nested arrays (10000 levels) valid json that overflows the stack of recursive walkers, deep equality checks and schema validators. valid deep &quot;[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[...&quot; (20000 chars) ">
+  <div class="case-head"><code class="gen">json()</code><h3>deeply nested arrays (10000 levels)</h3></div>
+  <code class="value">&quot;[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[...&quot; (20000 chars)</code>
+  <p>Valid JSON that overflows the stack of recursive walkers, deep equality checks and schema validators.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">deep</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json deeply nested objects (10000 levels) same as nested arrays for code that recurses into object values, such as deep merge and clone helpers. valid deep &quot;{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:...&quot; (60001 chars) ">
+  <div class="case-head"><code class="gen">json()</code><h3>deeply nested objects (10000 levels)</h3></div>
+  <code class="value">&quot;{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:{\&quot;a\&quot;:...&quot; (60001 chars)</code>
+  <p>Same as nested arrays for code that recurses into object values, such as deep merge and clone helpers.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">deep</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json duplicate keys allowed by json.parse, which keeps the last value; other parsers keep the first or reject it, so validators and consumers disagree. valid duplicate-keys security &quot;{\&quot;a\&quot;:1,\&quot;a\&quot;:2}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>duplicate keys</h3></div>
+  <code class="value">&quot;{\&quot;a\&quot;:1,\&quot;a\&quot;:2}&quot;</code>
+  <p>Allowed by JSON.parse, which keeps the last value; other parsers keep the first or reject it, so validators and consumers disagree.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">duplicate-keys</span><span class="tag">security</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json integer above 2^53 parses to 9007199254740992: ids silently change. send large ids as strings. valid big-number precision &quot;{\&quot;id\&quot;:9007199254740993}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>integer above 2^53</h3></div>
+  <code class="value">&quot;{\&quot;id\&quot;:9007199254740993}&quot;</code>
+  <p>Parses to 9007199254740992: IDs silently change. Send large IDs as strings.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">big-number</span><span class="tag">precision</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json huge exponent valid json that parses to infinity, which json.stringify then writes as null. valid big-number infinity &quot;1e400&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>huge exponent</h3></div>
+  <code class="value">&quot;1e400&quot;</code>
+  <p>Valid JSON that parses to Infinity, which JSON.stringify then writes as null.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">big-number</span><span class="tag">infinity</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json negative zero parses to -0, but json.stringify(-0) is &quot;0&quot;, so round trips lose the sign. valid sign &quot;-0&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>negative zero</h3></div>
+  <code class="value">&quot;-0&quot;</code>
+  <p>Parses to -0, but JSON.stringify(-0) is &quot;0&quot;, so round trips lose the sign.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">sign</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json number with trailing zeros parses to 1 and stringifies as &quot;1&quot;: signatures and hashes over json text change after a round trip. valid canonical &quot;1.0&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>number with trailing zeros</h3></div>
+  <code class="value">&quot;1.0&quot;</code>
+  <p>Parses to 1 and stringifies as &quot;1&quot;: signatures and hashes over JSON text change after a round trip.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">canonical</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json __proto__ key json.parse creates an own property, but merging the result into another object with assignment pollutes its prototype. valid security prototype &quot;{\&quot;__proto__\&quot;:{\&quot;isadmin\&quot;:true}}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>__proto__ key</h3></div>
+  <code class="value">&quot;{\&quot;__proto__\&quot;:{\&quot;isAdmin\&quot;:true}}&quot;</code>
+  <p>JSON.parse creates an own property, but merging the result into another object with assignment pollutes its prototype.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">security</span><span class="tag">prototype</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json empty key valid; path based libraries (a.b.c syntax) cannot address it. valid keys &quot;{\&quot;\&quot;:1}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>empty key</h3></div>
+  <code class="value">&quot;{\&quot;\&quot;:1}&quot;</code>
+  <p>Valid; path based libraries (a.b.c syntax) cannot address it.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">keys</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json escaped lone surrogate valid json that decodes to malformed utf-16; re-encoding to utf-8 or a database fails. valid unicode surrogate &quot;\&quot;\\ud800\&quot;&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>escaped lone surrogate</h3></div>
+  <code class="value">&quot;\&quot;\\ud800\&quot;&quot;</code>
+  <p>Valid JSON that decodes to malformed UTF-16; re-encoding to UTF-8 or a database fails.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">unicode</span><span class="tag">surrogate</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json line and paragraph separators valid json that was invalid in javascript string literals before es2019, which broke jsonp and inline script tags. valid unicode &quot;\&quot;a\u2028b\u2029c\&quot;&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>line and paragraph separators</h3></div>
+  <code class="value">&quot;\&quot;a\u2028b\u2029c\&quot;&quot;</code>
+  <p>Valid JSON that was invalid in JavaScript string literals before ES2019, which broke JSONP and inline script tags.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">unicode</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json top level string valid json since rfc 7159; code that assumes an object reads properties of a string. valid scalar &quot;\&quot;just a string\&quot;&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>top level string</h3></div>
+  <code class="value">&quot;\&quot;just a string\&quot;&quot;</code>
+  <p>Valid JSON since RFC 7159; code that assumes an object reads properties of a string.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">scalar</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json top level null valid json that parses to null; `const { a } = json.parse(text)` throws. valid scalar &quot;null&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>top level null</h3></div>
+  <code class="value">&quot;null&quot;</code>
+  <p>Valid JSON that parses to null; `const { a } = JSON.parse(text)` throws.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">scalar</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json whitespace around value valid; byte or regex based detectors that check the first character for &quot;{&quot; fail. valid whitespace &quot; \n\t {\&quot;a\&quot;:1} \r\n&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>whitespace around value</h3></div>
+  <code class="value">&quot; \n\t {\&quot;a\&quot;:1} \r\n&quot;</code>
+  <p>Valid; byte or regex based detectors that check the first character for &quot;{&quot; fail.</p>
+  <div class="tags"><span class="tag">valid</span><span class="tag">whitespace</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json byte order mark prefix windows tools write a bom; json.parse throws on it, so strip it when reading files. invalid bom &quot;\ufeff{\&quot;a\&quot;:1}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>byte order mark prefix</h3></div>
+  <code class="value">&quot;\uFEFF{\&quot;a\&quot;:1}&quot;</code>
+  <p>Windows tools write a BOM; JSON.parse throws on it, so strip it when reading files.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">bom</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json trailing comma accepted by javascript and json5, rejected by json.parse. invalid syntax &quot;[1,2,]&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>trailing comma</h3></div>
+  <code class="value">&quot;[1,2,]&quot;</code>
+  <p>Accepted by JavaScript and JSON5, rejected by JSON.parse.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">syntax</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json comments common in config files (jsonc) but invalid json. invalid syntax &quot;{\&quot;a\&quot;:1 /* note */}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>comments</h3></div>
+  <code class="value">&quot;{\&quot;a\&quot;:1 /* note */}&quot;</code>
+  <p>Common in config files (JSONC) but invalid JSON.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">syntax</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json single quotes javascript object syntax, not json. invalid syntax &quot;{'a':1}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>single quotes</h3></div>
+  <code class="value">&quot;{'a':1}&quot;</code>
+  <p>JavaScript object syntax, not JSON.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">syntax</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json nan literal python json.dumps writes nan by default, and json.parse rejects it. invalid nan &quot;{\&quot;a\&quot;:nan}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>NaN literal</h3></div>
+  <code class="value">&quot;{\&quot;a\&quot;:NaN}&quot;</code>
+  <p>Python json.dumps writes NaN by default, and JSON.parse rejects it.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">nan</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json unquoted key javascript object literal syntax that json does not allow. invalid syntax &quot;{a:1}&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>unquoted key</h3></div>
+  <code class="value">&quot;{a:1}&quot;</code>
+  <p>JavaScript object literal syntax that JSON does not allow.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">syntax</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json empty text an empty response body is not json; json.parse(&quot;&quot;) throws &quot;unexpected end of json input&quot;. invalid empty &quot;&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>empty text</h3></div>
+  <code class="value">&quot;&quot;</code>
+  <p>An empty response body is not JSON; JSON.parse(&quot;&quot;) throws &quot;Unexpected end of JSON input&quot;.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">empty</span></div>
+</li>
+<li class="case" data-generator="json" data-search="json raw control character in string unescaped tab inside a string is invalid json even though it looks harmless. invalid control &quot;\&quot;a\tb\&quot;&quot; ">
+  <div class="case-head"><code class="gen">json()</code><h3>raw control character in string</h3></div>
+  <code class="value">&quot;\&quot;a\tb\&quot;&quot;</code>
+  <p>Unescaped tab inside a string is invalid JSON even though it looks harmless.</p>
+  <div class="tags"><span class="tag">invalid</span><span class="tag">control</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays empty array truthy even though empty; reduce without a seed throws and math.max(...[]) is -infinity. empty [] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>empty array</h3></div>
+  <code class="value">[]</code>
+  <p>Truthy even though empty; reduce without a seed throws and Math.max(...[]) is -Infinity.</p>
+  <div class="tags"><span class="tag">empty</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays array with a hole foreach, map and filter skip the hole but for...of and spread yield undefined, so the two styles disagree. sparse hole [1, &lt;hole&gt;, 3] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>array with a hole</h3></div>
+  <code class="value">[1, &lt;hole&gt;, 3]</code>
+  <p>forEach, map and filter skip the hole but for...of and spread yield undefined, so the two styles disagree.</p>
+  <div class="tags"><span class="tag">sparse</span><span class="tag">hole</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays explicit undefined looks like the hole case when printed, but every iteration method visits it and `1 in arr` is true. undefined [1, undefined, 3] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>explicit undefined</h3></div>
+  <code class="value">[1, undefined, 3]</code>
+  <p>Looks like the hole case when printed, but every iteration method visits it and `1 in arr` is true.</p>
+  <div class="tags"><span class="tag">undefined</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays length 5 with no elements new array(5) has five holes: map returns holes, not values, and json.stringify writes nulls. sparse hole [&lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>length 5 with no elements</h3></div>
+  <code class="value">[&lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;]</code>
+  <p>new Array(5) has five holes: map returns holes, not values, and JSON.stringify writes nulls.</p>
+  <div class="tags"><span class="tag">sparse</span><span class="tag">hole</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays huge sparse length (2^32 - 1) the maximum array length: cheap to create, but any loop to length or array.from runs four billion times. sparse huge limit [&quot;first&quot;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, ...] (length 4294967295) ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>huge sparse length (2^32 - 1)</h3></div>
+  <code class="value">[&quot;first&quot;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, &lt;hole&gt;, ...] (length 4294967295)</code>
+  <p>The maximum array length: cheap to create, but any loop to length or Array.from runs four billion times.</p>
+  <div class="tags"><span class="tag">sparse</span><span class="tag">huge</span><span class="tag">limit</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays nan element indexof(nan) is -1 while includes(nan) is true; set and map treat nan as equal to itself. nan [nan] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>NaN element</h3></div>
+  <code class="value">[NaN]</code>
+  <p>indexOf(NaN) is -1 while includes(NaN) is true; Set and Map treat NaN as equal to itself.</p>
+  <div class="tags"><span class="tag">nan</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays -0 and 0 set collapses them into one value and includes(-0) finds 0; object.is tells them apart. zero sign [-0, 0] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>-0 and 0</h3></div>
+  <code class="value">[-0, 0]</code>
+  <p>Set collapses them into one value and includes(-0) finds 0; Object.is tells them apart.</p>
+  <div class="tags"><span class="tag">zero</span><span class="tag">sign</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays numbers that sort as strings default sort() compares strings, giving [1, 10, 100, 9]; always pass a comparator. sort [10, 9, 1, 100] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>numbers that sort as strings</h3></div>
+  <code class="value">[10, 9, 1, 100]</code>
+  <p>Default sort() compares strings, giving [1, 10, 100, 9]; always pass a comparator.</p>
+  <div class="tags"><span class="tag">sort</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays undefined during sort sort() moves undefined to the end without calling the comparator, so comparators never see it. sort undefined [3, undefined, 1] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>undefined during sort</h3></div>
+  <code class="value">[3, undefined, 1]</code>
+  <p>sort() moves undefined to the end without calling the comparator, so comparators never see it.</p>
+  <div class="tags"><span class="tag">sort</span><span class="tag">undefined</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays mixed number and numeric string includes(&quot;1&quot;) and set treat them as different, while == and loose lookups do not. mixed coercion [1, &quot;1&quot;] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>mixed number and numeric string</h3></div>
+  <code class="value">[1, &quot;1&quot;]</code>
+  <p>includes(&quot;1&quot;) and Set treat them as different, while == and loose lookups do not.</p>
+  <div class="tags"><span class="tag">mixed</span><span class="tag">coercion</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays nested empty arrays flat() and recursive flatten helpers must handle empty levels; string([[[]]]) is &quot;&quot;. nested [[[]]] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>nested empty arrays</h3></div>
+  <code class="value">[[[]]]</code>
+  <p>flat() and recursive flatten helpers must handle empty levels; String([[[]]]) is &quot;&quot;.</p>
+  <div class="tags"><span class="tag">nested</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays array with extra property for...in visits &quot;extra&quot; and object.keys includes it, but length and json.stringify ignore it. properties [1, 2] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>array with extra property</h3></div>
+  <code class="value">[1, 2]</code>
+  <p>for...in visits &quot;extra&quot; and Object.keys includes it, but length and JSON.stringify ignore it.</p>
+  <div class="tags"><span class="tag">properties</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays frozen array push and in place sort throw typeerror in strict mode; libraries that mutate input break. frozen [1, 2, 3] ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>frozen array</h3></div>
+  <code class="value">[1, 2, 3]</code>
+  <p>push and in place sort throw TypeError in strict mode; libraries that mutate input break.</p>
+  <div class="tags"><span class="tag">frozen</span></div>
+</li>
+<li class="case" data-generator="arrays" data-search="arrays 500000 elements (too many to spread) math.max(...arr) and fn.apply(null, arr) exceed the argument limit and throw rangeerror. large stack [0, 1, 2, 3, 4, 5, ...] (length 500000) ">
+  <div class="case-head"><code class="gen">arrays()</code><h3>500000 elements (too many to spread)</h3></div>
+  <code class="value">[0, 1, 2, 3, 4, 5, ...] (length 500000)</code>
+  <p>Math.max(...arr) and fn.apply(null, arr) exceed the argument limit and throw RangeError.</p>
+  <div class="tags"><span class="tag">large</span><span class="tag">stack</span></div>
+</li>
+  </ol>
+</section>
+
+<section id="guides">
+  <h2>Guides</h2>
+  <ul class="guides">
+    <li><a href="test-timezones-javascript.html"><strong>How to test time zones in JavaScript</strong></a><p>Test JavaScript date code in any time zone: run tests under TZ, switch zones per test with withTimeZone, and catch New Year and UTC offset bugs with ready made edge cases.</p></li>
+    <li><a href="test-daylight-saving-time-jest.html"><strong>How to test daylight saving time in Jest</strong></a><p>Test DST transitions in Jest: real spring forward gaps and fall back overlaps for New York, London, Sao Paulo and Lord Howe, computed from Intl, plus mocking the date without fake timers.</p></li>
+    <li><a href="unicode-test-strings.html"><strong>Unicode test strings for JavaScript</strong></a><p>Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.</p></li>
+    <li><a href="javascript-number-edge-cases.html"><strong>JavaScript number edge cases to test</strong></a><p>Test JavaScript number handling with -0, NaN, Infinity, MAX_SAFE_INTEGER + 1, 0.1 + 0.2, 1e21 and values between -1 and 0, plus numeric strings and BigInt limits.</p></li>
+    <li><a href="test-dates-before-1970.html"><strong>Testing dates before 1970 in JavaScript</strong></a><p>Dates before the Unix epoch have negative timestamps, and fractional seconds round the wrong way with Math.trunc and %. Test pre-1970 dates, local mean time and year 0 with edgegoat.</p></li>
+    <li><a href="javascript-negative-zero.html"><strong>Negative zero in JavaScript: why -0 is different from 0</strong></a><p>-0 === 0 is true, yet 1 / -0 is -Infinity and Object.is(-0, 0) is false. Learn where -0 comes from, which code it breaks, and how to test it.</p></li>
+    <li><a href="mock-date-javascript.html"><strong>How to mock Date in JavaScript tests</strong></a><p>Freeze new Date() and Date.now() in Vitest, Jest, node:test or Mocha with a tiny helper, combine it with a time zone, and test New Year and DST edge instants.</p></li>
+    <li><a href="property-based-testing-edge-cases.html"><strong>Property based testing and curated edge cases in JavaScript</strong></a><p>Property based testing finds bugs with random inputs; curated edge cases find the known ones every time. How to combine fast-check with edgegoat's labeled inputs in Vitest or Jest.</p></li>
+  </ul>
+</section>
+<script src="app.js" defer></script>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

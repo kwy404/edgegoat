@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JavaScript number edge cases for tests: -0, NaN, Infinity, 2^53 | edgegoat</title>
+<meta name="description" content="Test JavaScript number handling with -0, NaN, Infinity, MAX_SAFE_INTEGER + 1, 0.1 + 0.2, 1e21 and values between -1 and 0, plus numeric strings and BigInt limits.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/javascript-number-edge-cases.html">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="JavaScript number edge cases for tests: -0, NaN, Infinity, 2^53 | edgegoat">
+<meta property="og:description" content="Test JavaScript number handling with -0, NaN, Infinity, MAX_SAFE_INTEGER + 1, 0.1 + 0.2, 1e21 and values between -1 and 0, plus numeric strings and BigInt limits.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/javascript-number-edge-cases.html">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JavaScript number edge cases for tests: -0, NaN, Infinity, 2^53 | edgegoat">
+<meta name="twitter:description" content="Test JavaScript number handling with -0, NaN, Infinity, MAX_SAFE_INTEGER + 1, 0.1 + 0.2, 1e21 and values between -1 and 0, plus numeric strings and BigInt limits.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "JavaScript number edge cases to test",
+      "description": "Test JavaScript number handling with -0, NaN, Infinity, MAX_SAFE_INTEGER + 1, 0.1 + 0.2, 1e21 and values between -1 and 0, plus numeric strings and BigInt limits.",
+      "url": "https://kwy404.github.io/edgegoat/javascript-number-edge-cases.html",
+      "image": "https://kwy404.github.io/edgegoat/og.png",
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-12",
+      "inLanguage": "en",
+      "proficiencyLevel": "Intermediate",
+      "author": {
+        "@type": "Person",
+        "name": "Alexandre Kohler",
+        "url": "https://github.com/kwy404"
+      },
+      "about": [
+        "JavaScript numbers",
+        "IEEE 754",
+        "NaN",
+        "negative zero"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "edgegoat",
+        "url": "https://kwy404.github.io/edgegoat/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is 0.1 + 0.2 not 0.3 in JavaScript?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Neither 0.1 nor 0.2 has an exact binary representation, so their sum is 0.30000000000000004. Compare with a tolerance, or keep money in integer cents."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the largest safe integer in JavaScript?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Number.MAX_SAFE_INTEGER, 2^53 - 1 (9007199254740991). Above it, consecutive integers can no longer all be represented, so 2 ** 53 + 1 === 2 ** 53. Use BigInt or strings for 64 bit IDs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I check for NaN?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use Number.isNaN(x). The global isNaN converts its argument first, so isNaN(\"abc\") is true, and x === NaN is always false."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does 1e21 print in exponent notation?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Number.prototype.toString switches to exponent notation for magnitudes of 1e21 and above and below 1e-6, so String(1e21) is \"1e+21\" and digit only checks fail."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<article class="guide">
+  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
+  <h1>JavaScript number edge cases to test</h1>
+  <p class="lede">A JavaScript number is an IEEE 754 double. That gives you two zeros, a value that is not equal to itself, two infinities, and integers that stop being exact after 2^53.</p>
+  <section><h2>The bug: losing the sign between -1 and 0</h2>
+<p>A formatter that prints the integer part and the fraction separately works for -1.5 and 0.5, but not for -0.5: the integer part of -0.5 is -0, and <code>String(-0)</code> is <code>"0"</code>. pdf.js had exactly this bug in <code>util.printf</code>, fixed in <a href="https://github.com/mozilla/pdf.js/pull/22017">mozilla/pdf.js#22017</a>.</p>
+</section>
+  <section><h2>A naive implementation that fails</h2>
+<pre><code class="language-js">function formatFixed(n, digits) {
+  const int = Math.trunc(n);
+  const frac = Math.abs(n - int).toFixed(digits).slice(1); // ".50"
+  return String(int) + frac;
+}
+
+formatFixed(-0.5, 2); // "0.50", expected "-0.50"</code></pre>
+</section>
+  <section><h2>The edgegoat test that catches it</h2>
+<pre><code class="language-js">import { expect, test } from 'vitest';
+import { numbers } from 'edgegoat';
+
+test.each(numbers({ tags: ['sign', 'negative'] }))('$label keeps its sign', ({ value }) =&gt; {
+  expect(formatFixed(value, 2).startsWith('-')).toBe(value &lt; 0);
+});</code></pre>
+<div class="callout fail"><strong>Fails:</strong> <code>-0.5</code>, <code>-0.0001</code> and <code>-1e-7</code>: each truncates to -0, which prints as 0. A sign aware version formats <code>Math.abs(n)</code> and prefixes the minus sign when <code>n &lt; 0</code>.</div>
+</section>
+  <section><h2>Infinity is a real value</h2>
+<p>Infinity shows up as a "never expires" or "no limit" sentinel. tough-cookie had to treat an infinite max-age as a cookie that never expires (<a href="https://github.com/salesforce/tough-cookie/pull/644">salesforce/tough-cookie#644</a>). Elsewhere it overflows: <code>setTimeout(fn, Infinity)</code> fires after about 1 ms in Node.js, because delays that do not fit in 32 bits are reset to 1, and <code>JSON.stringify(Infinity)</code> is <code>"null"</code>.</p>
+</section>
+  <section><h2>What numbers() contains</h2>
+<ul>
+<li>Zeros and signs: <code>0</code>, <code>-0</code>, <code>-0.5</code>, <code>-0.0001</code>, <code>-1e-7</code>.</li>
+<li>Special values: <code>NaN</code>, <code>Infinity</code>, <code>-Infinity</code>.</li>
+<li>Limits: <code>MAX_SAFE_INTEGER</code> and its neighbors, <code>MIN_SAFE_INTEGER - 1</code>, <code>MAX_VALUE</code>, <code>MIN_VALUE</code>, <code>EPSILON</code>, <code>2^31</code>, <code>2^32</code>.</li>
+<li>Rounding and formatting: <code>0.1 + 0.2</code>, <code>1.005</code>, <code>0.5</code>, <code>1e21</code>, <code>1e-7</code>.</li>
+</ul>
+<p><code>numericStrings()</code> adds inputs like <code>""</code>, <code>"1e3"</code>, <code>"0x1A"</code>, <code>"1,5"</code> and <code>"9007199254740993"</code>, where <code>Number</code>, <code>parseInt</code> and <code>parseFloat</code> disagree. <code>bigints()</code> covers the int64 and uint64 limits.</p>
+</section>
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>Why is 0.1 + 0.2 not 0.3 in JavaScript?</summary><p>Neither 0.1 nor 0.2 has an exact binary representation, so their sum is 0.30000000000000004. Compare with a tolerance, or keep money in integer cents.</p></details>
+<details><summary>What is the largest safe integer in JavaScript?</summary><p><code>Number.MAX_SAFE_INTEGER</code>, 2^53 - 1 (9007199254740991). Above it, consecutive integers can no longer all be represented, so <code>2 ** 53 + 1 === 2 ** 53</code>. Use BigInt or strings for 64 bit IDs.</p></details>
+<details><summary>How do I check for NaN?</summary><p>Use <code>Number.isNaN(x)</code>. The global <code>isNaN</code> converts its argument first, so <code>isNaN("abc")</code> is true, and <code>x === NaN</code> is always false.</p></details>
+<details><summary>Why does 1e21 print in exponent notation?</summary><p><code>Number.prototype.toString</code> switches to exponent notation for magnitudes of 1e21 and above and below 1e-6, so <code>String(1e21)</code> is <code>"1e+21"</code> and digit only checks fail.</p></details>
+  </section>
+  <section>
+    <h2>More guides</h2>
+    <ul>
+    <li><a href="test-timezones-javascript.html">How to test time zones in JavaScript</a></li>
+    <li><a href="test-daylight-saving-time-jest.html">How to test daylight saving time in Jest</a></li>
+    <li><a href="unicode-test-strings.html">Unicode test strings for JavaScript</a></li>
+    <li><a href="test-dates-before-1970.html">Testing dates before 1970 in JavaScript</a></li>
+    <li><a href="javascript-negative-zero.html">Negative zero in JavaScript: why -0 is different from 0</a></li>
+    <li><a href="mock-date-javascript.html">How to mock Date in JavaScript tests</a></li>
+    <li><a href="property-based-testing-edge-cases.html">Property based testing and curated edge cases in JavaScript</a></li>
+    </ul>
+  </section>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

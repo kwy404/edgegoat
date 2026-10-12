@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Property based testing and edge cases in JavaScript: fast-check plus edgegoat | edgegoat</title>
+<meta name="description" content="Property based testing finds bugs with random inputs; curated edge cases find the known ones every time. How to combine fast-check with edgegoat's labeled inputs in Vitest or Jest.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/property-based-testing-edge-cases.html">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="Property based testing and edge cases in JavaScript: fast-check plus edgegoat | edgegoat">
+<meta property="og:description" content="Property based testing finds bugs with random inputs; curated edge cases find the known ones every time. How to combine fast-check with edgegoat's labeled inputs in Vitest or Jest.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/property-based-testing-edge-cases.html">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Property based testing and edge cases in JavaScript: fast-check plus edgegoat | edgegoat">
+<meta name="twitter:description" content="Property based testing finds bugs with random inputs; curated edge cases find the known ones every time. How to combine fast-check with edgegoat's labeled inputs in Vitest or Jest.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Property based testing and curated edge cases in JavaScript",
+      "description": "Property based testing finds bugs with random inputs; curated edge cases find the known ones every time. How to combine fast-check with edgegoat's labeled inputs in Vitest or Jest.",
+      "url": "https://kwy404.github.io/edgegoat/property-based-testing-edge-cases.html",
+      "image": "https://kwy404.github.io/edgegoat/og.png",
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-12",
+      "inLanguage": "en",
+      "proficiencyLevel": "Intermediate",
+      "author": {
+        "@type": "Person",
+        "name": "Alexandre Kohler",
+        "url": "https://github.com/kwy404"
+      },
+      "about": [
+        "property based testing",
+        "fast-check",
+        "edge cases",
+        "fuzzing"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "edgegoat",
+        "url": "https://kwy404.github.io/edgegoat/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is property based testing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Instead of writing examples, you state a property that must hold for all inputs (for example \"decode(encode(x)) equals x\") and a library such as fast-check checks it against many generated inputs, shrinking any failure to a minimal case."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Should I use fast-check or edgegoat?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Both. Use fast-check to explore inputs you did not think of, and edgegoat to make sure the inputs that are known to break code are always tested, with readable names in the test report."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does edgegoat generate random data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Every call returns the same cases, so failures are reproducible. DST instants are computed from the runtime tz database, so they are deterministic for a given Node.js version."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is edgegoat different from big-list-of-naughty-strings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The big list is a large list of strings for fuzzing. edgegoat is smaller, explains every case, is filterable by tags and also covers dates, time zones, numbers, URLs, paths, JSON and arrays."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<article class="guide">
+  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
+  <h1>Property based testing and curated edge cases in JavaScript</h1>
+  <p class="lede">fast-check generates thousands of random inputs and shrinks failures to a minimal example. edgegoat hands you the few hundred inputs that already broke real code, with names and reasons. They answer different questions and work well together.</p>
+  <section><h2>What each approach is good at</h2>
+<table>
+<thead><tr><th></th><th>fast-check</th><th>edgegoat</th><th>big-list-of-naughty-strings</th></tr></thead>
+<tbody>
+<tr><th scope="row">Inputs</th><td>Random, generated from arbitraries</td><td>Curated, deterministic</td><td>Curated raw strings</td></tr>
+<tr><th scope="row">Finds</th><td>Unknown bugs, with shrinking</td><td>Known bug classes, every run</td><td>String handling bugs</td></tr>
+<tr><th scope="row">Explains why</th><td>No</td><td>Yes, one line per case</td><td>Comments by section</td></tr>
+<tr><th scope="row">Types</th><td>Any</td><td>Dates, zones, strings, numbers, URLs, paths, JSON, arrays</td><td>Strings</td></tr>
+<tr><th scope="row">DST and New Year instants</th><td>Rarely hit by chance</td><td>Computed per zone</td><td>No</td></tr>
+</tbody>
+</table>
+</section>
+  <section><h2>The bug random inputs rarely find</h2>
+<p>A uniformly random instant falls inside a given one hour window about once in 8,760 tries, so a property test over random dates almost never lands on the hour where clocks jump. <code>dates({ tags: ['dst'] })</code> hits it on every run, in every zone you choose. The same goes for a surrogate pair exactly at a cut boundary or a number between -1 and 0.</p>
+</section>
+  <section><h2>Seed fast-check with edgegoat values</h2>
+<pre><code class="language-js">import fc from 'fast-check';
+import { test } from 'vitest';
+import { strings } from 'edgegoat';
+
+const tricky = fc.constantFrom(...strings().map((c) =&gt; c.value));
+const text = fc.oneof(tricky, fc.string({ unit: 'grapheme' }));
+
+test('slugify is idempotent', () =&gt; {
+  fc.assert(fc.property(text, (s) =&gt; slugify(slugify(s)) === slugify(s)));
+});</code></pre>
+<p>fast-check mixes the curated values with random ones and still shrinks failures. <code>unit: 'grapheme'</code> needs fast-check 3.22 or later.</p>
+</section>
+  <section><h2>Or keep the labels with check()</h2>
+<p>The same property, without a property testing library, reports failures by name and reason:</p>
+<pre><code class="language-js">import { expect, test } from 'vitest';
+import { check, strings } from 'edgegoat';
+
+test('slugify is idempotent on every edge case', () =&gt; {
+  const failures = check(slugify, strings(), (out) =&gt; slugify(out) === out);
+  expect(failures.map((f) =&gt; `${f.label}: ${f.why}`)).toEqual([]);
+});</code></pre>
+</section>
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>What is property based testing?</summary><p>Instead of writing examples, you state a property that must hold for all inputs (for example "decode(encode(x)) equals x") and a library such as fast-check checks it against many generated inputs, shrinking any failure to a minimal case.</p></details>
+<details><summary>Should I use fast-check or edgegoat?</summary><p>Both. Use fast-check to explore inputs you did not think of, and edgegoat to make sure the inputs that are known to break code are always tested, with readable names in the test report.</p></details>
+<details><summary>Does edgegoat generate random data?</summary><p>No. Every call returns the same cases, so failures are reproducible. DST instants are computed from the runtime tz database, so they are deterministic for a given Node.js version.</p></details>
+<details><summary>How is edgegoat different from big-list-of-naughty-strings?</summary><p>The big list is a large list of strings for fuzzing. edgegoat is smaller, explains every case, is filterable by tags and also covers dates, time zones, numbers, URLs, paths, JSON and arrays.</p></details>
+  </section>
+  <section>
+    <h2>More guides</h2>
+    <ul>
+    <li><a href="test-timezones-javascript.html">How to test time zones in JavaScript</a></li>
+    <li><a href="test-daylight-saving-time-jest.html">How to test daylight saving time in Jest</a></li>
+    <li><a href="unicode-test-strings.html">Unicode test strings for JavaScript</a></li>
+    <li><a href="javascript-number-edge-cases.html">JavaScript number edge cases to test</a></li>
+    <li><a href="test-dates-before-1970.html">Testing dates before 1970 in JavaScript</a></li>
+    <li><a href="javascript-negative-zero.html">Negative zero in JavaScript: why -0 is different from 0</a></li>
+    <li><a href="mock-date-javascript.html">How to mock Date in JavaScript tests</a></li>
+    </ul>
+  </section>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unicode test strings for JavaScript: emoji, surrogate pairs, RTL | edgegoat</title>
+<meta name="description" content="Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/unicode-test-strings.html">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="Unicode test strings for JavaScript: emoji, surrogate pairs, RTL | edgegoat">
+<meta property="og:description" content="Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/unicode-test-strings.html">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Unicode test strings for JavaScript: emoji, surrogate pairs, RTL | edgegoat">
+<meta name="twitter:description" content="Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Unicode test strings for JavaScript",
+      "description": "Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.",
+      "url": "https://kwy404.github.io/edgegoat/unicode-test-strings.html",
+      "image": "https://kwy404.github.io/edgegoat/og.png",
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-12",
+      "inLanguage": "en",
+      "proficiencyLevel": "Intermediate",
+      "author": {
+        "@type": "Person",
+        "name": "Alexandre Kohler",
+        "url": "https://github.com/kwy404"
+      },
+      "about": [
+        "Unicode",
+        "UTF-16",
+        "surrogate pairs",
+        "JavaScript strings"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "edgegoat",
+        "url": "https://kwy404.github.io/edgegoat/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are good unicode test strings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Strings that break assumptions about length, equality and display: emoji outside the BMP, ZWJ sequences, NFC vs NFD pairs, right to left text, invisible spaces, lone surrogates and locale sensitive casing. strings() returns 49 of them with the reason each one breaks code."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a surrogate pair?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "UTF-16 encodes code points above U+FFFF as two 16 bit code units, a high surrogate followed by a low surrogate. JavaScript string indexes count code units, so one emoji has length 2 and can be cut in half."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I count characters in a JavaScript string?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "s.length counts UTF-16 code units, [...s].length counts code points, and [...new Intl.Segmenter().segment(s)].length counts grapheme clusters, which is what users perceive as characters."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is this different from the big list of naughty strings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The big list of naughty strings is a large raw list, great for fuzzing. edgegoat is smaller and curated: every string has a label, a one line reason and tags, plus typed generators for dates, numbers and URLs. They work well together."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<article class="guide">
+  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
+  <h1>Unicode test strings for JavaScript</h1>
+  <p class="lede">JavaScript strings are sequences of UTF-16 code units, not characters. Anything that slices, counts, reverses or compares text by code unit will eventually split an emoji or treat two identical looking strings as different.</p>
+  <section><h2>The bug: cutting a surrogate pair in half</h2>
+<p>Characters outside the Basic Multilingual Plane, including most emoji, take two code units (a surrogate pair). <code>slice</code>, <code>substring</code> and <code>str[i]</code> do not know that. Cut between the two halves and you get a lone surrogate: it renders as a replacement character, <code>encodeURIComponent</code> throws <code>URIError</code>, and some databases reject the text.</p>
+<p>Real bugs of this kind were fixed in <a href="https://github.com/google/budoux/pull/1411">google/budoux#1411</a> (do not split surrogate pairs) and <a href="https://github.com/microsoft/vscode-js-debug/pull/2423">microsoft/vscode-js-debug#2423</a> (avoid splitting surrogate pairs in trimEnd).</p>
+</section>
+  <section><h2>A naive implementation that fails</h2>
+<pre><code class="language-js">function truncate(text, max) {
+  return text.length &lt;= max ? text : text.slice(0, max) + '...';
+}</code></pre>
+</section>
+  <section><h2>The edgegoat test that catches it</h2>
+<pre><code class="language-js">import { expect, test } from 'vitest';
+import { check, strings } from 'edgegoat';
+
+test('truncate never produces malformed UTF-16', () =&gt; {
+  const inputs = strings({ exclude: ['malformed'] });
+  const failures = check((s) =&gt; truncate(s, 10), inputs, (out) =&gt; out.isWellFormed());
+  expect(failures.map((f) =&gt; f.label)).toEqual([]);
+});</code></pre>
+<div class="callout fail"><strong>Fails:</strong> <code>surrogate pair cut by slice(0, 10)</code>: the emoji starts at index 9. Other lengths also break the ZWJ family, flag and skin tone cases. (<code>isWellFormed</code> needs Node.js 20; older versions can use a regex.)</div>
+<p>The fix walks grapheme clusters with <code>Intl.Segmenter</code>:</p>
+<pre><code class="language-js">function truncate(text, max) {
+  if (text.length &lt;= max) return text;
+  let out = '';
+  for (const { segment } of new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)) {
+    if (out.length + segment.length &gt; max) break;
+    out += segment;
+  }
+  return out + '...';
+}</code></pre>
+</section>
+  <section><h2>What strings() contains</h2>
+<ul>
+<li><strong>Whitespace and invisible characters</strong>: no-break space, ideographic space, zero width space, byte order mark, soft hyphen.</li>
+<li><strong>Emoji and graphemes</strong>: ZWJ family, regional indicator flags, skin tone modifiers, variation selectors, keycaps.</li>
+<li><strong>Surrogates</strong>: a pair at a cut boundary, lone high and low surrogates.</li>
+<li><strong>Normalization</strong>: NFC vs NFD accents, Hangul syllables vs jamo, stacked combining marks.</li>
+<li><strong>Bidirectional text</strong>: Hebrew and Arabic mixed with Latin, the right to left override used by Trojan Source, bidi isolates.</li>
+<li><strong>Casing</strong>: Turkish dotted and dotless i, German sharp s, Greek final sigma.</li>
+<li><strong>Newlines and control characters</strong>: CRLF, CR, U+2028, U+2029, NUL, vertical tab.</li>
+<li><strong>Injection shaped text</strong>: HTML, SQL quotes, regex metacharacters, template placeholders, <code>__proto__</code>.</li>
+<li><strong>Digits and scripts</strong>: Arabic-Indic and full width digits, Thai without spaces, wide CJK characters.</li>
+</ul>
+<p>Every value is written with escapes in the source, so the catalog shows emoji as code points such as <code>\u{1F600}</code>, never as hidden glyphs. Filter with tags, for example <code>strings({ tags: ['emoji', 'bidi'] })</code>.</p>
+</section>
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>What are good unicode test strings?</summary><p>Strings that break assumptions about length, equality and display: emoji outside the BMP, ZWJ sequences, NFC vs NFD pairs, right to left text, invisible spaces, lone surrogates and locale sensitive casing. <code>strings()</code> returns 49 of them with the reason each one breaks code.</p></details>
+<details><summary>What is a surrogate pair?</summary><p>UTF-16 encodes code points above U+FFFF as two 16 bit code units, a high surrogate followed by a low surrogate. JavaScript string indexes count code units, so one emoji has <code>length</code> 2 and can be cut in half.</p></details>
+<details><summary>How do I count characters in a JavaScript string?</summary><p><code>s.length</code> counts UTF-16 code units, <code>[...s].length</code> counts code points, and <code>[...new Intl.Segmenter().segment(s)].length</code> counts grapheme clusters, which is what users perceive as characters.</p></details>
+<details><summary>How is this different from the big list of naughty strings?</summary><p>The big list of naughty strings is a large raw list, great for fuzzing. edgegoat is smaller and curated: every string has a label, a one line reason and tags, plus typed generators for dates, numbers and URLs. They work well together.</p></details>
+  </section>
+  <section>
+    <h2>More guides</h2>
+    <ul>
+    <li><a href="test-timezones-javascript.html">How to test time zones in JavaScript</a></li>
+    <li><a href="test-daylight-saving-time-jest.html">How to test daylight saving time in Jest</a></li>
+    <li><a href="javascript-number-edge-cases.html">JavaScript number edge cases to test</a></li>
+    <li><a href="test-dates-before-1970.html">Testing dates before 1970 in JavaScript</a></li>
+    <li><a href="javascript-negative-zero.html">Negative zero in JavaScript: why -0 is different from 0</a></li>
+    <li><a href="mock-date-javascript.html">How to mock Date in JavaScript tests</a></li>
+    <li><a href="property-based-testing-edge-cases.html">Property based testing and curated edge cases in JavaScript</a></li>
+    </ul>
+  </section>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

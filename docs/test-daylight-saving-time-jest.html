@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to test daylight saving time in Jest (and Vitest) | edgegoat</title>
+<meta name="description" content="Test DST transitions in Jest: real spring forward gaps and fall back overlaps for New York, London, Sao Paulo and Lord Howe, computed from Intl, plus mocking the date without fake timers.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/test-daylight-saving-time-jest.html">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="How to test daylight saving time in Jest (and Vitest) | edgegoat">
+<meta property="og:description" content="Test DST transitions in Jest: real spring forward gaps and fall back overlaps for New York, London, Sao Paulo and Lord Howe, computed from Intl, plus mocking the date without fake timers.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/test-daylight-saving-time-jest.html">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to test daylight saving time in Jest (and Vitest) | edgegoat">
+<meta name="twitter:description" content="Test DST transitions in Jest: real spring forward gaps and fall back overlaps for New York, London, Sao Paulo and Lord Howe, computed from Intl, plus mocking the date without fake timers.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "How to test daylight saving time in Jest",
+      "description": "Test DST transitions in Jest: real spring forward gaps and fall back overlaps for New York, London, Sao Paulo and Lord Howe, computed from Intl, plus mocking the date without fake timers.",
+      "url": "https://kwy404.github.io/edgegoat/test-daylight-saving-time-jest.html",
+      "image": "https://kwy404.github.io/edgegoat/og.png",
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-12",
+      "inLanguage": "en",
+      "proficiencyLevel": "Intermediate",
+      "author": {
+        "@type": "Person",
+        "name": "Alexandre Kohler",
+        "url": "https://github.com/kwy404"
+      },
+      "about": [
+        "daylight saving time",
+        "Jest",
+        "Vitest",
+        "JavaScript Date"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "edgegoat",
+        "url": "https://kwy404.github.io/edgegoat/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I test daylight saving time in Jest?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use real transition instants (dates({ tags: ['dst'] })), run each one in its zone with withTimeZone() or by starting Jest with TZ, and assert on local wall clock values, not on millisecond differences."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I mock the date in Jest during a DST change?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Either jest.useFakeTimers({ now: date }), or withFrozenTime(date, fn) from edgegoat, which only replaces Date and leaves timers alone. Combine it with withTimeZone() to control the zone too."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are the DST instants hard coded?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. edgegoat scans UTC offsets with Intl.DateTimeFormat and binary searches each change down to the minute, so the instants match the tz database of the runtime. Its test suite checks that every case is a real transition."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which zones have unusual DST rules?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Australia/Lord_Howe shifts by 30 minutes, Antarctica/Troll by two hours, America/Sao_Paulo switched at midnight until 2019, and the tz database models Europe/Dublin with a negative DST save."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<article class="guide">
+  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
+  <h1>How to test daylight saving time in Jest</h1>
+  <p class="lede">Twice a year a local day is 23 or 25 hours long, a wall clock time is skipped or repeated, and code that treats a day as 86,400,000 milliseconds drifts by an hour.</p>
+  <section><h2>The bug: one day is not always 24 hours</h2>
+<p>On 2026-03-08 in New York, clocks jump from 02:00 to 03:00. That local day lasts 23 hours. On 2026-11-01 they fall back from 02:00 to 01:00, so 01:30 happens twice and the day lasts 25 hours. Reminders, recurring events, "same time tomorrow" and date pickers all break here.</p>
+<p>Some zones are stranger: Australia/Lord_Howe shifts by 30 minutes, and America/Sao_Paulo used to change at midnight, so on 2018-11-04 local midnight did not exist and <code>new Date(2018, 10, 4)</code> returns 01:00.</p>
+</section>
+  <section><h2>A naive implementation that fails</h2>
+<pre><code class="language-js">// Same time tomorrow, or so it seems.
+function addDays(date, days) {
+  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
+}</code></pre>
+</section>
+  <section><h2>The edgegoat test that catches it</h2>
+<p><code>dates({ tags: ['dst'] })</code> returns the last instant before each spring forward, the first instant after it, and both occurrences of the repeated time at each fall back, for every zone. Each case carries its <code>zone</code>:</p>
+<pre><code class="language-js">const { dates, withTimeZone } = require('edgegoat');
+
+describe('addDays keeps the wall clock time', () =&gt; {
+  test.each(dates({ tags: ['dst'] }))('$label', ({ value, zone }) =&gt; {
+    withTimeZone(zone, () =&gt; {
+      const next = addDays(value, 1);
+      expect([next.getHours(), next.getMinutes()]).toEqual([value.getHours(), value.getMinutes()]);
+    });
+  });
+});</code></pre>
+<div class="callout fail"><strong>Fails:</strong> every case whose next 24 hours cross a transition, for example "America/New_York 2026: 1 ms before spring forward" (01:59 becomes 02:59) and "fall back, first 01:30" (01:30 becomes 00:30).</div>
+<p>The fix is to move the calendar date and let the engine resolve the wall clock time:</p>
+<pre><code class="language-js">function addDays(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}</code></pre>
+</section>
+  <section><h2>Set the time zone for the whole Jest run</h2>
+<pre><code class="language-sh">TZ=America/New_York npx jest</code></pre>
+<p>Or set it once in a global setup file so every worker inherits it:</p>
+<pre><code class="language-js">// jest.config.js
+module.exports = { globalSetup: './jest.global-setup.js' };
+
+// jest.global-setup.js
+module.exports = async () =&gt; {
+  process.env.TZ = 'America/New_York';
+};</code></pre>
+</section>
+  <section><h2>Mock the current date during a DST change</h2>
+<p>To test code that reads "now", freeze the clock at a DST instant. <code>withFrozenTime</code> needs no fake timers, and it nests inside <code>withTimeZone</code>:</p>
+<pre><code class="language-js">const { dates, withFrozenTime, withTimeZone } = require('edgegoat');
+
+for (const { label, value, zone } of dates({ tags: ['overlap'] })) {
+  test(label, () =&gt; {
+    withTimeZone(zone, () =&gt;
+      withFrozenTime(value, () =&gt; {
+        expect(minutesUntilMidnight()).toBeGreaterThan(0);
+      }),
+    );
+  });
+}</code></pre>
+<p>With Jest's own fake timers the equivalent is <code>jest.useFakeTimers({ now: value })</code>.</p>
+</section>
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>How do I test daylight saving time in Jest?</summary><p>Use real transition instants (<code>dates({ tags: ['dst'] })</code>), run each one in its zone with <code>withTimeZone()</code> or by starting Jest with <code>TZ</code>, and assert on local wall clock values, not on millisecond differences.</p></details>
+<details><summary>How do I mock the date in Jest during a DST change?</summary><p>Either <code>jest.useFakeTimers({ now: date })</code>, or <code>withFrozenTime(date, fn)</code> from edgegoat, which only replaces <code>Date</code> and leaves timers alone. Combine it with <code>withTimeZone()</code> to control the zone too.</p></details>
+<details><summary>Are the DST instants hard coded?</summary><p>No. edgegoat scans UTC offsets with <code>Intl.DateTimeFormat</code> and binary searches each change down to the minute, so the instants match the tz database of the runtime. Its test suite checks that every case is a real transition.</p></details>
+<details><summary>Which zones have unusual DST rules?</summary><p>Australia/Lord_Howe shifts by 30 minutes, Antarctica/Troll by two hours, America/Sao_Paulo switched at midnight until 2019, and the tz database models Europe/Dublin with a negative DST save.</p></details>
+  </section>
+  <section>
+    <h2>More guides</h2>
+    <ul>
+    <li><a href="test-timezones-javascript.html">How to test time zones in JavaScript</a></li>
+    <li><a href="unicode-test-strings.html">Unicode test strings for JavaScript</a></li>
+    <li><a href="javascript-number-edge-cases.html">JavaScript number edge cases to test</a></li>
+    <li><a href="test-dates-before-1970.html">Testing dates before 1970 in JavaScript</a></li>
+    <li><a href="javascript-negative-zero.html">Negative zero in JavaScript: why -0 is different from 0</a></li>
+    <li><a href="mock-date-javascript.html">How to mock Date in JavaScript tests</a></li>
+    <li><a href="property-based-testing-edge-cases.html">Property based testing and curated edge cases in JavaScript</a></li>
+    </ul>
+  </section>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

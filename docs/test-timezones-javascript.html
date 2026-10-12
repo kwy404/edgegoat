@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to test time zones in JavaScript (Node, Vitest, Jest) | edgegoat</title>
+<meta name="description" content="Test JavaScript date code in any time zone: run tests under TZ, switch zones per test with withTimeZone, and catch New Year and UTC offset bugs with ready made edge cases.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/test-timezones-javascript.html">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="How to test time zones in JavaScript (Node, Vitest, Jest) | edgegoat">
+<meta property="og:description" content="Test JavaScript date code in any time zone: run tests under TZ, switch zones per test with withTimeZone, and catch New Year and UTC offset bugs with ready made edge cases.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/test-timezones-javascript.html">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to test time zones in JavaScript (Node, Vitest, Jest) | edgegoat">
+<meta name="twitter:description" content="Test JavaScript date code in any time zone: run tests under TZ, switch zones per test with withTimeZone, and catch New Year and UTC offset bugs with ready made edge cases.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "How to test time zones in JavaScript",
+      "description": "Test JavaScript date code in any time zone: run tests under TZ, switch zones per test with withTimeZone, and catch New Year and UTC offset bugs with ready made edge cases.",
+      "url": "https://kwy404.github.io/edgegoat/test-timezones-javascript.html",
+      "image": "https://kwy404.github.io/edgegoat/og.png",
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-12",
+      "inLanguage": "en",
+      "proficiencyLevel": "Intermediate",
+      "author": {
+        "@type": "Person",
+        "name": "Alexandre Kohler",
+        "url": "https://github.com/kwy404"
+      },
+      "about": [
+        "time zones",
+        "JavaScript Date",
+        "Intl.DateTimeFormat",
+        "unit testing"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "edgegoat",
+        "url": "https://kwy404.github.io/edgegoat/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I test time zones in JavaScript?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Run the same date assertions under several time zones, either for the whole process with the TZ environment variable or per test with withTimeZone(), and feed them instants where local and UTC dates disagree, such as the year-boundary cases from dates()."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I change the time zone of a running Node.js process?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Assigning process.env.TZ makes Node.js reset its cached zone, so later Date and Intl calls use the new one. Deleting the variable does not reset it, which is why withTimeZone() switches back explicitly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I set the time zone in browser tests?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A page cannot change its own zone at runtime. Launch the browser in the zone: Playwright has a timezoneId option, and Chrome DevTools Protocol has Emulation.setTimezoneOverride."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do my date tests pass locally and fail in CI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CI runners usually run in UTC while your machine does not, so dates near midnight or New Year land on different days. Pin TZ in CI and add matrix entries with zones far from UTC."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<article class="guide">
+  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
+  <h1>How to test time zones in JavaScript</h1>
+  <p class="lede">Most date bugs are invisible in the time zone of the developer who wrote the code. The fix is to run the same assertions in zones that disagree with UTC, at the instants where they disagree the most: local midnight and New Year.</p>
+  <section><h2>The bug: deciding &quot;this year&quot; in UTC</h2>
+<p>GitHub's <code>&lt;relative-time&gt;</code> element hides the year for dates in the current year ("Mar 4") and shows it otherwise ("Mar 4, 2025"). The check compared years in UTC instead of in the display time zone, so around New Year the year was shown or hidden incorrectly. It was fixed in <a href="https://github.com/github/relative-time-element/pull/384">github/relative-time-element#384</a>.</p>
+<p>The window is not small. At <code>2025-12-31T10:00:00Z</code> it is already 2026 in Pacific/Kiritimati (UTC+14:00), and at <code>2026-01-01T03:00:00Z</code> it is still 2025 in New York. Every zone away from UTC has hours each year where the local year and the UTC year disagree.</p>
+</section>
+  <section><h2>A naive implementation that fails</h2>
+<pre><code class="language-js">// Shows "Dec 31" for dates in the current year and "Dec 31, 2025" otherwise.
+function formatShort(date, timeZone) {
+  const sameYear = date.getUTCFullYear() === new Date().getUTCFullYear();
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    month: 'short',
+    day: 'numeric',
+    ...(sameYear ? {} : { year: 'numeric' }),
+  }).format(date);
+}</code></pre>
+</section>
+  <section><h2>The edgegoat test that catches it</h2>
+<p><code>dates({ tags: ['year-boundary'] })</code> returns, for each zone, the instant where the local year and the UTC year disagree. Freeze "now" at that instant and format a date one hour away, on the other side of the local New Year:</p>
+<pre><code class="language-js">import { expect, test } from 'vitest';
+import { dates, withFrozenTime } from 'edgegoat';
+
+const HOUR = 3_600_000;
+const yearIn = (d, timeZone) =&gt; new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric' }).format(d);
+const edges = dates({ tags: ['year-boundary'] }).filter((c) =&gt; c.zone);
+
+test.each(edges)('$label', ({ value, zone }) =&gt; {
+  const before = new Date(value.getTime() - HOUR);
+  const after = new Date(value.getTime() + HOUR);
+  const other = yearIn(before, zone) !== yearIn(value, zone) ? before : after;
+  const out = withFrozenTime(value, () =&gt; formatShort(other, zone));
+  expect(out).toContain(yearIn(other, zone));
+});</code></pre>
+<div class="callout fail"><strong>Fails:</strong> Pacific/Kiritimati, Asia/Kathmandu, Australia/Lord_Howe, America/New_York, America/Sao_Paulo and Pacific/Pago_Pago. The fix compares <code>yearIn(date, zone)</code> with <code>yearIn(new Date(), zone)</code>.</div>
+<p>The same test lives in the repository as a runnable example: <a href="https://github.com/kwy404/edgegoat/tree/main/examples/real-world">examples/real-world</a>.</p>
+</section>
+  <section><h2>Run the whole suite in another time zone</h2>
+<p>The <code>TZ</code> environment variable sets the zone of a Node.js process. Run your existing suite under zones with unusual offsets; most suites that only ever ran in UTC will fail somewhere.</p>
+<pre><code class="language-sh">TZ=Asia/Kathmandu npx vitest run
+TZ=Pacific/Kiritimati npx jest
+
+# Windows PowerShell
+$env:TZ = 'Asia/Kathmandu'; npx vitest run</code></pre>
+<p>In CI, add a matrix entry per zone. edgegoat's own workflow runs the suite in UTC, America/Sao_Paulo and Asia/Kathmandu:</p>
+<pre><code class="language-yaml">strategy:
+  matrix:
+    tz: [UTC, America/Sao_Paulo, Asia/Kathmandu]
+env:
+  TZ: ${{ matrix.tz }}</code></pre>
+</section>
+  <section><h2>Switch zones inside a single test</h2>
+<p><code>withTimeZone(zone, fn)</code> sets <code>process.env.TZ</code>, verifies that the runtime applied it, runs <code>fn</code> and restores the previous zone, also when <code>fn</code> throws or returns a rejected promise.</p>
+<pre><code class="language-js">import { withTimeZone } from 'edgegoat';
+
+withTimeZone('Asia/Kathmandu', () =&gt; {
+  new Date('2026-01-01T00:00:00Z').getTimezoneOffset(); // -345
+});</code></pre>
+<div class="callout tip">The zone is process wide, so do not combine <code>withTimeZone</code> with <code>test.concurrent</code>. In browsers it throws, because a page cannot change its own time zone; launch the browser in the zone instead (for example Playwright's <code>timezoneId</code> option).</div>
+</section>
+  <section><h2>Which time zones to test</h2>
+<ul>
+<li><strong>UTC</strong>: the control. Bugs hide here, which is why CI that only runs in UTC misses them.</li>
+<li><strong>America/New_York</strong> and <strong>Pacific/Pago_Pago</strong> (UTC-11:00): local dates lag behind UTC.</li>
+<li><strong>Pacific/Kiritimati</strong> (UTC+14:00): local dates run ahead; first place to reach New Year.</li>
+<li><strong>Asia/Kathmandu</strong> (UTC+05:45) and <strong>Asia/Kolkata</strong> (UTC+05:30): offsets that are not whole hours.</li>
+<li><strong>Australia/Lord_Howe</strong>: DST that shifts by 30 minutes.</li>
+<li><strong>America/Sao_Paulo</strong> before 2019: DST changes at midnight, so some days had no 00:00.</li>
+</ul>
+<p><code>timeZones()</code> returns 18 such zones, each with the reason it is interesting.</p>
+</section>
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>How do I test time zones in JavaScript?</summary><p>Run the same date assertions under several time zones, either for the whole process with the <code>TZ</code> environment variable or per test with <code>withTimeZone()</code>, and feed them instants where local and UTC dates disagree, such as the <code>year-boundary</code> cases from <code>dates()</code>.</p></details>
+<details><summary>Can I change the time zone of a running Node.js process?</summary><p>Yes. Assigning <code>process.env.TZ</code> makes Node.js reset its cached zone, so later <code>Date</code> and <code>Intl</code> calls use the new one. Deleting the variable does not reset it, which is why <code>withTimeZone()</code> switches back explicitly.</p></details>
+<details><summary>How do I set the time zone in browser tests?</summary><p>A page cannot change its own zone at runtime. Launch the browser in the zone: Playwright has a <code>timezoneId</code> option, and Chrome DevTools Protocol has <code>Emulation.setTimezoneOverride</code>.</p></details>
+<details><summary>Why do my date tests pass locally and fail in CI?</summary><p>CI runners usually run in UTC while your machine does not, so dates near midnight or New Year land on different days. Pin <code>TZ</code> in CI and add matrix entries with zones far from UTC.</p></details>
+  </section>
+  <section>
+    <h2>More guides</h2>
+    <ul>
+    <li><a href="test-daylight-saving-time-jest.html">How to test daylight saving time in Jest</a></li>
+    <li><a href="unicode-test-strings.html">Unicode test strings for JavaScript</a></li>
+    <li><a href="javascript-number-edge-cases.html">JavaScript number edge cases to test</a></li>
+    <li><a href="test-dates-before-1970.html">Testing dates before 1970 in JavaScript</a></li>
+    <li><a href="javascript-negative-zero.html">Negative zero in JavaScript: why -0 is different from 0</a></li>
+    <li><a href="mock-date-javascript.html">How to mock Date in JavaScript tests</a></li>
+    <li><a href="property-based-testing-edge-cases.html">Property based testing and curated edge cases in JavaScript</a></li>
+    </ul>
+  </section>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

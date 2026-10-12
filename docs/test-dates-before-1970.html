@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testing dates before 1970 in JavaScript (negative timestamps) | edgegoat</title>
+<meta name="description" content="Dates before the Unix epoch have negative timestamps, and fractional seconds round the wrong way with Math.trunc and %. Test pre-1970 dates, local mean time and year 0 with edgegoat.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/test-dates-before-1970.html">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="Testing dates before 1970 in JavaScript (negative timestamps) | edgegoat">
+<meta property="og:description" content="Dates before the Unix epoch have negative timestamps, and fractional seconds round the wrong way with Math.trunc and %. Test pre-1970 dates, local mean time and year 0 with edgegoat.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/test-dates-before-1970.html">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Testing dates before 1970 in JavaScript (negative timestamps) | edgegoat">
+<meta name="twitter:description" content="Dates before the Unix epoch have negative timestamps, and fractional seconds round the wrong way with Math.trunc and %. Test pre-1970 dates, local mean time and year 0 with edgegoat.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Testing dates before 1970 in JavaScript",
+      "description": "Dates before the Unix epoch have negative timestamps, and fractional seconds round the wrong way with Math.trunc and %. Test pre-1970 dates, local mean time and year 0 with edgegoat.",
+      "url": "https://kwy404.github.io/edgegoat/test-dates-before-1970.html",
+      "image": "https://kwy404.github.io/edgegoat/og.png",
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-12",
+      "inLanguage": "en",
+      "proficiencyLevel": "Intermediate",
+      "author": {
+        "@type": "Person",
+        "name": "Alexandre Kohler",
+        "url": "https://github.com/kwy404"
+      },
+      "about": [
+        "Unix epoch",
+        "negative timestamps",
+        "JavaScript Date"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "edgegoat",
+        "url": "https://kwy404.github.io/edgegoat/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can JavaScript Date represent dates before 1970?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. A Date stores milliseconds since 1970-01-01T00:00:00Z as a signed number, so earlier dates are negative. The valid range is -271821-04-20 to +275760-09-13."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is my pre-1970 timestamp off by one second?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Truncation rounds negative values toward zero. Use Math.floor for the seconds and compute the remainder from it, so the fraction stays positive."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does a date in 1850 have a strange UTC offset?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Before standard time, zones used local mean time, with offsets such as -03:06:28. Intl reports them exactly, getTimezoneOffset() in whole minutes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does new Date(0, 0, 1) give year 0?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Years 0 to 99 passed to the Date constructor or Date.UTC become 1900 to 1999. Call setFullYear(0, 0, 1) instead."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<article class="guide">
+  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
+  <h1>Testing dates before 1970 in JavaScript</h1>
+  <p class="lede">JavaScript dates reach 271,821 years before 1970, yet a lot of code quietly assumes timestamps are positive. One negative timestamp with a fraction of a second is usually enough to show it.</p>
+  <section><h2>The bug: negative milliseconds round toward zero</h2>
+<p><code>new Date(-1500)</code> is <code>1969-12-31T23:59:58.500Z</code>, one and a half seconds before the epoch. <code>Math.trunc(-1.5)</code> is -1, not -2, and <code>-1500 % 1000</code> is -500, not 500. Code that splits a timestamp into seconds and a fraction with truncation and <code>%</code> gets 23:59:59 and a negative fraction.</p>
+</section>
+  <section><h2>A naive implementation that fails</h2>
+<p>Protocol Buffers and many APIs encode time as <code>{ seconds, nanos }</code> where <code>nanos</code> must be between 0 and 999,999,999:</p>
+<pre><code class="language-js">function toTimestamp(date) {
+  const ms = date.getTime();
+  return { seconds: Math.trunc(ms / 1000), nanos: (ms % 1000) * 1e6 };
+}
+
+toTimestamp(new Date(-1500)); // { seconds: -1, nanos: -500000000 }  invalid</code></pre>
+</section>
+  <section><h2>The edgegoat test that catches it</h2>
+<pre><code class="language-js">import { expect, test } from 'vitest';
+import { dates } from 'edgegoat';
+
+test.each(dates({ tags: ['pre-1970', 'epoch'] }))('$label', ({ value }) =&gt; {
+  const { seconds, nanos } = toTimestamp(value);
+  expect(nanos).toBeGreaterThanOrEqual(0);
+  expect(nanos).toBeLessThan(1e9);
+  expect(seconds * 1000 + nanos / 1e6).toBe(value.getTime());
+});</code></pre>
+<div class="callout fail"><strong>Fails:</strong> <code>1 ms before the epoch</code>, <code>before 1970 with fractional seconds</code> and <code>moon landing 1969-07-20T20:17:40.123Z</code>. The fix floors: <code>const seconds = Math.floor(ms / 1000)</code> and <code>nanos = (ms - seconds * 1000) * 1e6</code>.</div>
+</section>
+  <section><h2>Local mean time before time zones existed</h2>
+<p>Before standard time zones were adopted, each city kept its own local mean time. The tz database records offsets with seconds, such as -03:06:28 for Sao Paulo before 1914. <code>getTimezoneOffset()</code> reports whole minutes, so local arithmetic on old dates can drift by seconds. The <code>lmt</code> case in <code>dates()</code> covers it.</p>
+</section>
+  <section><h2>Year 0, negative years and the far edges</h2>
+<p><code>dates()</code> also includes year 0, year -1 (<code>-000001</code> in ISO format), the minimum and maximum valid dates (plus and minus 8.64e15 ms), year 9999 and year 10000, where <code>toISOString()</code> switches to a six digit, signed year.</p>
+<div class="callout tip"><code>new Date(0, 0, 1)</code> is 1900, not year 0: the Date constructor maps years 0 to 99 to 1900 to 1999. Use <code>setFullYear</code> to build early years.</div>
+</section>
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>Can JavaScript Date represent dates before 1970?</summary><p>Yes. A Date stores milliseconds since 1970-01-01T00:00:00Z as a signed number, so earlier dates are negative. The valid range is -271821-04-20 to +275760-09-13.</p></details>
+<details><summary>Why is my pre-1970 timestamp off by one second?</summary><p>Truncation rounds negative values toward zero. Use <code>Math.floor</code> for the seconds and compute the remainder from it, so the fraction stays positive.</p></details>
+<details><summary>Why does a date in 1850 have a strange UTC offset?</summary><p>Before standard time, zones used local mean time, with offsets such as -03:06:28. <code>Intl</code> reports them exactly, <code>getTimezoneOffset()</code> in whole minutes.</p></details>
+<details><summary>Does new Date(0, 0, 1) give year 0?</summary><p>No. Years 0 to 99 passed to the Date constructor or <code>Date.UTC</code> become 1900 to 1999. Call <code>setFullYear(0, 0, 1)</code> instead.</p></details>
+  </section>
+  <section>
+    <h2>More guides</h2>
+    <ul>
+    <li><a href="test-timezones-javascript.html">How to test time zones in JavaScript</a></li>
+    <li><a href="test-daylight-saving-time-jest.html">How to test daylight saving time in Jest</a></li>
+    <li><a href="unicode-test-strings.html">Unicode test strings for JavaScript</a></li>
+    <li><a href="javascript-number-edge-cases.html">JavaScript number edge cases to test</a></li>
+    <li><a href="javascript-negative-zero.html">Negative zero in JavaScript: why -0 is different from 0</a></li>
+    <li><a href="mock-date-javascript.html">How to mock Date in JavaScript tests</a></li>
+    <li><a href="property-based-testing-edge-cases.html">Property based testing and curated edge cases in JavaScript</a></li>
+    </ul>
+  </section>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

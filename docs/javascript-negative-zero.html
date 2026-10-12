@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negative zero in JavaScript: why -0 is not 0 and how to test it | edgegoat</title>
+<meta name="description" content="-0 === 0 is true, yet 1 / -0 is -Infinity and Object.is(-0, 0) is false. Learn where -0 comes from, which code it breaks, and how to test it.">
+<link rel="canonical" href="https://kwy404.github.io/edgegoat/javascript-negative-zero.html">
+<meta name="author" content="Alexandre Kohler">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2E9C8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="edgegoat">
+<meta property="og:title" content="Negative zero in JavaScript: why -0 is not 0 and how to test it | edgegoat">
+<meta property="og:description" content="-0 === 0 is true, yet 1 / -0 is -Infinity and Object.is(-0, 0) is false. Learn where -0 comes from, which code it breaks, and how to test it.">
+<meta property="og:url" content="https://kwy404.github.io/edgegoat/javascript-negative-zero.html">
+<meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Negative zero in JavaScript: why -0 is not 0 and how to test it | edgegoat">
+<meta name="twitter:description" content="-0 === 0 is true, yet 1 / -0 is -Infinity and Object.is(-0, 0) is false. Learn where -0 comes from, which code it breaks, and how to test it.">
+<meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Negative zero in JavaScript: why -0 is different from 0",
+      "description": "-0 === 0 is true, yet 1 / -0 is -Infinity and Object.is(-0, 0) is false. Learn where -0 comes from, which code it breaks, and how to test it.",
+      "url": "https://kwy404.github.io/edgegoat/javascript-negative-zero.html",
+      "image": "https://kwy404.github.io/edgegoat/og.png",
+      "datePublished": "2026-10-12",
+      "dateModified": "2026-10-12",
+      "inLanguage": "en",
+      "proficiencyLevel": "Intermediate",
+      "author": {
+        "@type": "Person",
+        "name": "Alexandre Kohler",
+        "url": "https://github.com/kwy404"
+      },
+      "about": [
+        "negative zero",
+        "IEEE 754",
+        "JavaScript numbers"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "edgegoat",
+        "url": "https://kwy404.github.io/edgegoat/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is -0 different from 0?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Floating point numbers store a sign bit separately from the magnitude, so zero can be positive or negative. === treats them as equal, but division, Object.is, Math.atan2 and Intl formatting can tell them apart."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I check for negative zero in JavaScript?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use Object.is(x, -0), or x === 0 && 1 / x === -Infinity in older code."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does JSON keep negative zero?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "JSON.parse(\"-0\") returns -0, but JSON.stringify(-0) returns \"0\", so a round trip loses the sign."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I get rid of -0?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Add zero (x + 0) or write x === 0 ? 0 : x. For display, Intl.NumberFormat with signDisplay: 'exceptZero' or 'negative' avoids printing it."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav aria-label="Main">
+      <a href="./#catalog">Catalog</a>
+      <a href="./#guides">Guides</a>
+      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
+      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+
+<article class="guide">
+  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
+  <h1>Negative zero in JavaScript: why -0 is different from 0</h1>
+  <p class="lede">IEEE 754 numbers carry a sign bit even for zero. JavaScript hides it in most places and exposes it in a few, and that inconsistency is exactly what turns into a bug.</p>
+  <section><h2>Where -0 comes from</h2>
+<ul>
+<li>Rounding small negatives: <code>Math.round(-0.4)</code>, <code>Math.trunc(-0.5)</code>, <code>Math.ceil(-0.5)</code>.</li>
+<li>Arithmetic: <code>-1 % 1</code>, <code>-0.5 * 0</code>, <code>0 / -5</code>.</li>
+<li>Parsing: <code>Number("-0")</code> and <code>JSON.parse("-0")</code>.</li>
+</ul>
+</section>
+  <section><h2>Where it shows up</h2>
+<ul>
+<li><code>1 / -0</code> is <code>-Infinity</code> and <code>Math.atan2(0, -0)</code> is pi.</li>
+<li><code>Object.is(-0, 0)</code> is false, so React state, memoization and <code>Object.is</code> based equality treat them as different.</li>
+<li><code>String(-0)</code> and <code>JSON.stringify(-0)</code> print <code>"0"</code>, but <code>Intl.NumberFormat</code> and <code>toLocaleString()</code> print <code>"-0"</code>.</li>
+</ul>
+</section>
+  <section><h2>The bug: &quot;-0&quot; on screen</h2>
+<p>A change indicator rounds a tiny negative delta to zero, and <code>Intl.NumberFormat</code> keeps the sign. Users see <code>-0</code>.</p>
+<pre><code class="language-js">function formatDelta(n) {
+  return (n &gt; 0 ? '+' : '') + new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(n);
+}
+
+formatDelta(-0.04); // "-0"</code></pre>
+</section>
+  <section><h2>The edgegoat test that catches it</h2>
+<pre><code class="language-js">import { expect, test } from 'vitest';
+import { numbers } from 'edgegoat';
+
+test.each(numbers({ tags: ['zero', 'sign'] }))('$label', ({ value }) =&gt; {
+  expect(formatDelta(value)).not.toBe('-0');
+});</code></pre>
+<div class="callout fail"><strong>Fails:</strong> <code>negative zero</code> and <code>-0.0001</code>. The fix is <code>signDisplay: 'exceptZero'</code>, which prints <code>+0.5</code>, <code>-0.5</code> and a plain <code>0</code>.</div>
+</section>
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>Why is -0 different from 0?</summary><p>Floating point numbers store a sign bit separately from the magnitude, so zero can be positive or negative. <code>===</code> treats them as equal, but division, <code>Object.is</code>, <code>Math.atan2</code> and <code>Intl</code> formatting can tell them apart.</p></details>
+<details><summary>How do I check for negative zero in JavaScript?</summary><p>Use <code>Object.is(x, -0)</code>, or <code>x === 0 &amp;&amp; 1 / x === -Infinity</code> in older code.</p></details>
+<details><summary>Does JSON keep negative zero?</summary><p><code>JSON.parse("-0")</code> returns -0, but <code>JSON.stringify(-0)</code> returns <code>"0"</code>, so a round trip loses the sign.</p></details>
+<details><summary>How do I get rid of -0?</summary><p>Add zero (<code>x + 0</code>) or write <code>x === 0 ? 0 : x</code>. For display, <code>Intl.NumberFormat</code> with <code>signDisplay: 'exceptZero'</code> or <code>'negative'</code> avoids printing it.</p></details>
+  </section>
+  <section>
+    <h2>More guides</h2>
+    <ul>
+    <li><a href="test-timezones-javascript.html">How to test time zones in JavaScript</a></li>
+    <li><a href="test-daylight-saving-time-jest.html">How to test daylight saving time in Jest</a></li>
+    <li><a href="unicode-test-strings.html">Unicode test strings for JavaScript</a></li>
+    <li><a href="javascript-number-edge-cases.html">JavaScript number edge cases to test</a></li>
+    <li><a href="test-dates-before-1970.html">Testing dates before 1970 in JavaScript</a></li>
+    <li><a href="mock-date-javascript.html">How to mock Date in JavaScript tests</a></li>
+    <li><a href="property-based-testing-edge-cases.html">Property based testing and curated edge cases in JavaScript</a></li>
+    </ul>
+  </section>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
+    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

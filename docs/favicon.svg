@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>edgegoat</title>
+  <defs><clipPath id="fav"><circle cx="32" cy="32" r="31"/></clipPath></defs>
+  <circle cx="32" cy="32" r="31" fill="#2E9C8A"/>
+  <g clip-path="url(#fav)">
+    <g transform="translate(-72 -20) scale(0.4)">
+      <g stroke="#22303C" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" fill="#FBF7EE">
+        <path d="M226 196 L246 140 L284 146 L266 232 L222 232 Z"/>
+        <path d="M240 122 Q258 112 284 124 L316 154 Q322 166 308 172 L274 170 Q250 168 240 150 Z"/>
+        <path d="M276 168 L300 170 L288 204 Z"/>
+        <path d="M244 134 Q222 128 212 140 Q228 148 246 146 Z"/>
+      </g>
+      <path d="M252 120 Q244 86 214 82" fill="none" stroke="#22303C" stroke-width="14" stroke-linecap="round"/>
+      <path d="M266 120 Q262 92 238 80" fill="none" stroke="#22303C" stroke-width="11" stroke-linecap="round"/>
+      <circle cx="278" cy="140" r="8" fill="#22303C"/>
+    </g>
+  </g>
+</svg>
