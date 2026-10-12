@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-labelledby="ledge-title ledge-desc">
+  <title id="ledge-title">Ledge, the edgegoat mascot</title>
+  <desc id="ledge-desc">A confident mountain goat standing on the very edge of a cliff, with a pebble falling off the edge.</desc>
+  <defs>
+    <clipPath id="ledge-badge"><circle cx="200" cy="200" r="192"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="192" fill="#2E9C8A"/>
+  <g clip-path="url(#ledge-badge)">
+    <circle cx="104" cy="112" r="38" fill="#F2A93B"/>
+    <path d="M0 292 H268 L276 300 L268 330 L282 366 L276 400 H0 Z" fill="#22303C"/>
+    <path d="M40 318 H120 M70 344 H190 M30 372 H96" stroke="#2E9C8A" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+    <circle cx="300" cy="338" r="6" fill="#22303C"/>
+    <circle cx="312" cy="372" r="4" fill="#22303C"/>
+  </g>
+  <g stroke="#22303C" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <!-- far legs -->
+    <rect x="138" y="232" width="20" height="58" rx="9" fill="#FBF7EE"/>
+    <rect x="224" y="232" width="20" height="58" rx="9" fill="#FBF7EE"/>
+    <!-- tail -->
+    <path d="M112 196 Q96 186 100 172 Q112 178 118 190" fill="#FBF7EE"/>
+    <!-- neck -->
+    <path d="M226 196 L246 140 L284 146 L266 212 Z" fill="#FBF7EE"/>
+    <!-- body -->
+    <path d="M110 214 Q108 180 146 178 L232 178 Q262 180 262 214 Q262 250 232 252 L222 260 L212 252 L172 252 L162 260 L152 252 L142 252 Q110 250 110 214 Z" fill="#FBF7EE"/>
+    <!-- near legs -->
+    <rect x="118" y="236" width="20" height="54" rx="9" fill="#FBF7EE"/>
+    <rect x="244" y="236" width="20" height="54" rx="9" fill="#FBF7EE"/>
+    <!-- head -->
+    <path d="M240 122 Q258 112 284 124 L316 154 Q322 166 308 172 L274 170 Q250 168 240 150 Z" fill="#FBF7EE"/>
+    <!-- beard -->
+    <path d="M276 168 L300 170 L288 204 Z" fill="#FBF7EE"/>
+    <!-- ear -->
+    <path d="M244 134 Q222 128 212 140 Q228 148 246 146 Z" fill="#FBF7EE"/>
+  </g>
+  <!-- hooves -->
+  <g fill="#22303C">
+    <rect x="114" y="278" width="28" height="14" rx="5"/>
+    <rect x="134" y="278" width="28" height="14" rx="5"/>
+    <rect x="220" y="278" width="28" height="14" rx="5"/>
+    <rect x="240" y="278" width="28" height="14" rx="5"/>
+  </g>
+  <!-- horns -->
+  <path d="M252 120 Q244 86 214 82" fill="none" stroke="#22303C" stroke-width="12" stroke-linecap="round"/>
+  <path d="M266 120 Q262 92 238 80" fill="none" stroke="#22303C" stroke-width="9" stroke-linecap="round"/>
+  <!-- eye and nose -->
+  <circle cx="278" cy="140" r="6" fill="#22303C"/>
+  <circle cx="280" cy="138" r="2" fill="#FBF7EE"/>
+  <circle cx="312" cy="158" r="4" fill="#22303C"/>
+</svg>

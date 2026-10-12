@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 444" width="920" height="444" role="img" aria-labelledby="t d">
+  <title id="t">edgegoat demo: a naive isSameYear fails on New Year edge cases</title>
+  <desc id="d">Animated terminal: Vitest runs isSameYear tests, three ordinary cases pass, then two edgegoat time zone cases around New Year in Pacific/Kiritimati and America/New_York fail because the code compared UTC years.</desc>
+  <rect width="920" height="444" rx="14" fill="#0F1720"/>
+  <rect width="920" height="40" rx="14" fill="#1B2733"/>
+  <rect y="26" width="920" height="14" fill="#1B2733"/>
+  <circle cx="26" cy="20" r="6.5" fill="#F87171"/>
+  <circle cx="48" cy="20" r="6.5" fill="#F2A93B"/>
+  <circle cx="70" cy="20" r="6.5" fill="#34D399"/>
+  <text x="460" y="25" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" fill="#94A3B8">edgegoat: test isSameYear across time zones</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" xml:space="preserve">
+    <g>
+      <clipPath id="type"><rect x="20" y="71" height="26" width="0">
+        <animate attributeName="width" dur="14s" repeatCount="indefinite" values="0;0;880;880;0;0" keyTimes="0;0.0143;0.0929;0.9143;0.9429;1"/>
+      </rect></clipPath>
+      <text x="24" y="89" fill="#E5E7EB" clip-path="url(#type)"><tspan fill="#2E9C8A">$</tspan> npx vitest run is-same-year.test.ts</text>
+    </g>
+    
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.1929;0.2036;0.9143;0.9429;1"/>
+      <text x="24" y="139" fill="#E5E7EB" font-weight="700"> isSameYear(a, b, timeZone)</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.2321;0.2429;0.9143;0.9429;1"/>
+      <rect x="30" y="148" width="50" height="21" rx="4" fill="#059669"/>
+      <text x="55" y="164" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="13">PASS</text>
+      <text x="92" y="164" fill="#D1D5DB">March 14 and November 2, 2026 in America/New_York</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.2714;0.2821;0.9143;0.9429;1"/>
+      <rect x="30" y="173" width="50" height="21" rx="4" fill="#059669"/>
+      <text x="55" y="189" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="13">PASS</text>
+      <text x="92" y="189" fill="#D1D5DB">July 1, 2025 and July 1, 2026 are different years</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.3107;0.3214;0.9143;0.9429;1"/>
+      <rect x="30" y="198" width="50" height="21" rx="4" fill="#059669"/>
+      <text x="55" y="214" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="13">PASS</text>
+      <text x="92" y="214" fill="#D1D5DB">two summer dates in Europe/London</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.3500;0.3607;0.9143;0.9429;1"/>
+      <rect x="30" y="223" width="50" height="21" rx="4" fill="#DC2626"/>
+      <text x="55" y="239" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="13">FAIL</text>
+      <text x="92" y="239" fill="#FCA5A5">edgegoat: Pacific/Kiritimati: first instant of 2026 local time</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.3893;0.4000;0.9143;0.9429;1"/>
+      <text x="92" y="264" fill="#FCA5A5">expected false to be true</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.4286;0.4393;0.9143;0.9429;1"/>
+      <text x="92" y="289" fill="#94A3B8">Local time is 2026-01-01 00:00 (UTC+14:00) but the UTC year is</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.4679;0.4786;0.9143;0.9429;1"/>
+      <text x="92" y="314" fill="#94A3B8">still 2025; a year check with getUTCFullYear() is off by one.</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.5071;0.5179;0.9143;0.9429;1"/>
+      <rect x="30" y="323" width="50" height="21" rx="4" fill="#DC2626"/>
+      <text x="55" y="339" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="13">FAIL</text>
+      <text x="92" y="339" fill="#FCA5A5">edgegoat: America/New_York: last instant of 2025 local time</text>
+    </g>
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.5464;0.5571;0.9143;0.9429;1"/>
+      <text x="92" y="364" fill="#FCA5A5">expected false to be true</text>
+    </g>
+    
+    <g opacity="0"><animate attributeName="opacity" dur="14s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.6250;0.6357;0.9143;0.9429;1"/>
+      <text x="24" y="414" fill="#E5E7EB"><tspan font-weight="700"> Tests </tspan><tspan fill="#F87171" font-weight="700">2 failed</tspan><tspan fill="#94A3B8"> | </tspan><tspan fill="#34D399" font-weight="700">3 passed</tspan><tspan fill="#94A3B8"> (5)</tspan></text>
+    </g>
+  </g>
+</svg>

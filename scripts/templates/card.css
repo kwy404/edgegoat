@@ -1,0 +1,18 @@
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(circle at 18% 30%, #16312f 0%, #0e141a 60%);
+  color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  padding: 0 80px;
+}
+img { flex: none; }
+h1 { font-size: 112px; font-weight: 800; letter-spacing: -4px; line-height: 1; }
+h1 span { color: #5fd0bd; }
+.tagline { font-size: 36px; color: #c9d1d9; margin-top: 18px; line-height: 1.25; font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.chips span { font-size: 22px; font-weight: 700; color: #8fe0d2; background: rgba(46, 156, 138, 0.22); padding: 6px 16px; border-radius: 999px; }
+.url { margin-top: 28px; font-size: 22px; color: #9aa7b3; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }

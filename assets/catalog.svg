@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 554" width="900" height="554" role="img" aria-labelledby="t d">
+  <title id="t">edgegoat catalog: 284 edge cases in 11 generators</title>
+  <desc id="d">Bar chart of edge case counts: dates 46, timeZones 18, strings 49, numbers 26, numericStrings 17, bigints 8, urls 28, emails 26, paths 30, json 22, arrays 14.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .bg { fill: #FFFFFF; stroke: #D0D7DE; }
+    .title { fill: #22303C; font-size: 26px; font-weight: 800; }
+    .sub { fill: #57606A; font-size: 15px; }
+    .label { fill: #22303C; font-size: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .count { fill: #22303C; font-size: 15px; font-weight: 700; }
+    .track { fill: #2E9C8A; fill-opacity: 0.1; }
+    .bar0 { fill: #2E9C8A; } .bar1 { fill: #3BB09C; } .bar2 { fill: #F2A93B; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0D1117; stroke: #30363D; }
+      .title, .label, .count { fill: #E6EDF3; }
+      .sub { fill: #8B949E; }
+      .track { fill-opacity: 0.18; }
+    }
+  </style>
+  <rect class="bg" x="1" y="1" width="898" height="552" rx="16"/>
+  <text class="title" x="40" y="50">284 edge cases, 11 generators</text>
+  <text class="sub" x="40" y="75">Every case has a label, a value, a one line why, and tags for filtering.</text>
+  <g transform="translate(0 96)">
+    <text class="label" x="234" y="21" text-anchor="end">dates()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar0" x="250" y="4" width="526" height="24" rx="12"/>
+    <text class="count" x="786" y="22">46</text>
+  </g>
+  <g transform="translate(0 134)">
+    <text class="label" x="234" y="21" text-anchor="end">timeZones()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar1" x="250" y="4" width="206" height="24" rx="12"/>
+    <text class="count" x="466" y="22">18</text>
+  </g>
+  <g transform="translate(0 172)">
+    <text class="label" x="234" y="21" text-anchor="end">strings()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar2" x="250" y="4" width="560" height="24" rx="12"/>
+    <text class="count" x="820" y="22">49</text>
+  </g>
+  <g transform="translate(0 210)">
+    <text class="label" x="234" y="21" text-anchor="end">numbers()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar0" x="250" y="4" width="297" height="24" rx="12"/>
+    <text class="count" x="557" y="22">26</text>
+  </g>
+  <g transform="translate(0 248)">
+    <text class="label" x="234" y="21" text-anchor="end">numericStrings()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar1" x="250" y="4" width="194" height="24" rx="12"/>
+    <text class="count" x="454" y="22">17</text>
+  </g>
+  <g transform="translate(0 286)">
+    <text class="label" x="234" y="21" text-anchor="end">bigints()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar2" x="250" y="4" width="91" height="24" rx="12"/>
+    <text class="count" x="351" y="22">8</text>
+  </g>
+  <g transform="translate(0 324)">
+    <text class="label" x="234" y="21" text-anchor="end">urls()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar0" x="250" y="4" width="320" height="24" rx="12"/>
+    <text class="count" x="580" y="22">28</text>
+  </g>
+  <g transform="translate(0 362)">
+    <text class="label" x="234" y="21" text-anchor="end">emails()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar1" x="250" y="4" width="297" height="24" rx="12"/>
+    <text class="count" x="557" y="22">26</text>
+  </g>
+  <g transform="translate(0 400)">
+    <text class="label" x="234" y="21" text-anchor="end">paths()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar2" x="250" y="4" width="343" height="24" rx="12"/>
+    <text class="count" x="603" y="22">30</text>
+  </g>
+  <g transform="translate(0 438)">
+    <text class="label" x="234" y="21" text-anchor="end">json()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar0" x="250" y="4" width="251" height="24" rx="12"/>
+    <text class="count" x="511" y="22">22</text>
+  </g>
+  <g transform="translate(0 476)">
+    <text class="label" x="234" y="21" text-anchor="end">arrays()</text>
+    <rect class="track" x="250" y="4" width="560" height="24" rx="12"/>
+    <rect class="bar1" x="250" y="4" width="160" height="24" rx="12"/>
+    <text class="count" x="420" y="22">14</text>
+  </g>
+</svg>
