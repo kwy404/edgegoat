@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node ${{ matrix.node }}${{ matrix.tz && format(' (TZ={0})', matrix.tz) || '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+        tz: ['']
+        include:
+          - node: 22
+            tz: America/Sao_Paulo
+          - node: 22
+            tz: Asia/Kathmandu
+    env:
+      TZ: ${{ matrix.tz || 'UTC' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Check the process time zone
+        run: node -e "console.log(process.env.TZ, new Date(2026, 0, 1).getTimezoneOffset())"
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - name: node:test example
+        run: npm run examples:node-test
+      - name: Package contents
+        run: npm pack --dry-run
