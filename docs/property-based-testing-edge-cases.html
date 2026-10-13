@@ -23,7 +23,10 @@
 <meta name="twitter:description" content="Property based testing finds bugs with random inputs; curated edge cases find the known ones every time. How to combine fast-check with edgegoat's labeled inputs in Vitest or Jest.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('voodoo:theme');if(t==='"light"'||t==='"dark"')t=t.slice(1,-1);if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t}}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
+<noscript><style>.site-nav { display: flex; }</style></noscript>
+<script src="https://cdn.jsdelivr.net/npm/voodoojs@0.13.0/dist/voodoo.full.min.js" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -98,19 +101,26 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
+<header class="site-header" v-data="{ menu: false }" @keydown.esc="menu = false">
   <div class="wrap header-row">
-    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
-    <nav aria-label="Main">
-      <a href="./#catalog">Catalog</a>
-      <a href="./#guides">Guides</a>
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav id="site-nav" class="site-nav" :class="{ open: menu }" aria-label="Main">
+      <a href="./#catalog" @click="menu = false">Catalog</a>
+      <a href="./#how-it-works" @click="menu = false">How it works</a>
+      <a href="./#guides" @click="menu = false">Guides</a>
+      <a href="./#faq" @click="menu = false">FAQ</a>
       <a href="https://github.com/kwy404/edgegoat">GitHub</a>
       <a href="https://www.npmjs.com/package/edgegoat">npm</a>
     </nav>
+    <div class="header-actions">
+      <button type="button" class="icon-button" v-theme-toggle v-cloak aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
+      <button type="button" class="icon-button menu-button" v-cloak @click="menu = !menu" :aria-expanded="menu ? 'true' : 'false'" aria-controls="site-nav" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
   </div>
 </header>
-<main id="main" class="wrap">
+<main id="main">
 
+<div class="wrap">
 <article class="guide">
   <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
   <h1>Property based testing and curated edge cases in JavaScript</h1>
@@ -131,34 +141,48 @@
 <p>A uniformly random instant falls inside a given one hour window about once in 8,760 tries, so a property test over random dates almost never lands on the hour where clocks jump. <code>dates({ tags: ['dst'] })</code> hits it on every run, in every zone you choose. The same goes for a surrogate pair exactly at a cut boundary or a number between -1 and 0.</p>
 </section>
   <section><h2>Seed fast-check with edgegoat values</h2>
-<pre><code class="language-js">import fc from 'fast-check';
-import { test } from 'vitest';
-import { strings } from 'edgegoat';
-
-const tricky = fc.constantFrom(...strings().map((c) =&gt; c.value));
-const text = fc.oneof(tricky, fc.string({ unit: 'grapheme' }));
-
-test('slugify is idempotent', () =&gt; {
-  fc.assert(fc.property(text, (s) =&gt; slugify(slugify(s)) === slugify(s)));
-});</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-1" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> fc</span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0"> from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'fast-check'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'vitest'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">strings</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> tricky</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">fc</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">constantFrom</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(...</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">strings</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">().</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">map</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">((</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">c</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> c</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">));</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">fc</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">oneof</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">tricky</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">fc</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">string</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">unit:</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'grapheme'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }));</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'slugify is idempotent'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">  fc</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">assert</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">fc</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">property</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, (</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">s</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> slugify</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">slugify</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">s</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)) === </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">slugify</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">s</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)));</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
 <p>fast-check mixes the curated values with random ones and still shrinks failures. <code>unit: 'grapheme'</code> needs fast-check 3.22 or later.</p>
 </section>
   <section><h2>Or keep the labels with check()</h2>
 <p>The same property, without a property testing library, reports failures by name and reason:</p>
-<pre><code class="language-js">import { expect, test } from 'vitest';
-import { check, strings } from 'edgegoat';
-
-test('slugify is idempotent on every edge case', () =&gt; {
-  const failures = check(slugify, strings(), (out) =&gt; slugify(out) === out);
-  expect(failures.map((f) =&gt; `${f.label}: ${f.why}`)).toEqual([]);
-});</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-2" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-2" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'vitest'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">check</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">strings</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'slugify is idempotent on every edge case'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> failures</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">check</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">slugify</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">strings</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(), (</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> slugify</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) === </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">  expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">failures</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">map</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">((</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">f</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> `</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">${</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">f</span><span style="--shiki-light:#000000FF;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">label</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">: </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">${</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">f</span><span style="--shiki-light:#000000FF;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">why</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">`</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toEqual</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">([]);</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
 </section>
-  <section class="faq">
+  <section>
     <h2>FAQ</h2>
-    <details><summary>What is property based testing?</summary><p>Instead of writing examples, you state a property that must hold for all inputs (for example "decode(encode(x)) equals x") and a library such as fast-check checks it against many generated inputs, shrinking any failure to a minimal case.</p></details>
-<details><summary>Should I use fast-check or edgegoat?</summary><p>Both. Use fast-check to explore inputs you did not think of, and edgegoat to make sure the inputs that are known to break code are always tested, with readable names in the test report.</p></details>
-<details><summary>Does edgegoat generate random data?</summary><p>No. Every call returns the same cases, so failures are reproducible. DST instants are computed from the runtime tz database, so they are deterministic for a given Node.js version.</p></details>
-<details><summary>How is edgegoat different from big-list-of-naughty-strings?</summary><p>The big list is a large list of strings for fuzzing. edgegoat is smaller, explains every case, is filterable by tags and also covers dates, time zones, numbers, URLs, paths, JSON and arrays.</p></details>
+    <div class="faq" v-accordion>
+    <div class="faq-item" v-accordion-item="open">
+      <button type="button" class="faq-q">What is property based testing?</button>
+      <div class="faq-a"><p>Instead of writing examples, you state a property that must hold for all inputs (for example "decode(encode(x)) equals x") and a library such as fast-check checks it against many generated inputs, shrinking any failure to a minimal case.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Should I use fast-check or edgegoat?</button>
+      <div class="faq-a"><p>Both. Use fast-check to explore inputs you did not think of, and edgegoat to make sure the inputs that are known to break code are always tested, with readable names in the test report.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Does edgegoat generate random data?</button>
+      <div class="faq-a"><p>No. Every call returns the same cases, so failures are reproducible. DST instants are computed from the runtime tz database, so they are deterministic for a given Node.js version.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">How is edgegoat different from big-list-of-naughty-strings?</button>
+      <div class="faq-a"><p>The big list is a large list of strings for fuzzing. edgegoat is smaller, explains every case, is filterable by tags and also covers dates, time zones, numbers, URLs, paths, JSON and arrays.</p></div>
+    </div>
+  </div>
   </section>
   <section>
     <h2>More guides</h2>
@@ -173,11 +197,43 @@ test('slugify is idempotent on every edge case', () =&gt; {
     </ul>
   </section>
 </article>
+</div>
 </main>
 <footer class="site-footer">
-  <div class="wrap">
-    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
-    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt=""><span>edge<b>goat</b></span></a>
+      <p>The inputs that break code, ready to drop into your tests. Zero dependencies, MIT licensed.</p>
+      <p class="footer-links"><a href="https://github.com/kwy404/edgegoat">GitHub</a> <a href="https://www.npmjs.com/package/edgegoat">npm</a> <a href="catalog.json">catalog.json</a> <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md">Changelog</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Guides</h2>
+      <ul class="footer-list">
+        <li><a href="test-timezones-javascript.html">Time zones</a></li>
+        <li><a href="test-daylight-saving-time-jest.html">DST in Jest</a></li>
+        <li><a href="unicode-test-strings.html">Unicode strings</a></li>
+        <li><a href="javascript-number-edge-cases.html">Number edge cases</a></li>
+        <li><a href="test-dates-before-1970.html">Dates before 1970</a></li>
+        <li><a href="javascript-negative-zero.html">Negative zero</a></li>
+        <li><a href="mock-date-javascript.html">Mock Date</a></li>
+        <li><a href="property-based-testing-edge-cases.html">Property based testing</a></li>
+      </ul>
+    </div>
+    <div class="footer-more">
+      <h2 class="footer-title">More from kwy404</h2>
+      <ul class="footer-list projects">
+        <li><a href="https://kwy404.github.io/graphemely/">graphemely</a><span>Truncate, slice and count strings with emoji safely, by grapheme cluster.</span></li>
+        <li><a href="https://kwy404.github.io/edgegoat/">edgegoat</a><span>Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.</span></li>
+        <li><a href="https://kwy404.github.io/vueleap/">vueleap</a><span>Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.</span></li>
+        <li><a href="https://kwy404.github.io/numberparrot/">numberparrot</a><span>Parse localized number and currency strings back into real numbers, for any locale.</span></li>
+        <li><a href="https://github.com/kwy404/breakhound">breakhound</a><span>Find bugs in any JavaScript or TypeScript library automatically, no tests required.</span></li>
+        <li><a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a><span>The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>Made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. MIT license.</p>
+    <p class="credit">Interactive parts built with <a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a>.</p>
   </div>
 </footer>
 </body>

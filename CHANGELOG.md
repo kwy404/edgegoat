@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-10-12
+
+### Changed
+
+- The Portuguese README moved to `i18n/README.pt-BR.md`, so the npm page shows the
+  English README only. The package now ships a single README.
+- README images and links use absolute URLs, so they render on npmjs.com.
+- README badges for npm downloads per month and in total, and a "More from kwy404" section.
+- Documentation site redesign: Voodoo.js for the interactive parts (catalog search, generator
+  and tag filters, case details, install tabs, theme toggle, copy buttons, FAQ) and
+  build time syntax highlighting with Shiki in VS Code Light+ and Dark+ colors.
+
+No changes to the library API or to the cases.
+
 ## [0.1.0] - 2026-10-12
 
 ### Added
@@ -18,4 +32,5 @@ All notable changes to this project are documented here. The format follows
 - Helpers: `withTimeZone()`, `withFrozenTime()`, `check()` and `assertNoThrow()`.
 - ESM and CommonJS builds with type declarations, zero runtime dependencies.
 
+[0.1.1]: https://github.com/kwy404/edgegoat/releases/tag/v0.1.1
 [0.1.0]: https://github.com/kwy404/edgegoat/releases/tag/v0.1.0

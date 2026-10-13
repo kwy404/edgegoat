@@ -1,4 +1,4 @@
-<p align="right"><strong>English</strong> | <a href="https://github.com/kwy404/edgegoat/blob/main/README.pt-BR.md">Português (Brasil)</a></p>
+<p align="right"><strong>English</strong> | <a href="https://github.com/kwy404/edgegoat/blob/main/i18n/README.pt-BR.md">Português (Brasil)</a></p>
 
 <p align="center">
   <picture>
@@ -13,6 +13,8 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/edgegoat"><img height="20" src="https://img.shields.io/npm/v/edgegoat.svg?color=2E9C8A" alt="edgegoat npm version"></a>
+  <a href="https://www.npmjs.com/package/edgegoat"><img height="20" src="https://img.shields.io/npm/dm/edgegoat?color=2E9C8A" alt="edgegoat npm downloads per month"></a>
+  <a href="https://www.npmjs.com/package/edgegoat"><img height="20" src="https://img.shields.io/npm/dt/edgegoat?color=2E9C8A" alt="edgegoat npm downloads in total"></a>
   <a href="https://bundlephobia.com/package/edgegoat"><img height="20" src="https://img.shields.io/bundlephobia/minzip/edgegoat?color=2E9C8A" alt="edgegoat bundle size, minified and gzipped"></a>
   <a href="https://github.com/kwy404/edgegoat/actions/workflows/ci.yml"><img height="20" src="https://github.com/kwy404/edgegoat/actions/workflows/ci.yml/badge.svg" alt="CI status: build, typecheck, lint and tests on Node 18, 20 and 22"></a>
   <a href="https://github.com/kwy404/edgegoat/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-2E9C8A.svg" alt="MIT license"></a>
@@ -665,6 +667,17 @@ The documentation site is at **[kwy404.github.io/edgegoat](https://kwy404.github
 ## How can I contribute?
 
 New cases are welcome when they have broken real code. Every case needs a `why`, and ideally a link to a real bug. See [CONTRIBUTING.md](https://github.com/kwy404/edgegoat/blob/main/CONTRIBUTING.md) for the checklist and the [changelog](https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md) for releases.
+
+## More from kwy404
+
+<!-- more:start -->
+- [graphemely](https://kwy404.github.io/graphemely/): Truncate, slice and count strings with emoji safely, by grapheme cluster.
+- [edgegoat](https://kwy404.github.io/edgegoat/): Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.
+- [vueleap](https://kwy404.github.io/vueleap/): Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.
+- [numberparrot](https://kwy404.github.io/numberparrot/): Parse localized number and currency strings back into real numbers, for any locale.
+- [breakhound](https://github.com/kwy404/breakhound): Find bugs in any JavaScript or TypeScript library automatically, no tests required.
+- [Voodoo.js](https://github.com/kwy404/Voodoo.js): The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.
+<!-- more:end -->
 
 ## License
 

@@ -23,7 +23,10 @@
 <meta name="twitter:description" content="Test DST transitions in Jest: real spring forward gaps and fall back overlaps for New York, London, Sao Paulo and Lord Howe, computed from Intl, plus mocking the date without fake timers.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('voodoo:theme');if(t==='"light"'||t==='"dark"')t=t.slice(1,-1);if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t}}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
+<noscript><style>.site-nav { display: flex; }</style></noscript>
+<script src="https://cdn.jsdelivr.net/npm/voodoojs@0.13.0/dist/voodoo.full.min.js" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -98,19 +101,26 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
+<header class="site-header" v-data="{ menu: false }" @keydown.esc="menu = false">
   <div class="wrap header-row">
-    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
-    <nav aria-label="Main">
-      <a href="./#catalog">Catalog</a>
-      <a href="./#guides">Guides</a>
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav id="site-nav" class="site-nav" :class="{ open: menu }" aria-label="Main">
+      <a href="./#catalog" @click="menu = false">Catalog</a>
+      <a href="./#how-it-works" @click="menu = false">How it works</a>
+      <a href="./#guides" @click="menu = false">Guides</a>
+      <a href="./#faq" @click="menu = false">FAQ</a>
       <a href="https://github.com/kwy404/edgegoat">GitHub</a>
       <a href="https://www.npmjs.com/package/edgegoat">npm</a>
     </nav>
+    <div class="header-actions">
+      <button type="button" class="icon-button" v-theme-toggle v-cloak aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
+      <button type="button" class="icon-button menu-button" v-cloak @click="menu = !menu" :aria-expanded="menu ? 'true' : 'false'" aria-controls="site-nav" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
   </div>
 </header>
-<main id="main" class="wrap">
+<main id="main">
 
+<div class="wrap">
 <article class="guide">
   <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
   <h1>How to test daylight saving time in Jest</h1>
@@ -120,63 +130,77 @@
 <p>Some zones are stranger: Australia/Lord_Howe shifts by 30 minutes, and America/Sao_Paulo used to change at midnight, so on 2018-11-04 local midnight did not exist and <code>new Date(2018, 10, 4)</code> returns 01:00.</p>
 </section>
   <section><h2>A naive implementation that fails</h2>
-<pre><code class="language-js">// Same time tomorrow, or so it seems.
-function addDays(date, days) {
-  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
-}</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-1" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// Same time tomorrow, or so it seems.</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> addDays</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">days</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6"> new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">() + </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">days</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> * </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">24</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> * </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">60</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> * </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">60</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> * </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1000</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>The edgegoat test that catches it</h2>
 <p><code>dates({ tags: ['dst'] })</code> returns the last instant before each spring forward, the first instant after it, and both occurrences of the repeated time at each fall back, for every zone. Each case carries its <code>zone</code>:</p>
-<pre><code class="language-js">const { dates, withTimeZone } = require('edgegoat');
-
-describe('addDays keeps the wall clock time', () =&gt; {
-  test.each(dates({ tags: ['dst'] }))('$label', ({ value, zone }) =&gt; {
-    withTimeZone(zone, () =&gt; {
-      const next = addDays(value, 1);
-      expect([next.getHours(), next.getMinutes()]).toEqual([value.getHours(), value.getMinutes()]);
-    });
-  });
-});</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-2" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-2" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">withTimeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">require</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">describe</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'addDays keeps the wall clock time'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">  test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">each</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">tags:</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> [</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'dst'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">] }))(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'$label'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, ({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">    withTimeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">      const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> next</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">addDays</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">      expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">([</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">next</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getHours</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(), </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">next</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getMinutes</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">()]).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toEqual</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">([</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getHours</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(), </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getMinutes</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">()]);</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">    });</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">  });</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
 <div class="callout fail"><strong>Fails:</strong> every case whose next 24 hours cross a transition, for example "America/New_York 2026: 1 ms before spring forward" (01:59 becomes 02:59) and "fall back, first 01:30" (01:30 becomes 00:30).</div>
 <p>The fix is to move the calendar date and let the engine resolve the wall clock time:</p>
-<pre><code class="language-js">function addDays(date, days) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
-}</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-3" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-3" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> addDays</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">days</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> d</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">  d</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">setDate</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">d</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getDate</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">() + </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">days</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> d</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>Set the time zone for the whole Jest run</h2>
-<pre><code class="language-sh">TZ=America/New_York npx jest</code></pre>
+<div class="code-block" data-lang="sh"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="sh" aria-hidden="true">&gt;_</span><span class="code-title">Terminal</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-4" v-copy-label="Copied" aria-label="Copy Terminal code">Copy</button></div><pre id="code-4" v-pre aria-label="Terminal code" class="shiki shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">TZ</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">America/New_York</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> npx</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> jest</span></span></code></pre></div><!--/code-block-->
 <p>Or set it once in a global setup file so every worker inherits it:</p>
-<pre><code class="language-js">// jest.config.js
-module.exports = { globalSetup: './jest.global-setup.js' };
-
-// jest.global-setup.js
-module.exports = async () =&gt; {
-  process.env.TZ = 'America/New_York';
-};</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-5" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-5" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// jest.config.js</span></span>
+<span class="line"><span style="--shiki-light:#267F99;--shiki-dark:#4EC9B0">module</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#267F99;--shiki-dark:#4EC9B0">exports</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">globalSetup:</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> './jest.global-setup.js'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> };</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// jest.global-setup.js</span></span>
+<span class="line"><span style="--shiki-light:#267F99;--shiki-dark:#4EC9B0">module</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#267F99;--shiki-dark:#4EC9B0">exports</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">async</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">  process</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">env</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">TZ</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'America/New_York'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">};</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>Mock the current date during a DST change</h2>
 <p>To test code that reads "now", freeze the clock at a DST instant. <code>withFrozenTime</code> needs no fake timers, and it nests inside <code>withTimeZone</code>:</p>
-<pre><code class="language-js">const { dates, withFrozenTime, withTimeZone } = require('edgegoat');
-
-for (const { label, value, zone } of dates({ tags: ['overlap'] })) {
-  test(label, () =&gt; {
-    withTimeZone(zone, () =&gt;
-      withFrozenTime(value, () =&gt; {
-        expect(minutesUntilMidnight()).toBeGreaterThan(0);
-      }),
-    );
-  });
-}</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-6" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-6" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">withTimeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">require</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">for</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> (</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">label</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">of</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">tags:</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> [</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'overlap'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">] })) {</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">  test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">label</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">    withTimeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">      withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">        expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">minutesUntilMidnight</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">()).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toBeGreaterThan</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">      }),</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">    );</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">  });</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/code-block-->
 <p>With Jest's own fake timers the equivalent is <code>jest.useFakeTimers({ now: value })</code>.</p>
 </section>
-  <section class="faq">
+  <section>
     <h2>FAQ</h2>
-    <details><summary>How do I test daylight saving time in Jest?</summary><p>Use real transition instants (<code>dates({ tags: ['dst'] })</code>), run each one in its zone with <code>withTimeZone()</code> or by starting Jest with <code>TZ</code>, and assert on local wall clock values, not on millisecond differences.</p></details>
-<details><summary>How do I mock the date in Jest during a DST change?</summary><p>Either <code>jest.useFakeTimers({ now: date })</code>, or <code>withFrozenTime(date, fn)</code> from edgegoat, which only replaces <code>Date</code> and leaves timers alone. Combine it with <code>withTimeZone()</code> to control the zone too.</p></details>
-<details><summary>Are the DST instants hard coded?</summary><p>No. edgegoat scans UTC offsets with <code>Intl.DateTimeFormat</code> and binary searches each change down to the minute, so the instants match the tz database of the runtime. Its test suite checks that every case is a real transition.</p></details>
-<details><summary>Which zones have unusual DST rules?</summary><p>Australia/Lord_Howe shifts by 30 minutes, Antarctica/Troll by two hours, America/Sao_Paulo switched at midnight until 2019, and the tz database models Europe/Dublin with a negative DST save.</p></details>
+    <div class="faq" v-accordion>
+    <div class="faq-item" v-accordion-item="open">
+      <button type="button" class="faq-q">How do I test daylight saving time in Jest?</button>
+      <div class="faq-a"><p>Use real transition instants (<code>dates({ tags: ['dst'] })</code>), run each one in its zone with <code>withTimeZone()</code> or by starting Jest with <code>TZ</code>, and assert on local wall clock values, not on millisecond differences.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">How do I mock the date in Jest during a DST change?</button>
+      <div class="faq-a"><p>Either <code>jest.useFakeTimers({ now: date })</code>, or <code>withFrozenTime(date, fn)</code> from edgegoat, which only replaces <code>Date</code> and leaves timers alone. Combine it with <code>withTimeZone()</code> to control the zone too.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Are the DST instants hard coded?</button>
+      <div class="faq-a"><p>No. edgegoat scans UTC offsets with <code>Intl.DateTimeFormat</code> and binary searches each change down to the minute, so the instants match the tz database of the runtime. Its test suite checks that every case is a real transition.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Which zones have unusual DST rules?</button>
+      <div class="faq-a"><p>Australia/Lord_Howe shifts by 30 minutes, Antarctica/Troll by two hours, America/Sao_Paulo switched at midnight until 2019, and the tz database models Europe/Dublin with a negative DST save.</p></div>
+    </div>
+  </div>
   </section>
   <section>
     <h2>More guides</h2>
@@ -191,11 +215,43 @@ for (const { label, value, zone } of dates({ tags: ['overlap'] })) {
     </ul>
   </section>
 </article>
+</div>
 </main>
 <footer class="site-footer">
-  <div class="wrap">
-    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
-    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt=""><span>edge<b>goat</b></span></a>
+      <p>The inputs that break code, ready to drop into your tests. Zero dependencies, MIT licensed.</p>
+      <p class="footer-links"><a href="https://github.com/kwy404/edgegoat">GitHub</a> <a href="https://www.npmjs.com/package/edgegoat">npm</a> <a href="catalog.json">catalog.json</a> <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md">Changelog</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Guides</h2>
+      <ul class="footer-list">
+        <li><a href="test-timezones-javascript.html">Time zones</a></li>
+        <li><a href="test-daylight-saving-time-jest.html">DST in Jest</a></li>
+        <li><a href="unicode-test-strings.html">Unicode strings</a></li>
+        <li><a href="javascript-number-edge-cases.html">Number edge cases</a></li>
+        <li><a href="test-dates-before-1970.html">Dates before 1970</a></li>
+        <li><a href="javascript-negative-zero.html">Negative zero</a></li>
+        <li><a href="mock-date-javascript.html">Mock Date</a></li>
+        <li><a href="property-based-testing-edge-cases.html">Property based testing</a></li>
+      </ul>
+    </div>
+    <div class="footer-more">
+      <h2 class="footer-title">More from kwy404</h2>
+      <ul class="footer-list projects">
+        <li><a href="https://kwy404.github.io/graphemely/">graphemely</a><span>Truncate, slice and count strings with emoji safely, by grapheme cluster.</span></li>
+        <li><a href="https://kwy404.github.io/edgegoat/">edgegoat</a><span>Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.</span></li>
+        <li><a href="https://kwy404.github.io/vueleap/">vueleap</a><span>Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.</span></li>
+        <li><a href="https://kwy404.github.io/numberparrot/">numberparrot</a><span>Parse localized number and currency strings back into real numbers, for any locale.</span></li>
+        <li><a href="https://github.com/kwy404/breakhound">breakhound</a><span>Find bugs in any JavaScript or TypeScript library automatically, no tests required.</span></li>
+        <li><a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a><span>The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>Made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. MIT license.</p>
+    <p class="credit">Interactive parts built with <a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a>.</p>
   </div>
 </footer>
 </body>

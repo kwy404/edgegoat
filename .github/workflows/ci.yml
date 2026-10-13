@@ -43,6 +43,6 @@ jobs:
         if: matrix.node == 22 && matrix.tz == ''
         run: |
           node scripts/build-docs.mjs
-          git diff --exit-code -- docs README.md README.pt-BR.md assets/catalog.svg
+          git diff --exit-code -- docs README.md i18n/README.pt-BR.md assets/catalog.svg
       - name: Package contents
         run: npm pack --dry-run

@@ -1,6 +1,6 @@
 {
   "name": "edgegoat",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Edge case test inputs for JavaScript and TypeScript: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON, ready for Vitest, Jest, node:test and Mocha.",
   "keywords": [
     "edge cases",
@@ -65,7 +65,6 @@
   "files": [
     "dist",
     "README.md",
-    "README.pt-BR.md",
     "LICENSE",
     "CHANGELOG.md"
   ],
@@ -82,13 +81,15 @@
     "examples:node-test": "node --test examples/node-test/edge-cases.test.mjs",
     "size": "node scripts/size.mjs",
     "prepublishOnly": "npm run build && npm test",
-    "docs": "npm run build && node scripts/build-assets.mjs && node scripts/build-docs.mjs"
+    "docs": "npm run build && node scripts/build-assets.mjs && node scripts/build-docs.mjs",
+    "docs:highlight": "node scripts/highlight-docs.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
     "@types/node": "^20.19.43",
     "esbuild": "^0.27.7",
     "eslint": "^9.39.5",
+    "shiki": "^4.5.0",
     "tsup": "^8.5.1",
     "typescript": "~5.9",
     "typescript-eslint": "^8.71.2",

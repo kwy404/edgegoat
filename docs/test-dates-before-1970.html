@@ -23,7 +23,10 @@
 <meta name="twitter:description" content="Dates before the Unix epoch have negative timestamps, and fractional seconds round the wrong way with Math.trunc and %. Test pre-1970 dates, local mean time and year 0 with edgegoat.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('voodoo:theme');if(t==='"light"'||t==='"dark"')t=t.slice(1,-1);if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t}}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
+<noscript><style>.site-nav { display: flex; }</style></noscript>
+<script src="https://cdn.jsdelivr.net/npm/voodoojs@0.13.0/dist/voodoo.full.min.js" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -97,19 +100,26 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
+<header class="site-header" v-data="{ menu: false }" @keydown.esc="menu = false">
   <div class="wrap header-row">
-    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
-    <nav aria-label="Main">
-      <a href="./#catalog">Catalog</a>
-      <a href="./#guides">Guides</a>
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav id="site-nav" class="site-nav" :class="{ open: menu }" aria-label="Main">
+      <a href="./#catalog" @click="menu = false">Catalog</a>
+      <a href="./#how-it-works" @click="menu = false">How it works</a>
+      <a href="./#guides" @click="menu = false">Guides</a>
+      <a href="./#faq" @click="menu = false">FAQ</a>
       <a href="https://github.com/kwy404/edgegoat">GitHub</a>
       <a href="https://www.npmjs.com/package/edgegoat">npm</a>
     </nav>
+    <div class="header-actions">
+      <button type="button" class="icon-button" v-theme-toggle v-cloak aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
+      <button type="button" class="icon-button menu-button" v-cloak @click="menu = !menu" :aria-expanded="menu ? 'true' : 'false'" aria-controls="site-nav" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
   </div>
 </header>
-<main id="main" class="wrap">
+<main id="main">
 
+<div class="wrap">
 <article class="guide">
   <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
   <h1>Testing dates before 1970 in JavaScript</h1>
@@ -119,23 +129,23 @@
 </section>
   <section><h2>A naive implementation that fails</h2>
 <p>Protocol Buffers and many APIs encode time as <code>{ seconds, nanos }</code> where <code>nanos</code> must be between 0 and 999,999,999:</p>
-<pre><code class="language-js">function toTimestamp(date) {
-  const ms = date.getTime();
-  return { seconds: Math.trunc(ms / 1000), nanos: (ms % 1000) * 1e6 };
-}
-
-toTimestamp(new Date(-1500)); // { seconds: -1, nanos: -500000000 }  invalid</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-1" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> toTimestamp</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> ms</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">();</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">seconds:</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> Math</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">trunc</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">ms</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> / </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1000</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">), </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">nanos:</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> (</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">ms</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> % </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1000</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) * </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1e6</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> };</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toTimestamp</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(-</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1500</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)); </span><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// { seconds: -1, nanos: -500000000 }  invalid</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>The edgegoat test that catches it</h2>
-<pre><code class="language-js">import { expect, test } from 'vitest';
-import { dates } from 'edgegoat';
-
-test.each(dates({ tags: ['pre-1970', 'epoch'] }))('$label', ({ value }) =&gt; {
-  const { seconds, nanos } = toTimestamp(value);
-  expect(nanos).toBeGreaterThanOrEqual(0);
-  expect(nanos).toBeLessThan(1e9);
-  expect(seconds * 1000 + nanos / 1e6).toBe(value.getTime());
-});</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-2" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-2" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'vitest'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">each</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">tags:</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> [</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'pre-1970'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'epoch'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">] }))(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'$label'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, ({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">seconds</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">nanos</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toTimestamp</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">  expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">nanos</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toBeGreaterThanOrEqual</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">  expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">nanos</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toBeLessThan</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1e9</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">  expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">seconds</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> * </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1000</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> + </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">nanos</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> / </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">1e6</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toBe</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">());</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
 <div class="callout fail"><strong>Fails:</strong> <code>1 ms before the epoch</code>, <code>before 1970 with fractional seconds</code> and <code>moon landing 1969-07-20T20:17:40.123Z</code>. The fix floors: <code>const seconds = Math.floor(ms / 1000)</code> and <code>nanos = (ms - seconds * 1000) * 1e6</code>.</div>
 </section>
   <section><h2>Local mean time before time zones existed</h2>
@@ -145,12 +155,26 @@ test.each(dates({ tags: ['pre-1970', 'epoch'] }))('$label', ({ value }) =&gt; {
 <p><code>dates()</code> also includes year 0, year -1 (<code>-000001</code> in ISO format), the minimum and maximum valid dates (plus and minus 8.64e15 ms), year 9999 and year 10000, where <code>toISOString()</code> switches to a six digit, signed year.</p>
 <div class="callout tip"><code>new Date(0, 0, 1)</code> is 1900, not year 0: the Date constructor maps years 0 to 99 to 1900 to 1999. Use <code>setFullYear</code> to build early years.</div>
 </section>
-  <section class="faq">
+  <section>
     <h2>FAQ</h2>
-    <details><summary>Can JavaScript Date represent dates before 1970?</summary><p>Yes. A Date stores milliseconds since 1970-01-01T00:00:00Z as a signed number, so earlier dates are negative. The valid range is -271821-04-20 to +275760-09-13.</p></details>
-<details><summary>Why is my pre-1970 timestamp off by one second?</summary><p>Truncation rounds negative values toward zero. Use <code>Math.floor</code> for the seconds and compute the remainder from it, so the fraction stays positive.</p></details>
-<details><summary>Why does a date in 1850 have a strange UTC offset?</summary><p>Before standard time, zones used local mean time, with offsets such as -03:06:28. <code>Intl</code> reports them exactly, <code>getTimezoneOffset()</code> in whole minutes.</p></details>
-<details><summary>Does new Date(0, 0, 1) give year 0?</summary><p>No. Years 0 to 99 passed to the Date constructor or <code>Date.UTC</code> become 1900 to 1999. Call <code>setFullYear(0, 0, 1)</code> instead.</p></details>
+    <div class="faq" v-accordion>
+    <div class="faq-item" v-accordion-item="open">
+      <button type="button" class="faq-q">Can JavaScript Date represent dates before 1970?</button>
+      <div class="faq-a"><p>Yes. A Date stores milliseconds since 1970-01-01T00:00:00Z as a signed number, so earlier dates are negative. The valid range is -271821-04-20 to +275760-09-13.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Why is my pre-1970 timestamp off by one second?</button>
+      <div class="faq-a"><p>Truncation rounds negative values toward zero. Use <code>Math.floor</code> for the seconds and compute the remainder from it, so the fraction stays positive.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Why does a date in 1850 have a strange UTC offset?</button>
+      <div class="faq-a"><p>Before standard time, zones used local mean time, with offsets such as -03:06:28. <code>Intl</code> reports them exactly, <code>getTimezoneOffset()</code> in whole minutes.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Does new Date(0, 0, 1) give year 0?</button>
+      <div class="faq-a"><p>No. Years 0 to 99 passed to the Date constructor or <code>Date.UTC</code> become 1900 to 1999. Call <code>setFullYear(0, 0, 1)</code> instead.</p></div>
+    </div>
+  </div>
   </section>
   <section>
     <h2>More guides</h2>
@@ -165,11 +189,43 @@ test.each(dates({ tags: ['pre-1970', 'epoch'] }))('$label', ({ value }) =&gt; {
     </ul>
   </section>
 </article>
+</div>
 </main>
 <footer class="site-footer">
-  <div class="wrap">
-    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
-    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt=""><span>edge<b>goat</b></span></a>
+      <p>The inputs that break code, ready to drop into your tests. Zero dependencies, MIT licensed.</p>
+      <p class="footer-links"><a href="https://github.com/kwy404/edgegoat">GitHub</a> <a href="https://www.npmjs.com/package/edgegoat">npm</a> <a href="catalog.json">catalog.json</a> <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md">Changelog</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Guides</h2>
+      <ul class="footer-list">
+        <li><a href="test-timezones-javascript.html">Time zones</a></li>
+        <li><a href="test-daylight-saving-time-jest.html">DST in Jest</a></li>
+        <li><a href="unicode-test-strings.html">Unicode strings</a></li>
+        <li><a href="javascript-number-edge-cases.html">Number edge cases</a></li>
+        <li><a href="test-dates-before-1970.html">Dates before 1970</a></li>
+        <li><a href="javascript-negative-zero.html">Negative zero</a></li>
+        <li><a href="mock-date-javascript.html">Mock Date</a></li>
+        <li><a href="property-based-testing-edge-cases.html">Property based testing</a></li>
+      </ul>
+    </div>
+    <div class="footer-more">
+      <h2 class="footer-title">More from kwy404</h2>
+      <ul class="footer-list projects">
+        <li><a href="https://kwy404.github.io/graphemely/">graphemely</a><span>Truncate, slice and count strings with emoji safely, by grapheme cluster.</span></li>
+        <li><a href="https://kwy404.github.io/edgegoat/">edgegoat</a><span>Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.</span></li>
+        <li><a href="https://kwy404.github.io/vueleap/">vueleap</a><span>Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.</span></li>
+        <li><a href="https://kwy404.github.io/numberparrot/">numberparrot</a><span>Parse localized number and currency strings back into real numbers, for any locale.</span></li>
+        <li><a href="https://github.com/kwy404/breakhound">breakhound</a><span>Find bugs in any JavaScript or TypeScript library automatically, no tests required.</span></li>
+        <li><a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a><span>The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>Made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. MIT license.</p>
+    <p class="credit">Interactive parts built with <a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a>.</p>
   </div>
 </footer>
 </body>

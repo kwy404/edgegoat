@@ -23,7 +23,10 @@
 <meta name="twitter:description" content="Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('voodoo:theme');if(t==='"light"'||t==='"dark"')t=t.slice(1,-1);if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t}}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
+<noscript><style>.site-nav { display: flex; }</style></noscript>
+<script src="https://cdn.jsdelivr.net/npm/voodoojs@0.13.0/dist/voodoo.full.min.js" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -98,19 +101,26 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
+<header class="site-header" v-data="{ menu: false }" @keydown.esc="menu = false">
   <div class="wrap header-row">
-    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
-    <nav aria-label="Main">
-      <a href="./#catalog">Catalog</a>
-      <a href="./#guides">Guides</a>
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav id="site-nav" class="site-nav" :class="{ open: menu }" aria-label="Main">
+      <a href="./#catalog" @click="menu = false">Catalog</a>
+      <a href="./#how-it-works" @click="menu = false">How it works</a>
+      <a href="./#guides" @click="menu = false">Guides</a>
+      <a href="./#faq" @click="menu = false">FAQ</a>
       <a href="https://github.com/kwy404/edgegoat">GitHub</a>
       <a href="https://www.npmjs.com/package/edgegoat">npm</a>
     </nav>
+    <div class="header-actions">
+      <button type="button" class="icon-button" v-theme-toggle v-cloak aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
+      <button type="button" class="icon-button menu-button" v-cloak @click="menu = !menu" :aria-expanded="menu ? 'true' : 'false'" aria-controls="site-nav" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
   </div>
 </header>
-<main id="main" class="wrap">
+<main id="main">
 
+<div class="wrap">
 <article class="guide">
   <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
   <h1>Unicode test strings for JavaScript</h1>
@@ -120,30 +130,30 @@
 <p>Real bugs of this kind were fixed in <a href="https://github.com/google/budoux/pull/1411">google/budoux#1411</a> (do not split surrogate pairs) and <a href="https://github.com/microsoft/vscode-js-debug/pull/2423">microsoft/vscode-js-debug#2423</a> (avoid splitting surrogate pairs in trimEnd).</p>
 </section>
   <section><h2>A naive implementation that fails</h2>
-<pre><code class="language-js">function truncate(text, max) {
-  return text.length &lt;= max ? text : text.slice(0, max) + '...';
-}</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-1" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> truncate</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">max</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">length</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> &#x3C;= </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">max</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> ? </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> : </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">slice</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">max</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) + </span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'...'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>The edgegoat test that catches it</h2>
-<pre><code class="language-js">import { expect, test } from 'vitest';
-import { check, strings } from 'edgegoat';
-
-test('truncate never produces malformed UTF-16', () =&gt; {
-  const inputs = strings({ exclude: ['malformed'] });
-  const failures = check((s) =&gt; truncate(s, 10), inputs, (out) =&gt; out.isWellFormed());
-  expect(failures.map((f) =&gt; f.label)).toEqual([]);
-});</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-2" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-2" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'vitest'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">check</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">strings</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'truncate never produces malformed UTF-16'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> inputs</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">strings</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">exclude:</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> [</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'malformed'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">] });</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> failures</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">check</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">((</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">s</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> truncate</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">s</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">10</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">), </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">inputs</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, (</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">isWellFormed</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">());</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">  expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">failures</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">map</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">((</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">f</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> f</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">label</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toEqual</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">([]);</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
 <div class="callout fail"><strong>Fails:</strong> <code>surrogate pair cut by slice(0, 10)</code>: the emoji starts at index 9. Other lengths also break the ZWJ family, flag and skin tone cases. (<code>isWellFormed</code> needs Node.js 20; older versions can use a regex.)</div>
 <p>The fix walks grapheme clusters with <code>Intl.Segmenter</code>:</p>
-<pre><code class="language-js">function truncate(text, max) {
-  if (text.length &lt;= max) return text;
-  let out = '';
-  for (const { segment } of new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)) {
-    if (out.length + segment.length &gt; max) break;
-    out += segment;
-  }
-  return out + '...';
-}</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-3" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-3" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> truncate</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">max</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  if</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> (</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">length</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> &#x3C;= </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">max</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">return</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  let</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">''</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  for</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> (</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">segment</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">of</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6"> new</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> Intl</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">Segmenter</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">undefined</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">granularity:</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'grapheme'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">segment</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">text</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)) {</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">    if</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> (</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">length</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> + </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">segment</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">length</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> > </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">max</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">break</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">    out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> += </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">segment</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> + </span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'...'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>What strings() contains</h2>
 <ul>
@@ -159,12 +169,26 @@ test('truncate never produces malformed UTF-16', () =&gt; {
 </ul>
 <p>Every value is written with escapes in the source, so the catalog shows emoji as code points such as <code>\u{1F600}</code>, never as hidden glyphs. Filter with tags, for example <code>strings({ tags: ['emoji', 'bidi'] })</code>.</p>
 </section>
-  <section class="faq">
+  <section>
     <h2>FAQ</h2>
-    <details><summary>What are good unicode test strings?</summary><p>Strings that break assumptions about length, equality and display: emoji outside the BMP, ZWJ sequences, NFC vs NFD pairs, right to left text, invisible spaces, lone surrogates and locale sensitive casing. <code>strings()</code> returns 49 of them with the reason each one breaks code.</p></details>
-<details><summary>What is a surrogate pair?</summary><p>UTF-16 encodes code points above U+FFFF as two 16 bit code units, a high surrogate followed by a low surrogate. JavaScript string indexes count code units, so one emoji has <code>length</code> 2 and can be cut in half.</p></details>
-<details><summary>How do I count characters in a JavaScript string?</summary><p><code>s.length</code> counts UTF-16 code units, <code>[...s].length</code> counts code points, and <code>[...new Intl.Segmenter().segment(s)].length</code> counts grapheme clusters, which is what users perceive as characters.</p></details>
-<details><summary>How is this different from the big list of naughty strings?</summary><p>The big list of naughty strings is a large raw list, great for fuzzing. edgegoat is smaller and curated: every string has a label, a one line reason and tags, plus typed generators for dates, numbers and URLs. They work well together.</p></details>
+    <div class="faq" v-accordion>
+    <div class="faq-item" v-accordion-item="open">
+      <button type="button" class="faq-q">What are good unicode test strings?</button>
+      <div class="faq-a"><p>Strings that break assumptions about length, equality and display: emoji outside the BMP, ZWJ sequences, NFC vs NFD pairs, right to left text, invisible spaces, lone surrogates and locale sensitive casing. <code>strings()</code> returns 49 of them with the reason each one breaks code.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">What is a surrogate pair?</button>
+      <div class="faq-a"><p>UTF-16 encodes code points above U+FFFF as two 16 bit code units, a high surrogate followed by a low surrogate. JavaScript string indexes count code units, so one emoji has <code>length</code> 2 and can be cut in half.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">How do I count characters in a JavaScript string?</button>
+      <div class="faq-a"><p><code>s.length</code> counts UTF-16 code units, <code>[...s].length</code> counts code points, and <code>[...new Intl.Segmenter().segment(s)].length</code> counts grapheme clusters, which is what users perceive as characters.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">How is this different from the big list of naughty strings?</button>
+      <div class="faq-a"><p>The big list of naughty strings is a large raw list, great for fuzzing. edgegoat is smaller and curated: every string has a label, a one line reason and tags, plus typed generators for dates, numbers and URLs. They work well together.</p></div>
+    </div>
+  </div>
   </section>
   <section>
     <h2>More guides</h2>
@@ -179,11 +203,43 @@ test('truncate never produces malformed UTF-16', () =&gt; {
     </ul>
   </section>
 </article>
+</div>
 </main>
 <footer class="site-footer">
-  <div class="wrap">
-    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
-    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt=""><span>edge<b>goat</b></span></a>
+      <p>The inputs that break code, ready to drop into your tests. Zero dependencies, MIT licensed.</p>
+      <p class="footer-links"><a href="https://github.com/kwy404/edgegoat">GitHub</a> <a href="https://www.npmjs.com/package/edgegoat">npm</a> <a href="catalog.json">catalog.json</a> <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md">Changelog</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Guides</h2>
+      <ul class="footer-list">
+        <li><a href="test-timezones-javascript.html">Time zones</a></li>
+        <li><a href="test-daylight-saving-time-jest.html">DST in Jest</a></li>
+        <li><a href="unicode-test-strings.html">Unicode strings</a></li>
+        <li><a href="javascript-number-edge-cases.html">Number edge cases</a></li>
+        <li><a href="test-dates-before-1970.html">Dates before 1970</a></li>
+        <li><a href="javascript-negative-zero.html">Negative zero</a></li>
+        <li><a href="mock-date-javascript.html">Mock Date</a></li>
+        <li><a href="property-based-testing-edge-cases.html">Property based testing</a></li>
+      </ul>
+    </div>
+    <div class="footer-more">
+      <h2 class="footer-title">More from kwy404</h2>
+      <ul class="footer-list projects">
+        <li><a href="https://kwy404.github.io/graphemely/">graphemely</a><span>Truncate, slice and count strings with emoji safely, by grapheme cluster.</span></li>
+        <li><a href="https://kwy404.github.io/edgegoat/">edgegoat</a><span>Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.</span></li>
+        <li><a href="https://kwy404.github.io/vueleap/">vueleap</a><span>Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.</span></li>
+        <li><a href="https://kwy404.github.io/numberparrot/">numberparrot</a><span>Parse localized number and currency strings back into real numbers, for any locale.</span></li>
+        <li><a href="https://github.com/kwy404/breakhound">breakhound</a><span>Find bugs in any JavaScript or TypeScript library automatically, no tests required.</span></li>
+        <li><a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a><span>The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>Made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. MIT license.</p>
+    <p class="credit">Interactive parts built with <a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a>.</p>
   </div>
 </footer>
 </body>

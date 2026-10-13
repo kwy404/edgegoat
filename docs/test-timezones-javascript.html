@@ -23,7 +23,10 @@
 <meta name="twitter:description" content="Test JavaScript date code in any time zone: run tests under TZ, switch zones per test with withTimeZone, and catch New Year and UTC offset bugs with ready made edge cases.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem('voodoo:theme');if(t==='"light"'||t==='"dark"')t=t.slice(1,-1);if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t}}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
+<noscript><style>.site-nav { display: flex; }</style></noscript>
+<script src="https://cdn.jsdelivr.net/npm/voodoojs@0.13.0/dist/voodoo.full.min.js" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -98,19 +101,26 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
+<header class="site-header" v-data="{ menu: false }" @keydown.esc="menu = false">
   <div class="wrap header-row">
-    <a class="brand" href="./"><img src="assets/mascot.svg" width="40" height="40" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
-    <nav aria-label="Main">
-      <a href="./#catalog">Catalog</a>
-      <a href="./#guides">Guides</a>
+    <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
+    <nav id="site-nav" class="site-nav" :class="{ open: menu }" aria-label="Main">
+      <a href="./#catalog" @click="menu = false">Catalog</a>
+      <a href="./#how-it-works" @click="menu = false">How it works</a>
+      <a href="./#guides" @click="menu = false">Guides</a>
+      <a href="./#faq" @click="menu = false">FAQ</a>
       <a href="https://github.com/kwy404/edgegoat">GitHub</a>
       <a href="https://www.npmjs.com/package/edgegoat">npm</a>
     </nav>
+    <div class="header-actions">
+      <button type="button" class="icon-button" v-theme-toggle v-cloak aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
+      <button type="button" class="icon-button menu-button" v-cloak @click="menu = !menu" :aria-expanded="menu ? 'true' : 'false'" aria-controls="site-nav" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
   </div>
 </header>
-<main id="main" class="wrap">
+<main id="main">
 
+<div class="wrap">
 <article class="guide">
   <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
   <h1>How to test time zones in JavaScript</h1>
@@ -120,57 +130,57 @@
 <p>The window is not small. At <code>2025-12-31T10:00:00Z</code> it is already 2026 in Pacific/Kiritimati (UTC+14:00), and at <code>2026-01-01T03:00:00Z</code> it is still 2025 in New York. Every zone away from UTC has hours each year where the local year and the UTC year disagree.</p>
 </section>
   <section><h2>A naive implementation that fails</h2>
-<pre><code class="language-js">// Shows "Dec 31" for dates in the current year and "Dec 31, 2025" otherwise.
-function formatShort(date, timeZone) {
-  const sameYear = date.getUTCFullYear() === new Date().getUTCFullYear();
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    month: 'short',
-    day: 'numeric',
-    ...(sameYear ? {} : { year: 'numeric' }),
-  }).format(date);
-}</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-1" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// Shows "Dec 31" for dates in the current year and "Dec 31, 2025" otherwise.</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> formatShort</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">timeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> sameYear</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getUTCFullYear</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">() === </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">().</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getUTCFullYear</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">();</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6"> new</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> Intl</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">DateTimeFormat</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'en-US'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, {</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">    timeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">    month:</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'short'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">    day:</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'numeric'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">    ...(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">sameYear</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> ? {} : { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">year:</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'numeric'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }),</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">  }).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">format</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>The edgegoat test that catches it</h2>
 <p><code>dates({ tags: ['year-boundary'] })</code> returns, for each zone, the instant where the local year and the UTC year disagree. Freeze "now" at that instant and format a date one hour away, on the other side of the local New Year:</p>
-<pre><code class="language-js">import { expect, test } from 'vitest';
-import { dates, withFrozenTime } from 'edgegoat';
-
-const HOUR = 3_600_000;
-const yearIn = (d, timeZone) =&gt; new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric' }).format(d);
-const edges = dates({ tags: ['year-boundary'] }).filter((c) =&gt; c.zone);
-
-test.each(edges)('$label', ({ value, zone }) =&gt; {
-  const before = new Date(value.getTime() - HOUR);
-  const after = new Date(value.getTime() + HOUR);
-  const other = yearIn(before, zone) !== yearIn(value, zone) ? before : after;
-  const out = withFrozenTime(value, () =&gt; formatShort(other, zone));
-  expect(out).toContain(yearIn(other, zone));
-});</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-2" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-2" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'vitest'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> HOUR</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">3_600_000</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> yearIn</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = (</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">d</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">timeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6"> new</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> Intl</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">DateTimeFormat</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'en-US'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">timeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">year:</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'numeric'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">format</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">d</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> edges</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">dates</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">tags:</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> [</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'year-boundary'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">] }).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">filter</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">((</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">c</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> c</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">each</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">edges</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'$label'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, ({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> before</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">() - </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">HOUR</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> after</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">() + </span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF">HOUR</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> other</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">yearIn</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">before</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) !== </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">yearIn</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) ? </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">before</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> : </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">after</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> formatShort</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">other</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">));</span></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">  expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">out</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toContain</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">yearIn</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">other</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">));</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
 <div class="callout fail"><strong>Fails:</strong> Pacific/Kiritimati, Asia/Kathmandu, Australia/Lord_Howe, America/New_York, America/Sao_Paulo and Pacific/Pago_Pago. The fix compares <code>yearIn(date, zone)</code> with <code>yearIn(new Date(), zone)</code>.</div>
 <p>The same test lives in the repository as a runnable example: <a href="https://github.com/kwy404/edgegoat/tree/main/examples/real-world">examples/real-world</a>.</p>
 </section>
   <section><h2>Run the whole suite in another time zone</h2>
 <p>The <code>TZ</code> environment variable sets the zone of a Node.js process. Run your existing suite under zones with unusual offsets; most suites that only ever ran in UTC will fail somewhere.</p>
-<pre><code class="language-sh">TZ=Asia/Kathmandu npx vitest run
-TZ=Pacific/Kiritimati npx jest
-
-# Windows PowerShell
-$env:TZ = 'Asia/Kathmandu'; npx vitest run</code></pre>
+<div class="code-block" data-lang="sh"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="sh" aria-hidden="true">&gt;_</span><span class="code-title">Terminal</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-3" v-copy-label="Copied" aria-label="Copy Terminal code">Copy</button></div><pre id="code-3" v-pre aria-label="Terminal code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">TZ</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">Asia/Kathmandu</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> npx</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> vitest</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> run</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">TZ</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">Pacific/Kiritimati</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> npx</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> jest</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#008000;--shiki-dark:#6A9955"># Windows PowerShell</span></span>
+<span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">$env</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">:TZ = </span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'Asia/Kathmandu'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">npx</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> vitest</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> run</span></span></code></pre></div><!--/code-block-->
 <p>In CI, add a matrix entry per zone. edgegoat's own workflow runs the suite in UTC, America/Sao_Paulo and Asia/Kathmandu:</p>
-<pre><code class="language-yaml">strategy:
-  matrix:
-    tz: [UTC, America/Sao_Paulo, Asia/Kathmandu]
-env:
-  TZ: ${{ matrix.tz }}</code></pre>
+<div class="code-block" data-lang="yaml"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="yaml" aria-hidden="true">YML</span><span class="code-title">ci.yml</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-4" v-copy-label="Copied" aria-label="Copy ci.yml code">Copy</button></div><pre id="code-4" v-pre aria-label="ci.yml code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#800000;--shiki-dark:#569CD6">strategy</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">:</span></span>
+<span class="line"><span style="--shiki-light:#800000;--shiki-dark:#569CD6">  matrix</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">:</span></span>
+<span class="line"><span style="--shiki-light:#800000;--shiki-dark:#569CD6">    tz</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">: [</span><span style="--shiki-light:#0000FF;--shiki-dark:#CE9178">UTC</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0000FF;--shiki-dark:#CE9178">America/Sao_Paulo</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#0000FF;--shiki-dark:#CE9178">Asia/Kathmandu</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">]</span></span>
+<span class="line"><span style="--shiki-light:#800000;--shiki-dark:#569CD6">env</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">:</span></span>
+<span class="line"><span style="--shiki-light:#800000;--shiki-dark:#569CD6">  TZ</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#0000FF;--shiki-dark:#CE9178">${{ matrix.tz }}</span></span></code></pre></div><!--/code-block-->
 </section>
   <section><h2>Switch zones inside a single test</h2>
 <p><code>withTimeZone(zone, fn)</code> sets <code>process.env.TZ</code>, verifies that the runtime applied it, runs <code>fn</code> and restores the previous zone, also when <code>fn</code> throws or returns a rejected promise.</p>
-<pre><code class="language-js">import { withTimeZone } from 'edgegoat';
-
-withTimeZone('Asia/Kathmandu', () =&gt; {
-  new Date('2026-01-01T00:00:00Z').getTimezoneOffset(); // -345
-});</code></pre>
+<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-5" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-5" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">withTimeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">withTimeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'Asia/Kathmandu'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'2026-01-01T00:00:00Z'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">getTimezoneOffset</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(); </span><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// -345</span></span>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
 <div class="callout tip">The zone is process wide, so do not combine <code>withTimeZone</code> with <code>test.concurrent</code>. In browsers it throws, because a page cannot change its own time zone; launch the browser in the zone instead (for example Playwright's <code>timezoneId</code> option).</div>
 </section>
   <section><h2>Which time zones to test</h2>
@@ -184,12 +194,26 @@ withTimeZone('Asia/Kathmandu', () =&gt; {
 </ul>
 <p><code>timeZones()</code> returns 18 such zones, each with the reason it is interesting.</p>
 </section>
-  <section class="faq">
+  <section>
     <h2>FAQ</h2>
-    <details><summary>How do I test time zones in JavaScript?</summary><p>Run the same date assertions under several time zones, either for the whole process with the <code>TZ</code> environment variable or per test with <code>withTimeZone()</code>, and feed them instants where local and UTC dates disagree, such as the <code>year-boundary</code> cases from <code>dates()</code>.</p></details>
-<details><summary>Can I change the time zone of a running Node.js process?</summary><p>Yes. Assigning <code>process.env.TZ</code> makes Node.js reset its cached zone, so later <code>Date</code> and <code>Intl</code> calls use the new one. Deleting the variable does not reset it, which is why <code>withTimeZone()</code> switches back explicitly.</p></details>
-<details><summary>How do I set the time zone in browser tests?</summary><p>A page cannot change its own zone at runtime. Launch the browser in the zone: Playwright has a <code>timezoneId</code> option, and Chrome DevTools Protocol has <code>Emulation.setTimezoneOverride</code>.</p></details>
-<details><summary>Why do my date tests pass locally and fail in CI?</summary><p>CI runners usually run in UTC while your machine does not, so dates near midnight or New Year land on different days. Pin <code>TZ</code> in CI and add matrix entries with zones far from UTC.</p></details>
+    <div class="faq" v-accordion>
+    <div class="faq-item" v-accordion-item="open">
+      <button type="button" class="faq-q">How do I test time zones in JavaScript?</button>
+      <div class="faq-a"><p>Run the same date assertions under several time zones, either for the whole process with the <code>TZ</code> environment variable or per test with <code>withTimeZone()</code>, and feed them instants where local and UTC dates disagree, such as the <code>year-boundary</code> cases from <code>dates()</code>.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Can I change the time zone of a running Node.js process?</button>
+      <div class="faq-a"><p>Yes. Assigning <code>process.env.TZ</code> makes Node.js reset its cached zone, so later <code>Date</code> and <code>Intl</code> calls use the new one. Deleting the variable does not reset it, which is why <code>withTimeZone()</code> switches back explicitly.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">How do I set the time zone in browser tests?</button>
+      <div class="faq-a"><p>A page cannot change its own zone at runtime. Launch the browser in the zone: Playwright has a <code>timezoneId</code> option, and Chrome DevTools Protocol has <code>Emulation.setTimezoneOverride</code>.</p></div>
+    </div>
+    <div class="faq-item" v-accordion-item>
+      <button type="button" class="faq-q">Why do my date tests pass locally and fail in CI?</button>
+      <div class="faq-a"><p>CI runners usually run in UTC while your machine does not, so dates near midnight or New Year land on different days. Pin <code>TZ</code> in CI and add matrix entries with zones far from UTC.</p></div>
+    </div>
+  </div>
   </section>
   <section>
     <h2>More guides</h2>
@@ -204,11 +228,43 @@ withTimeZone('Asia/Kathmandu', () =&gt; {
     </ul>
   </section>
 </article>
+</div>
 </main>
 <footer class="site-footer">
-  <div class="wrap">
-    <p><strong>Guides:</strong> <a href="test-timezones-javascript.html">Time zones</a> <span aria-hidden="true">/</span> <a href="test-daylight-saving-time-jest.html">DST in Jest</a> <span aria-hidden="true">/</span> <a href="unicode-test-strings.html">Unicode strings</a> <span aria-hidden="true">/</span> <a href="javascript-number-edge-cases.html">Number edge cases</a> <span aria-hidden="true">/</span> <a href="test-dates-before-1970.html">Dates before 1970</a> <span aria-hidden="true">/</span> <a href="javascript-negative-zero.html">Negative zero</a> <span aria-hidden="true">/</span> <a href="mock-date-javascript.html">Mock Date</a> <span aria-hidden="true">/</span> <a href="property-based-testing-edge-cases.html">Property based testing</a></p>
-    <p>edgegoat is MIT licensed, made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. <a href="https://github.com/kwy404/edgegoat">Source on GitHub</a>.</p>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt=""><span>edge<b>goat</b></span></a>
+      <p>The inputs that break code, ready to drop into your tests. Zero dependencies, MIT licensed.</p>
+      <p class="footer-links"><a href="https://github.com/kwy404/edgegoat">GitHub</a> <a href="https://www.npmjs.com/package/edgegoat">npm</a> <a href="catalog.json">catalog.json</a> <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md">Changelog</a></p>
+    </div>
+    <div>
+      <h2 class="footer-title">Guides</h2>
+      <ul class="footer-list">
+        <li><a href="test-timezones-javascript.html">Time zones</a></li>
+        <li><a href="test-daylight-saving-time-jest.html">DST in Jest</a></li>
+        <li><a href="unicode-test-strings.html">Unicode strings</a></li>
+        <li><a href="javascript-number-edge-cases.html">Number edge cases</a></li>
+        <li><a href="test-dates-before-1970.html">Dates before 1970</a></li>
+        <li><a href="javascript-negative-zero.html">Negative zero</a></li>
+        <li><a href="mock-date-javascript.html">Mock Date</a></li>
+        <li><a href="property-based-testing-edge-cases.html">Property based testing</a></li>
+      </ul>
+    </div>
+    <div class="footer-more">
+      <h2 class="footer-title">More from kwy404</h2>
+      <ul class="footer-list projects">
+        <li><a href="https://kwy404.github.io/graphemely/">graphemely</a><span>Truncate, slice and count strings with emoji safely, by grapheme cluster.</span></li>
+        <li><a href="https://kwy404.github.io/edgegoat/">edgegoat</a><span>Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.</span></li>
+        <li><a href="https://kwy404.github.io/vueleap/">vueleap</a><span>Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.</span></li>
+        <li><a href="https://kwy404.github.io/numberparrot/">numberparrot</a><span>Parse localized number and currency strings back into real numbers, for any locale.</span></li>
+        <li><a href="https://github.com/kwy404/breakhound">breakhound</a><span>Find bugs in any JavaScript or TypeScript library automatically, no tests required.</span></li>
+        <li><a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a><span>The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>Made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. MIT license.</p>
+    <p class="credit">Interactive parts built with <a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a>.</p>
   </div>
 </footer>
 </body>
