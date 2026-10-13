@@ -238,7 +238,7 @@ for (const [file, lang] of [
 // ------------------------------------------------------------ site
 const esc = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
-const VOODOO = 'https://cdn.jsdelivr.net/npm/voodoojs@0.13.0/dist/voodoo.full.min.js';
+const VOODOO = 'https://cdn.jsdelivr.net/npm/voodoojs@1.0.0/dist/voodoo.full.min.js';
 
 // Restores a saved light or dark choice before the first paint. Voodoo.js
 // (v-theme-toggle) writes the choice to localStorage under voodoo:theme and
