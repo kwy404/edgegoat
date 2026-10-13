@@ -14,6 +14,7 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 const SITE = 'https://kwy404.github.io/edgegoat/';
 const REPO = 'https://github.com/kwy404/edgegoat';
 const NPM = 'https://www.npmjs.com/package/edgegoat';
+const CDN = 'https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/';
 const UPDATED = '2026-10-12';
 const BS = String.fromCharCode(92);
 
@@ -182,7 +183,7 @@ function grid(lang) {
     const [title, line] = g[lang];
     const n = g.fns.length ? gridCount(g.fns) : 4;
     const unit = g.fns.length ? (lang === 'en' ? 'cases' : 'casos') : lang === 'en' ? 'functions' : 'funções';
-    return `<td width="33%" valign="top"><img src="assets/icons/${g.icon}.svg" width="40" height="40" alt="${g.alt}"><br><strong>${title}</strong> <code>${n} ${unit}</code><br><sub>${line}</sub></td>`;
+    return `<td width="33%" valign="top"><img src="${CDN}assets/icons/${g.icon}.svg" width="40" height="40" alt="${g.alt}"><br><strong>${title}</strong> <code>${n} ${unit}</code><br><sub>${line}</sub></td>`;
   });
   const rows = [];
   for (let i = 0; i < cells.length; i += 3) rows.push(`<tr>\n${cells.slice(i, i + 3).join('\n')}\n</tr>`);
