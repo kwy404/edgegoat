@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Dates icon">
-  <title>Dates</title>
-  <rect width="48" height="48" rx="12" fill="#2E9C8A" fill-opacity="0.14"/>
-  <rect x="10" y="13" width="28" height="25" rx="5" fill="none" stroke="#2E9C8A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M10 21h28M18 9v7M30 9v7" fill="none" stroke="#2E9C8A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="25" y="27" width="7" height="6" rx="1.5" fill="#F2A93B"/>
-</svg>

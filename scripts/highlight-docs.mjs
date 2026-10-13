@@ -15,7 +15,7 @@ import { createHighlighter } from 'shiki';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const docs = join(root, 'docs');
 
-// File icon text per language, in the colors VS Code uses (see style.css).
+// File icon text per language, in the colors VS Code uses (see docs/style.css).
 const ICONS = { js: 'JS', ts: 'TS', sh: '&gt;_', yaml: 'YML', json: 'JSON', html: '&lt;/&gt;' };
 
 /** File name shown in the editor tab when the block has no data-title. */
@@ -27,9 +27,11 @@ function defaultTitle(lang, code) {
   return lang;
 }
 const THEMES = { light: 'light-plus', dark: 'dark-plus' };
+// Icons from the sprite that scripts/site-art.mjs puts on every page.
+const COPY_ICONS = ['copy', 'check'].map((n) => `<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-${n}"></use></svg>`).join('');
 
 const SOURCE = /<pre><code class="language-([\w-]+)"(?: data-title="([^"]*)")?>([\s\S]*?)<\/code><\/pre>/g;
-const RENDERED = /<div class="code-block" data-lang="([\w-]+)"(?: data-title="([^"]*)")?>[\s\S]*?<code>([\s\S]*?)<\/code><\/pre><\/div><!--\/code-block-->/g;
+const RENDERED = /<div class="ed" data-lang="([\w-]+)"(?: data-title="([^"]*)")?>[\s\S]*?<code>([\s\S]*?)<\/code><\/pre><\/div><!--\/ed-->/g;
 
 const escText = (s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 const escAttr = (s) => escText(s).replaceAll('"', '&quot;');
@@ -81,11 +83,11 @@ export async function highlightHtml(html) {
       .replace('<pre class="shiki', `<pre id="${id}" v-pre aria-label="${escAttr(label)} code" class="shiki${lines >= 3 ? ' numbered' : ''}`);
     const t = title === undefined ? '' : ` data-title="${title}"`;
     return (
-      `<div class="code-block" data-lang="${lang}"${t}>` +
-      `<div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>` +
-      `<span class="code-tab"><span class="file-icon" data-lang="${lang}" aria-hidden="true">${ICONS[lang] ?? ''}</span><span class="code-title">${escText(label)}</span></span>` +
-      `<button type="button" class="copy" v-cloak v-copy-from="#${id}" v-copy-label="Copied" aria-label="Copy ${escAttr(label)} code">Copy</button></div>` +
-      `${pre}</div><!--/code-block-->`
+      `<div class="ed" data-lang="${lang}"${t}>` +
+      `<div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span>` +
+      `<span class="ed-tab"><span class="ed-file" data-lang="${lang}" aria-hidden="true">${ICONS[lang] ?? ''}</span><span class="ed-title">${escText(label)}</span></span>` +
+      `<button type="button" class="copy-btn ed-copy" v-cloak v-copy-from="#${id}" v-copy-label="Copied" aria-label="Copy ${escAttr(label)} code">${COPY_ICONS}<span>Copy</span></button></div>` +
+      `${pre}</div><!--/ed-->`
     );
   });
 }

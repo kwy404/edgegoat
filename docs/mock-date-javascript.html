@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem('voodoo:theme');if(t&&t.charAt(0)==='"')t=JSON.parse(t);var r=document.documentElement;if(t==='light'||t==='dark'){r.setAttribute('data-theme',t);r.style.colorScheme=t}}catch(e){}})();</script>
 <title>How to mock Date in JavaScript tests without fake timers | edgegoat</title>
 <meta name="description" content="Freeze new Date() and Date.now() in Vitest, Jest, node:test or Mocha with a tiny helper, combine it with a time zone, and test New Year and DST edge instants.">
 <link rel="canonical" href="https://kwy404.github.io/edgegoat/mock-date-javascript.html">
 <meta name="author" content="Alexandre Kohler">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#2E9C8A">
+<meta name="theme-color" content="#0e8f9c">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="edgegoat">
 <meta property="og:title" content="How to mock Date in JavaScript tests without fake timers | edgegoat">
@@ -23,10 +24,12 @@
 <meta name="twitter:description" content="Freeze new Date() and Date.now() in Vitest, Jest, node:test or Mocha with a tiny helper, combine it with a time zone, and test New Year and DST edge instants.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<script>try{var t=localStorage.getItem('voodoo:theme');if(t==='"light"'||t==='"dark"')t=t.slice(1,-1);if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t}}catch(e){}</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monsooncss@0.2.0/dist/monsoon.min.css">
 <link rel="stylesheet" href="style.css">
-<noscript><style>.site-nav { display: flex; }</style></noscript>
+<script src="https://cdn.jsdelivr.net/npm/monsooncss@0.2.0/dist/monsoon.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/voodoojs@1.0.0/dist/voodoo.full.min.js" defer></script>
+<script src="site.js" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -38,13 +41,17 @@
       "url": "https://kwy404.github.io/edgegoat/mock-date-javascript.html",
       "image": "https://kwy404.github.io/edgegoat/og.png",
       "datePublished": "2026-10-12",
-      "dateModified": "2026-10-12",
+      "dateModified": "2026-10-13",
       "inLanguage": "en",
       "proficiencyLevel": "Intermediate",
       "author": {
         "@type": "Person",
         "name": "Alexandre Kohler",
-        "url": "https://github.com/kwy404"
+        "url": "https://github.com/kwy404",
+        "sameAs": [
+          "https://github.com/kwy404",
+          "https://www.linkedin.com/in/alexandre-silva-173687256/"
+        ]
       },
       "about": [
         "mocking",
@@ -52,11 +59,35 @@
         "Jest",
         "Vitest"
       ],
+      "timeRequired": "PT2M",
       "isPartOf": {
         "@type": "WebSite",
         "name": "edgegoat",
         "url": "https://kwy404.github.io/edgegoat/"
       }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "edgegoat",
+          "item": "https://kwy404.github.io/edgegoat/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Time",
+          "item": "https://kwy404.github.io/edgegoat/test-timezones-javascript.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Mock Date",
+          "item": "https://kwy404.github.io/edgegoat/mock-date-javascript.html"
+        }
+      ]
     },
     {
       "@type": "FAQPage",
@@ -99,48 +130,149 @@
 }
 </script>
 </head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-<header class="site-header" v-data="{ menu: false }" @keydown.esc="menu = false">
-  <div class="wrap header-row">
-    <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
-    <nav id="site-nav" class="site-nav" :class="{ open: menu }" aria-label="Main">
-      <a href="./#catalog" @click="menu = false">Catalog</a>
-      <a href="./#how-it-works" @click="menu = false">How it works</a>
-      <a href="./#guides" @click="menu = false">Guides</a>
-      <a href="./#faq" @click="menu = false">FAQ</a>
-      <a href="https://github.com/kwy404/edgegoat">GitHub</a>
-      <a href="https://www.npmjs.com/package/edgegoat">npm</a>
-    </nav>
-    <div class="header-actions">
-      <button type="button" class="icon-button" v-theme-toggle v-cloak aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button>
-      <button type="button" class="icon-button menu-button" v-cloak @click="menu = !menu" :aria-expanded="menu ? 'true' : 'false'" aria-controls="site-nav" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-    </div>
+<body class="antialiased">
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="i-all" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3.5h5M10.5 3.5v5.2L5 18a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5.5-9.3V3.5"/><path d="M7.4 15h9.2" style="stroke:var(--art-accent)"/><circle cx="11" cy="18" r=".6" style="fill:var(--art-accent);stroke:none"/><circle cx="14" cy="17.6" r=".6" style="fill:var(--art-accent);stroke:none"/></g></symbol>
+<symbol id="i-dates" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M7.5 13.2h2M11 13.2h2M7.5 16.6h2" /><rect x="14.3" y="14.9" width="2.6" height="2.6" rx=".6" style="stroke:var(--art-accent)"/></g></symbol>
+<symbol id="i-timeZones" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.6 2.4 3.8 5.2 3.8 8.5s-1.2 6.1-3.8 8.5c-2.6-2.4-3.8-5.2-3.8-8.5S9.4 5.9 12 3.5z" style="stroke:var(--art-accent)"/></g></symbol>
+<symbol id="i-strings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18.5 8 5.5l4.5 13M5.2 14h5.6"/><path d="M17.5 5.5v13M15.5 5.5h4M15.5 18.5h4" style="stroke:var(--art-accent)"/></g></symbol>
+<symbol id="i-numbers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4.5" style="stroke:var(--art-accent)"/><ellipse cx="15" cy="12" rx="4.5" ry="7"/><path d="M12.6 17.2 17.4 6.8"/></g></symbol>
+<symbol id="i-numericStrings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6v3.5M8.5 6v3.5" style="stroke:var(--art-accent)"/><path d="M13 8.5 16 6v12.5M13 18.5h6"/></g></symbol>
+<symbol id="i-bigints" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 7 6v12.5M4.5 18.5h5"/><path d="M12.5 10v8.5M12.5 13a3.2 3.2 0 0 1 6.4 0v5.5" style="stroke:var(--art-accent)"/></g></symbol>
+<symbol id="i-urls" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" style="stroke:var(--art-accent)"/></g></symbol>
+<symbol id="i-emails" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5" style="stroke:var(--art-accent)"/><path d="M15.5 12v1.5a2.5 2.5 0 0 0 5 0V12a8.5 8.5 0 1 0-3.4 6.8"/></g></symbol>
+<symbol id="i-paths" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5v10a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-6l-2-2.5h-5a2 2 0 0 0-2 2z"/><path d="M10.2 16.8 13.8 10.8" style="stroke:var(--art-accent)"/></g></symbol>
+<symbol id="i-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 4.5H8a2 2 0 0 0-2 2v3A2.5 2.5 0 0 1 3.5 12 2.5 2.5 0 0 1 6 14.5v3a2 2 0 0 0 2 2h.5M15.5 4.5h.5a2 2 0 0 1 2 2v3a2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0-2.5 2.5v3a2 2 0 0 1-2 2h-.5"/><circle cx="12" cy="12" r="1.1" style="fill:var(--art-accent);stroke:none"/></g></symbol>
+<symbol id="i-arrays" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4.5H5v15h3M16 4.5h3v15h-3"/><circle cx="9.8" cy="12" r="1.1" style="fill:currentColor;stroke:none"/><circle cx="14.2" cy="12" r="1.3" style="stroke:var(--art-accent)"/></g></symbol>
+<symbol id="i-ui-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/></g></symbol>
+<symbol id="i-ui-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></g></symbol>
+<symbol id="i-ui-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></g></symbol>
+<symbol id="i-ui-system" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/></g></symbol>
+<symbol id="i-ui-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></g></symbol>
+<symbol id="i-ui-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></g></symbol>
+<symbol id="i-ui-close" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></g></symbol>
+<symbol id="i-ui-tag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.4 1.4 0 0 1 0 2l-7.1 7.1a1.4 1.4 0 0 1-2 0z"/><circle cx="8" cy="8" r="1.3"/></g></symbol>
+<symbol id="i-ui-book" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2 2 0 0 1 6 3.5h13.5v14H6a2 2 0 0 0-2 2z"/><path d="M4 19.5a2 2 0 0 0 2 2h13.5v-4"/></g></symbol>
+<symbol id="i-ui-arrow" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></g></symbol>
+<symbol id="i-ui-external" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></g></symbol>
+<symbol id="i-ui-bug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="8" width="10" height="12" rx="5"/><path d="M12 8v12M9 5.5 10.5 8M15 5.5 13.5 8M3.5 13h3.5M17 13h3.5M4.5 8.5 7 10M19.5 8.5 17 10M4.5 18.5 7 17M19.5 18.5 17 17"/></g></symbol>
+<symbol id="i-ui-terminal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 9.5 3 2.5-3 2.5M12.5 15H17"/></g></symbol>
+<symbol id="i-ui-filter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16l-6.2 7.3v5.4l-3.6 1.8v-7.2z"/></g></symbol>
+<symbol id="i-ui-menu" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></g></symbol>
+<symbol id="i-ui-sheet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h16v15H4zM14.5 4.5v15"/></g></symbol>
+<symbol id="i-ui-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></g></symbol>
+<symbol id="i-ui-jar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 3.5h9v3h-9zM8.5 6.5v1.5C6.5 9 5.5 10.5 5.5 12.5v6a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-6c0-2-1-3.5-3-4.5V6.5"/><path d="M5.5 14.5h13"/></g></symbol>
+<symbol id="i-ui-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 4.5H8a2 2 0 0 0-2 2v3A2.5 2.5 0 0 1 3.5 12 2.5 2.5 0 0 1 6 14.5v3a2 2 0 0 0 2 2h.5M15.5 4.5h.5a2 2 0 0 1 2 2v3a2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0-2.5 2.5v3a2 2 0 0 1-2 2h-.5"/></g></symbol>
+<symbol id="i-ui-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></g></symbol>
+<symbol id="i-ui-steps" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18.5h5v-5h5v-5h6"/></g></symbol>
+<symbol id="i-brand-github" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.8 9.7.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.4-3.4-1.4-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1.1 1.5 1.1.9 1.6 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7 1 .7 2v2.9c0 .3.2.6.7.5A10.2 10.2 0 0 0 22 12.2C22 6.6 17.5 2 12 2z"/></symbol>
+<symbol id="i-brand-linkedin" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></symbol>
+<symbol id="i-brand-npm" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M2 7h20v9.3H12v1.4H7.6v-1.4H2zm1.1 8.2h4.4V9.4h1.1v5.8h1.1V8.1H3.1zm5.6-7.1v8.2h2.2v-1.1h2.2V8.1zm2.2 1.3h1.1v3.2h-1.1zm3.3-1.3v7.1h2.2V9.4h1.1v5.8h1.1V9.4h1.1v5.8h1.1V8.1z"/></symbol>
+</defs></svg>
+<a href="#main" class="skip-link">Skip to content</a>
+<header class="navbar navbar-sticky navbar-blur topbar">
+  <div class="navbar-start">
+    <a href="./" class="navbar-brand brand" aria-label="edgegoat home"><img src="./assets/mascot.svg" width="30" height="30" alt="" class="mascot"><span class="wordmark">edge<b>goat</b></span></a>
+    <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md" class="badge badge-sm badge-outline ver" title="Changelog">v1.0.0</a>
+  </div>
+  <nav class="navbar-center navbar-nav" aria-label="Main"><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link" aria-current="page">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="./catalog.json" class="navbar-link">catalog.json</a></nav>
+  <div class="navbar-end">
+    <button type="button" class="search-btn" data-open-palette aria-haspopup="dialog" aria-controls="palette"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-search"></use></svg><span class="search-btn-label">Search</span><span class="kbd-pair" aria-hidden="true"><kbd class="kbd kbd-xs">Ctrl</kbd><kbd class="kbd kbd-xs">K</kbd></span></button>
+    <a href="https://github.com/kwy404/edgegoat" class="icon-btn" aria-label="edgegoat on GitHub"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-github"></use></svg></a>
+    <button type="button" class="icon-btn theme-btn" v-theme-toggle.cycle aria-label="Color theme: system, light or dark" title="Color theme">
+      <span class="ti ti-system"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-system"></use></svg></span><span class="ti ti-light"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-sun"></use></svg></span><span class="ti ti-dark"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-moon"></use></svg></span>
+    </button>
+    <details class="navbar-mobile"><summary class="navbar-burger" aria-label="Menu"></summary><nav class="navbar-mobile-panel" aria-label="Mobile"><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link" aria-current="page">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="./catalog.json" class="navbar-link">catalog.json</a><a href="https://github.com/kwy404/edgegoat" class="navbar-link">GitHub</a><a href="https://www.npmjs.com/package/edgegoat" class="navbar-link">npm</a></nav></details>
   </div>
 </header>
+<dialog id="palette" class="modal modal-top" aria-label="Search the lab">
+  <div class="command-palette" data-m-command data-m-command-hotkey="mod+k" data-m-command-empty="Nothing on this shelf. Try another word.">
+    <label class="command-palette-search"><input class="command-palette-input" placeholder="Search generators, tags and guides" aria-label="Search generators, tags and guides"></label>
+    <div class="command-palette-list">
+      <p class="command-palette-heading">Generators</p>
+      <a class="command-palette-item" href="./?gen=dates#catalog" data-gen="dates" data-keywords="Dates generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span>dates()</span><span class="command-palette-shortcut">46</span></a>
+      <a class="command-palette-item" href="./?gen=timeZones#catalog" data-gen="timeZones" data-keywords="Time zones generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-timeZones"></use></svg><span>timeZones()</span><span class="command-palette-shortcut">18</span></a>
+      <a class="command-palette-item" href="./?gen=strings#catalog" data-gen="strings" data-keywords="Strings generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg><span>strings()</span><span class="command-palette-shortcut">49</span></a>
+      <a class="command-palette-item" href="./?gen=numbers#catalog" data-gen="numbers" data-keywords="Numbers generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span>numbers()</span><span class="command-palette-shortcut">26</span></a>
+      <a class="command-palette-item" href="./?gen=numericStrings#catalog" data-gen="numericStrings" data-keywords="Numeric strings generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-numericStrings"></use></svg><span>numericStrings()</span><span class="command-palette-shortcut">17</span></a>
+      <a class="command-palette-item" href="./?gen=bigints#catalog" data-gen="bigints" data-keywords="BigInts generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-bigints"></use></svg><span>bigints()</span><span class="command-palette-shortcut">8</span></a>
+      <a class="command-palette-item" href="./?gen=urls#catalog" data-gen="urls" data-keywords="URLs generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-urls"></use></svg><span>urls()</span><span class="command-palette-shortcut">28</span></a>
+      <a class="command-palette-item" href="./?gen=emails#catalog" data-gen="emails" data-keywords="Emails generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-emails"></use></svg><span>emails()</span><span class="command-palette-shortcut">26</span></a>
+      <a class="command-palette-item" href="./?gen=paths#catalog" data-gen="paths" data-keywords="Paths generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-paths"></use></svg><span>paths()</span><span class="command-palette-shortcut">30</span></a>
+      <a class="command-palette-item" href="./?gen=json#catalog" data-gen="json" data-keywords="JSON generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-json"></use></svg><span>json()</span><span class="command-palette-shortcut">22</span></a>
+      <a class="command-palette-item" href="./?gen=arrays#catalog" data-gen="arrays" data-keywords="Arrays generator"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrays"></use></svg><span>arrays()</span><span class="command-palette-shortcut">14</span></a>
+      <p class="command-palette-heading">Tags</p>
+      <a class="command-palette-item" href="./?tags=dst#catalog" data-tag="dst" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: dst</span><span class="command-palette-shortcut">26</span></a>
+      <a class="command-palette-item" href="./?tags=year-boundary#catalog" data-tag="year-boundary" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: year-boundary</span><span class="command-palette-shortcut">7</span></a>
+      <a class="command-palette-item" href="./?tags=surrogate#catalog" data-tag="surrogate" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: surrogate</span><span class="command-palette-shortcut">9</span></a>
+      <a class="command-palette-item" href="./?tags=emoji#catalog" data-tag="emoji" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: emoji</span><span class="command-palette-shortcut">9</span></a>
+      <a class="command-palette-item" href="./?tags=normalization#catalog" data-tag="normalization" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: normalization</span><span class="command-palette-shortcut">7</span></a>
+      <a class="command-palette-item" href="./?tags=bidi#catalog" data-tag="bidi" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: bidi</span><span class="command-palette-shortcut">3</span></a>
+      <a class="command-palette-item" href="./?tags=sign#catalog" data-tag="sign" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: sign</span><span class="command-palette-shortcut">7</span></a>
+      <a class="command-palette-item" href="./?tags=nan#catalog" data-tag="nan" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: nan</span><span class="command-palette-shortcut">4</span></a>
+      <a class="command-palette-item" href="./?tags=precision#catalog" data-tag="precision" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: precision</span><span class="command-palette-shortcut">8</span></a>
+      <a class="command-palette-item" href="./?tags=traversal#catalog" data-tag="traversal" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: traversal</span><span class="command-palette-shortcut">3</span></a>
+      <a class="command-palette-item" href="./?tags=windows#catalog" data-tag="windows" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: windows</span><span class="command-palette-shortcut">20</span></a>
+      <a class="command-palette-item" href="./?tags=security#catalog" data-tag="security" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: security</span><span class="command-palette-shortcut">17</span></a>
+      <a class="command-palette-item" href="./?tags=invalid#catalog" data-tag="invalid" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: invalid</span><span class="command-palette-shortcut">27</span></a>
+      <a class="command-palette-item" href="./?tags=sparse#catalog" data-tag="sparse" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: sparse</span><span class="command-palette-shortcut">3</span></a>
+      <p class="command-palette-heading">Guides</p>
+      <a class="command-palette-item" href="./test-timezones-javascript.html" data-keywords="guide time zones JavaScript Date Intl.DateTimeFormat unit testing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to test time zones in JavaScript</span></a>
+      <a class="command-palette-item" href="./test-daylight-saving-time-jest.html" data-keywords="guide daylight saving time Jest Vitest JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to test daylight saving time in Jest</span></a>
+      <a class="command-palette-item" href="./unicode-test-strings.html" data-keywords="guide Unicode UTF-16 surrogate pairs JavaScript strings"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Unicode test strings for JavaScript</span></a>
+      <a class="command-palette-item" href="./javascript-number-edge-cases.html" data-keywords="guide JavaScript numbers IEEE 754 NaN negative zero"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>JavaScript number edge cases to test</span></a>
+      <a class="command-palette-item" href="./test-dates-before-1970.html" data-keywords="guide Unix epoch negative timestamps JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Testing dates before 1970 in JavaScript</span></a>
+      <a class="command-palette-item" href="./javascript-negative-zero.html" data-keywords="guide negative zero IEEE 754 JavaScript numbers"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Negative zero in JavaScript: why -0 is different from 0</span></a>
+      <a class="command-palette-item" href="./mock-date-javascript.html" data-keywords="guide mocking JavaScript Date Jest Vitest"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to mock Date in JavaScript tests</span></a>
+      <a class="command-palette-item" href="./property-based-testing-edge-cases.html" data-keywords="guide property based testing fast-check edge cases fuzzing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Property based testing and curated edge cases in JavaScript</span></a>
+      <p class="command-palette-heading">Links</p>
+      <a class="command-palette-item" href="https://github.com/kwy404/edgegoat" data-keywords="source code repository"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-github"></use></svg><span>GitHub repository</span></a>
+      <a class="command-palette-item" href="https://www.npmjs.com/package/edgegoat" data-keywords="package install"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-npm"></use></svg><span>edgegoat on npm</span></a>
+      <a class="command-palette-item" href="./catalog.json" data-keywords="data download export"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-json"></use></svg><span>catalog.json</span></a>
+      <a class="command-palette-item" href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md" data-keywords="releases versions"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-steps"></use></svg><span>Changelog</span></a>
+      <button type="button" class="command-palette-item" data-action="theme" data-keywords="dark light mode appearance"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-moon"></use></svg><span>Switch color theme</span></button>
+    </div>
+    <div class="command-palette-footer"><span><kbd>Up</kbd> <kbd>Down</kbd> to move</span><span><kbd>Enter</kbd> to open</span><span><kbd>Esc</kbd> to close</span></div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button aria-label="Close search">Close</button></form>
+</dialog>
 <main id="main">
 
-<div class="wrap">
-<article class="guide">
-  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
-  <h1>How to mock Date in JavaScript tests</h1>
-  <p class="lede">Code that reads the current time is untestable until you control the clock. You do not always need fake timers: often you only need new Date() to return one specific edge instant.</p>
-  <section><h2>Freeze the clock for one function call</h2>
-<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-1" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<div class="dash-tabs">
+  <div class="wrap">
+    <nav class="tabs tabs-line cat-tabs" aria-label="Guide categories"><a href="./#catalog" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg>Lab</a><a href="test-timezones-javascript.html" class="tab" aria-current="page"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg>Time<span class="badge badge-xs badge-primary">4</span></a><a href="unicode-test-strings.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg>Unicode<span class="badge badge-xs">1</span></a><a href="javascript-number-edge-cases.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg>Numbers<span class="badge badge-xs">2</span></a><a href="property-based-testing-edge-cases.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg>Method<span class="badge badge-xs">1</span></a></nav>
+    <nav class="tabs tabs-pills tabs-sm sub-tabs" aria-label="Time guides"><a href="test-timezones-javascript.html" class="tab">Time zones</a><a href="test-daylight-saving-time-jest.html" class="tab">DST in Jest</a><a href="test-dates-before-1970.html" class="tab">Dates before 1970</a><a href="mock-date-javascript.html" class="tab" aria-current="page">Mock Date</a></nav>
+  </div>
+</div>
+<div class="wrap dash">
+  <header class="dash-head">
+    <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="./">edgegoat</a></li><li><a href="test-timezones-javascript.html">Time</a></li><li><span aria-current="page">Mock Date</span></li></ol></nav>
+    <h1>How to mock Date in JavaScript tests</h1>
+    <p class="lede" v-pre>Code that reads the current time is untestable until you control the clock. You do not always need fake timers: often you only need new Date() to return one specific edge instant.</p>
+    <div class="stats dash-stats">
+      <div class="stat"><p class="stat-title">Specimens</p><p class="stat-value">12</p><p class="stat-desc">dates(), 3 tags</p></div>
+      <div class="stat"><p class="stat-title">Reading time</p><p class="stat-value">2 min</p><p class="stat-desc">4 sections</p></div>
+      <div class="stat"><p class="stat-title">Updated</p><p class="stat-value stat-date">2026-10-13</p><p class="stat-desc">edgegoat 1.0.0</p></div>
+    </div>
+  </header>
+  <div class="dash-grid">
+    <article class="prose dash-article">
+      <section id="freeze-the-clock-for-one-function-call" class="dash-card" aria-labelledby="freeze-the-clock-for-one-function-call-h"><h2 id="freeze-the-clock-for-one-function-call-h">Freeze the clock for one function call</h2>
+<div class="ed" data-lang="js"><div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="js" aria-hidden="true">JS</span><span class="ed-title">example.js</span></span><button type="button" class="copy-btn ed-copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy example.js code"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-copy"></use></svg><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-check"></use></svg><span>Copy</span></button></div><pre id="code-1" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'2026-12-31T23:59:59.999Z'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
 <span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">  Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">now</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">();         </span><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// 1798761599999</span></span>
 <span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">();         </span><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// 2026-12-31T23:59:59.999Z</span></span>
 <span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">  new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">2020</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);  </span><span style="--shiki-light:#008000;--shiki-dark:#6A9955">// still works normally</span></span>
-<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/ed-->
 <p>It accepts a Date, an ISO string or a timestamp, works with any test runner, restores the real <code>Date</code> afterwards (also when the function throws or its promise rejects) and leaves timers alone.</p>
 </section>
-  <section><h2>The bug: &quot;is this today?&quot; in UTC</h2>
-<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-2" v-copy-label="Copied" aria-label="Copy example.js code">Copy</button></div><pre id="code-2" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> isToday</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
+      <section id="the-bug-is-this-today-in-utc" class="dash-card" aria-labelledby="the-bug-is-this-today-in-utc-h"><h2 id="the-bug-is-this-today-in-utc-h">The bug: &quot;is this today?&quot; in UTC</h2>
+<div class="ed" data-lang="js"><div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="js" aria-hidden="true">JS</span><span class="ed-title">example.js</span></span><button type="button" class="copy-btn ed-copy" v-cloak v-copy-from="#code-2" v-copy-label="Copied" aria-label="Copy example.js code"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-copy"></use></svg><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-check"></use></svg><span>Copy</span></button></div><pre id="code-2" v-pre aria-label="example.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> isToday</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) {</span></span>
 <span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE"> date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toISOString</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">().</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">slice</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">10</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">) === </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">().</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toISOString</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">().</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">slice</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">10</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
-<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/code-block-->
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">}</span></span></code></pre></div><!--/ed-->
 <p>It compares UTC calendar days. At 23:30 in New York, 00:30 the same evening is "yesterday" in UTC terms. Test it with the clock frozen late in the evening, in every zone from <code>timeZones()</code>:</p>
-<div class="code-block" data-lang="js"><div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">example.test.js</span></span><button type="button" class="copy" v-cloak v-copy-from="#code-3" v-copy-label="Copied" aria-label="Copy example.test.js code">Copy</button></div><pre id="code-3" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'vitest'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
+<div class="ed" data-lang="js"><div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="js" aria-hidden="true">JS</span><span class="ed-title">example.test.js</span></span><button type="button" class="copy-btn ed-copy" v-cloak v-copy-from="#code-3" v-copy-label="Copied" aria-label="Copy example.test.js code"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-copy"></use></svg><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-check"></use></svg><span>Copy</span></button></div><pre id="code-3" v-pre aria-label="example.test.js code" class="shiki numbered shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'vitest'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">timeZones</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">withTimeZone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#AF00DB;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> 'edgegoat'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">test</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">each</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">timeZones</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">())(</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178">'$label'</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, ({ </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">value</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">zone</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> }) </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> {</span></span>
@@ -149,14 +281,14 @@
 <span class="line"><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">    const</span><span style="--shiki-light:#0070C1;--shiki-dark:#4FC1FF"> earlierToday</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> Date</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">2026</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">11</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">31</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#098658;--shiki-dark:#B5CEA8">30</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">);</span></span>
 <span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">    withFrozenTime</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">now</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">, () </span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA"> expect</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">isToday</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#001080;--shiki-dark:#9CDCFE">earlierToday</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">)).</span><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">toBe</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6">true</span><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">));</span></span>
 <span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">  });</span></span>
-<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/code-block-->
-<div class="callout fail"><strong>Fails:</strong> every zone with a non zero offset at that moment, from Pacific/Pago_Pago to Pacific/Kiritimati. Only UTC-like zones pass. The fix compares local fields or formats both dates with <code>Intl.DateTimeFormat</code> in the user's zone.</div>
+<span class="line"><span style="--shiki-light:#000000;--shiki-dark:#D4D4D4">});</span></span></code></pre></div><!--/ed-->
+<div class="callout callout-danger"><p class="callout-title">Fails on</p><p>every zone with a non zero offset at that moment, from Pacific/Pago_Pago to Pacific/Kiritimati. Only UTC-like zones pass. The fix compares local fields or formats both dates with <code>Intl.DateTimeFormat</code> in the user's zone.</p></div>
 </section>
-  <section><h2>How it works, and its limits</h2>
+      <section id="how-it-works-and-its-limits" class="dash-card" aria-labelledby="how-it-works-and-its-limits-h"><h2 id="how-it-works-and-its-limits-h">How it works, and its limits</h2>
 <p><code>withFrozenTime</code> swaps <code>globalThis.Date</code> for a thin wrapper whose prototype is the real one, so <code>instanceof Date</code>, <code>Date.UTC</code>, <code>Date.parse</code>, subclasses and <code>new Date(value)</code> keep working. Only <code>Date.now()</code>, <code>new Date()</code> and <code>Date()</code> are frozen.</p>
-<div class="callout tip">Code that captured <code>Date</code> or <code>Date.now</code> before the call still sees real time, and <code>performance.now()</code> and timers are not touched. When you need to advance time or run timers, use your runner's fake timers instead.</div>
+<div class="callout callout-info"><p class="callout-title">Note</p><p>Code that captured <code>Date</code> or <code>Date.now</code> before the call still sees real time, and <code>performance.now()</code> and timers are not touched. When you need to advance time or run timers, use your runner's fake timers instead.</p></div>
 </section>
-  <section><h2>When to use fake timers instead</h2>
+      <section id="when-to-use-fake-timers-instead" class="dash-card" aria-labelledby="when-to-use-fake-timers-instead-h"><h2 id="when-to-use-fake-timers-instead-h">When to use fake timers instead</h2>
 <ul>
 <li>Jest: <code>jest.useFakeTimers({ now: date })</code> or <code>jest.setSystemTime(date)</code>.</li>
 <li>Vitest: <code>vi.useFakeTimers()</code> then <code>vi.setSystemTime(date)</code>.</li>
@@ -164,77 +296,119 @@
 </ul>
 <p>Fake timers are the right tool for debounce, intervals and timeouts. For "what does this function do at 23:59:59.999 on New Year's Eve", a frozen clock is simpler.</p>
 </section>
-  <section>
-    <h2>FAQ</h2>
-    <div class="faq" v-accordion>
-    <div class="faq-item" v-accordion-item="open">
-      <button type="button" class="faq-q">How do I mock new Date() in Jest?</button>
-      <div class="faq-a"><p>Use <code>jest.useFakeTimers({ now: date })</code>, or <code>withFrozenTime(date, fn)</code> from edgegoat if you only need a fixed "now" without fake timers.</p></div>
-    </div>
-    <div class="faq-item" v-accordion-item>
-      <button type="button" class="faq-q">How do I mock Date.now() in Vitest?</button>
-      <div class="faq-a"><p><code>vi.setSystemTime(date)</code> with fake timers enabled. <code>vi.spyOn(Date, 'now')</code> only covers <code>Date.now()</code>, while <code>withFrozenTime</code> also freezes <code>new Date()</code>.</p></div>
-    </div>
-    <div class="faq-item" v-accordion-item>
-      <button type="button" class="faq-q">Does withFrozenTime affect setTimeout?</button>
-      <div class="faq-a"><p>No. It only replaces <code>Date</code>. Timers, <code>performance.now()</code> and the event loop run normally.</p></div>
-    </div>
-    <div class="faq-item" v-accordion-item>
-      <button type="button" class="faq-q">Can I freeze time and change the time zone together?</button>
-      <div class="faq-a"><p>Yes. Nest them: <code>withTimeZone(zone, () =&gt; withFrozenTime(date, fn))</code>. Both restore their state when the function returns.</p></div>
-    </div>
+      <section id="faq" class="dash-card" aria-labelledby="faq-h"><h2 id="faq-h">FAQ</h2>
+        <div class="accordion collapse-plus faq" v-pre>
+    <details class="collapse" name="faq" open><summary class="collapse-title">How do I mock new Date() in Jest?</summary><div class="collapse-content"><p>Use <code>jest.useFakeTimers({ now: date })</code>, or <code>withFrozenTime(date, fn)</code> from edgegoat if you only need a fixed "now" without fake timers.</p></div></details>
+    <details class="collapse" name="faq"><summary class="collapse-title">How do I mock Date.now() in Vitest?</summary><div class="collapse-content"><p><code>vi.setSystemTime(date)</code> with fake timers enabled. <code>vi.spyOn(Date, 'now')</code> only covers <code>Date.now()</code>, while <code>withFrozenTime</code> also freezes <code>new Date()</code>.</p></div></details>
+    <details class="collapse" name="faq"><summary class="collapse-title">Does withFrozenTime affect setTimeout?</summary><div class="collapse-content"><p>No. It only replaces <code>Date</code>. Timers, <code>performance.now()</code> and the event loop run normally.</p></div></details>
+    <details class="collapse" name="faq"><summary class="collapse-title">Can I freeze time and change the time zone together?</summary><div class="collapse-content"><p>Yes. Nest them: <code>withTimeZone(zone, () =&gt; withFrozenTime(date, fn))</code>. Both restore their state when the function returns.</p></div></details>
   </div>
-  </section>
-  <section>
-    <h2>More guides</h2>
-    <ul>
-    <li><a href="test-timezones-javascript.html">How to test time zones in JavaScript</a></li>
-    <li><a href="test-daylight-saving-time-jest.html">How to test daylight saving time in Jest</a></li>
-    <li><a href="unicode-test-strings.html">Unicode test strings for JavaScript</a></li>
-    <li><a href="javascript-number-edge-cases.html">JavaScript number edge cases to test</a></li>
-    <li><a href="test-dates-before-1970.html">Testing dates before 1970 in JavaScript</a></li>
-    <li><a href="javascript-negative-zero.html">Negative zero in JavaScript: why -0 is different from 0</a></li>
-    <li><a href="property-based-testing-edge-cases.html">Property based testing and curated edge cases in JavaScript</a></li>
+      </section>
+    </article>
+    <aside class="dash-side" aria-label="Related specimens and contents">
+      <div class="side-card">
+        <div class="side-head"><svg class="jar-art side-jar" viewBox="0 0 80 100" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path class="art-glass" d="M24 18v4c-7 2.5-11 8-11 15v43a11 11 0 0 0 11 11h32a11 11 0 0 0 11-11V37c0-7-4-12.5-11-15v-4"/>
+    <path class="art-liquid" d="M14 58c6-3 12 3 18 0s12-3 18 0 12 3 16 0V80a10 10 0 0 1-10 10H24a10 10 0 0 1-10-10z" stroke="none"/>
+    <rect x="20" y="7" width="40" height="11" rx="3" class="art-lid"/>
+    <path d="M27 7v11M34 7v11M41 7v11M48 7v11M55 7v11" class="art-hatch"/>
+    <path d="M19.5 44v18" class="art-shine"/>
+  </g>
+  <g class="art-specimen"><use href="#i-dates" x="25" y="38" width="30" height="30"></use></g>
+  
+</svg><div><p class="side-kicker">From the lab</p><p class="side-title">12 specimens for this note</p></div></div>
+        <ul class="spec-list">
+          <li><a href="./?case=dates-16#catalog" class="spec-row"><span class="spec-label" v-pre>leap day 2024-02-29</span><code v-pre>2024-02-29T12:00:00.000Z</code></a></li>
+          <li><a href="./?case=dates-17#catalog" class="spec-row"><span class="spec-label" v-pre>leap day 2000-02-29 (400 year rule)</span><code v-pre>2000-02-29T12:00:00.000Z</code></a></li>
+          <li><a href="./?case=dates-18#catalog" class="spec-row"><span class="spec-label" v-pre>not a leap year 2100-02-28</span><code v-pre>2100-02-28T12:00:00.000Z</code></a></li>
+          <li><a href="./?case=dates-19#catalog" class="spec-row"><span class="spec-label" v-pre>month end 2026-01-31</span><code v-pre>2026-01-31T12:00:00.000Z</code></a></li>
+          <li><a href="./?case=dates-20#catalog" class="spec-row"><span class="spec-label" v-pre>month end 2026-03-31</span><code v-pre>2026-03-31T12:00:00.000Z</code></a></li>
+          <li><a href="./?case=dates-21#catalog" class="spec-row"><span class="spec-label" v-pre>last millisecond of 2026 (UTC)</span><code v-pre>2026-12-31T23:59:59.999Z</code></a></li>
+          <li><a href="./?case=dates-29#catalog" class="spec-row"><span class="spec-label" v-pre>America/New_York: last instant of 2025 local time</span><code v-pre>2026-01-01T04:59:59.999Z</code></a></li>
+          <li><a href="./?case=dates-34#catalog" class="spec-row"><span class="spec-label" v-pre>America/Sao_Paulo: last instant of 2017 local time</span><code v-pre>2018-01-01T01:59:59.999Z</code></a></li>
+        </ul>
+        <a href="./?gen=dates&amp;tags=year-boundary,leap,month-end#catalog" class="btn btn-sm btn-primary side-btn">Open them in the lab <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-arrow"></use></svg></a>
+      </div>
+      <nav class="side-card toc-card" aria-labelledby="toc-h">
+        <p id="toc-h" class="toc-title">On this page</p>
+        <ul class="toc">
+          <li><a href="#freeze-the-clock-for-one-function-call">Freeze the clock for one function call</a></li>
+          <li><a href="#the-bug-is-this-today-in-utc">The bug: &quot;is this today?&quot; in UTC</a></li>
+          <li><a href="#how-it-works-and-its-limits">How it works, and its limits</a></li>
+          <li><a href="#when-to-use-fake-timers-instead">When to use fake timers instead</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+    </aside>
+  </div>
+  <section class="more-notes" aria-labelledby="more-h">
+    <h2 id="more-h">More lab notes</h2>
+    <ul class="notes notes-sm">
+      <li><a href="test-timezones-javascript.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to test time zones in JavaScript</strong></a></li>
+      <li><a href="test-daylight-saving-time-jest.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to test daylight saving time in Jest</strong></a></li>
+      <li><a href="unicode-test-strings.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg><span class="note-cat">Unicode</span><strong>Unicode test strings for JavaScript</strong></a></li>
+      <li><a href="javascript-number-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>JavaScript number edge cases to test</strong></a></li>
+      <li><a href="test-dates-before-1970.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>Testing dates before 1970 in JavaScript</strong></a></li>
+      <li><a href="javascript-negative-zero.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>Negative zero in JavaScript: why -0 is different from 0</strong></a></li>
+      <li><a href="property-based-testing-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg><span class="note-cat">Method</span><strong>Property based testing and curated edge cases in JavaScript</strong></a></li>
     </ul>
   </section>
-</article>
 </div>
 </main>
 <footer class="site-footer">
-  <div class="wrap footer-grid">
-    <div class="footer-brand">
-      <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt=""><span>edge<b>goat</b></span></a>
-      <p>The inputs that break code, ready to drop into your tests. Zero dependencies, MIT licensed.</p>
-      <p class="footer-links"><a href="https://github.com/kwy404/edgegoat">GitHub</a> <a href="https://www.npmjs.com/package/edgegoat">npm</a> <a href="catalog.json">catalog.json</a> <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md">Changelog</a></p>
+  <svg class="ridge footer-ridge" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <path class="ridge-fill" d="M0 48V34l70-14 46 10 68-24 58 18 40-8 76 20 64-22 52 12 88-24 60 20 44-10 72 22 58-16 66 10 80-26 54 18 48-8 70 20 62-16 74 12 90-20 52 14 48-6V48z"/>
+  <path class="ridge-line" d="M0 34l70-14 46 10 68-24 58 18 40-8 76 20 64-22 52 12 88-24 60 20 44-10 72 22 58-16 66 10 80-26 54 18 48-8 70 20 62-16 74 12 90-20 52 14 48-6" fill="none"/>
+</svg>
+  <div class="footer wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="./" class="navbar-brand brand"><img src="./assets/mascot.svg" width="34" height="34" alt="" class="mascot"><span class="wordmark">edge<b>goat</b></span></a>
+        <p>The inputs that break code, ready to drop into your tests. 284 specimens, zero dependencies, MIT licensed.</p>
+        <p class="made">Made by <a href="https://github.com/kwy404" rel="me noopener">Alexandre Kohler</a> <span class="footer-social"><a href="https://github.com/kwy404" rel="me noopener" aria-label="Alexandre Kohler on GitHub"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-github"></use></svg></a><a href="https://www.linkedin.com/in/alexandre-silva-173687256/" rel="me noopener" aria-label="Alexandre Kohler on LinkedIn"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-linkedin"></use></svg></a></span></p>
+        <p class="built">Built with <a href="https://kwy404.github.io/monsoon/">Monsoon</a>. Interactive parts built with <a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a>.</p>
+      </div>
+      <nav aria-label="Guides">
+        <p class="footer-title">Lab notes</p>
+        <ul class="footer-links">
+          <li><a href="./test-timezones-javascript.html">Time zones</a></li>
+          <li><a href="./test-daylight-saving-time-jest.html">DST in Jest</a></li>
+          <li><a href="./unicode-test-strings.html">Unicode strings</a></li>
+          <li><a href="./javascript-number-edge-cases.html">Number edge cases</a></li>
+          <li><a href="./test-dates-before-1970.html">Dates before 1970</a></li>
+          <li><a href="./javascript-negative-zero.html">Negative zero</a></li>
+          <li><a href="./mock-date-javascript.html">Mock Date</a></li>
+          <li><a href="./property-based-testing-edge-cases.html">Property based testing</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Project">
+        <p class="footer-title">edgegoat</p>
+        <ul class="footer-links">
+          <li><a href="./#catalog">Specimen lab</a></li>
+          <li><a href="./catalog.json">catalog.json</a></li>
+          <li><a href="https://github.com/kwy404/edgegoat">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/edgegoat">npm</a></li>
+          <li><a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md">Changelog</a></li>
+          <li><a href="https://github.com/kwy404/edgegoat/blob/main/CONTRIBUTING.md">Contributing</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="More from kwy404" class="footer-more">
+        <p class="footer-title">More from kwy404</p>
+        <ul class="footer-links">
+          <li><a href="https://kwy404.github.io/monsoon/">Monsoon</a><span>Utility-first CSS from a CDN with no build step, a whole theme from one seed color.</span></li>
+          <li><a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a><span>The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.</span></li>
+          <li><a href="https://kwy404.github.io/breakhound/">breakhound</a><span>Find bugs in any JavaScript or TypeScript library automatically, no tests required.</span></li>
+          <li><a href="https://kwy404.github.io/vueleap/">vueleap</a><span>Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.</span></li>
+          <li><a href="https://kwy404.github.io/graphemely/">graphemely</a><span>Truncate, slice and count strings with emoji safely, by grapheme cluster.</span></li>
+          <li><a href="https://kwy404.github.io/numberparrot/">numberparrot</a><span>Parse localized number and currency strings back into real numbers, for any locale.</span></li>
+        </ul>
+      </nav>
     </div>
-    <div>
-      <h2 class="footer-title">Guides</h2>
-      <ul class="footer-list">
-        <li><a href="test-timezones-javascript.html">Time zones</a></li>
-        <li><a href="test-daylight-saving-time-jest.html">DST in Jest</a></li>
-        <li><a href="unicode-test-strings.html">Unicode strings</a></li>
-        <li><a href="javascript-number-edge-cases.html">Number edge cases</a></li>
-        <li><a href="test-dates-before-1970.html">Dates before 1970</a></li>
-        <li><a href="javascript-negative-zero.html">Negative zero</a></li>
-        <li><a href="mock-date-javascript.html">Mock Date</a></li>
-        <li><a href="property-based-testing-edge-cases.html">Property based testing</a></li>
-      </ul>
+    <div class="footer-bottom">
+      <p>MIT license. Ledge the goat walks the edges so your code does not fall off them.</p>
+      <p><a href="./sitemap.xml">Sitemap</a></p>
     </div>
-    <div class="footer-more">
-      <h2 class="footer-title">More from kwy404</h2>
-      <ul class="footer-list projects">
-        <li><a href="https://kwy404.github.io/graphemely/">graphemely</a><span>Truncate, slice and count strings with emoji safely, by grapheme cluster.</span></li>
-        <li><a href="https://kwy404.github.io/edgegoat/">edgegoat</a><span>Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.</span></li>
-        <li><a href="https://kwy404.github.io/vueleap/">vueleap</a><span>Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.</span></li>
-        <li><a href="https://kwy404.github.io/numberparrot/">numberparrot</a><span>Parse localized number and currency strings back into real numbers, for any locale.</span></li>
-        <li><a href="https://github.com/kwy404/breakhound">breakhound</a><span>Find bugs in any JavaScript or TypeScript library automatically, no tests required.</span></li>
-        <li><a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a><span>The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.</span></li>
-      </ul>
-    </div>
-  </div>
-  <div class="wrap footer-bottom">
-    <p>Made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. MIT license.</p>
-    <p class="credit">Interactive parts built with <a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a>.</p>
   </div>
 </footer>
 </body>

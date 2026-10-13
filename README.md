@@ -67,6 +67,8 @@ test.each(dates({ tags: ['dst'] }))('$label', ({ value, zone }) => {
 - [How does edgegoat compare to fast-check and big-list-of-naughty-strings?](#how-does-edgegoat-compare-to-fast-check-and-big-list-of-naughty-strings)
 - [Where are the guides and docs?](#where-are-the-guides-and-docs)
 - [How can I contribute?](#how-can-i-contribute)
+- [More from kwy404](#more-from-kwy404)
+- [Author](#author)
 - [License](#license)
 
 ## How do I install edgegoat?
@@ -653,7 +655,7 @@ Feed edgegoat values into fast-check with `fc.constantFrom(...strings().map((c) 
 
 ## Where are the guides and docs?
 
-The documentation site is at **[kwy404.github.io/edgegoat](https://kwy404.github.io/edgegoat/)**, with a searchable catalog of every case and these guides:
+The documentation site is at **[kwy404.github.io/edgegoat](https://kwy404.github.io/edgegoat/)**: the home page is a specimen lab where you can filter every case by generator and tag, inspect its code points and copy a ready `test.each`. It also has these guides:
 
 - [How to test time zones in JavaScript](https://kwy404.github.io/edgegoat/test-timezones-javascript.html)
 - [How to test daylight saving time in Jest](https://kwy404.github.io/edgegoat/test-daylight-saving-time-jest.html)
@@ -671,13 +673,19 @@ New cases are welcome when they have broken real code. Every case needs a `why`,
 ## More from kwy404
 
 <!-- more:start -->
-- [graphemely](https://kwy404.github.io/graphemely/): Truncate, slice and count strings with emoji safely, by grapheme cluster.
-- [edgegoat](https://kwy404.github.io/edgegoat/): Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.
+- [Monsoon](https://kwy404.github.io/monsoon/): Utility-first CSS from a CDN with no build step, a whole theme from one seed color.
+- [Voodoo.js](https://kwy404.github.io/Voodoo.js/): The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.
+- [breakhound](https://kwy404.github.io/breakhound/): Find bugs in any JavaScript or TypeScript library automatically, no tests required.
 - [vueleap](https://kwy404.github.io/vueleap/): Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.
+- [graphemely](https://kwy404.github.io/graphemely/): Truncate, slice and count strings with emoji safely, by grapheme cluster.
 - [numberparrot](https://kwy404.github.io/numberparrot/): Parse localized number and currency strings back into real numbers, for any locale.
-- [breakhound](https://github.com/kwy404/breakhound): Find bugs in any JavaScript or TypeScript library automatically, no tests required.
-- [Voodoo.js](https://github.com/kwy404/Voodoo.js): The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.
 <!-- more:end -->
+
+## Author
+
+Made by [Alexandre Kohler](https://github.com/kwy404) ([LinkedIn](https://www.linkedin.com/in/alexandre-silva-173687256/)).
+
+Built with [Monsoon](https://kwy404.github.io/monsoon/): the docs site is styled with Monsoon, and its interactive parts are built with [Voodoo.js](https://kwy404.github.io/Voodoo.js/).
 
 ## License
 

@@ -61,9 +61,11 @@
   ],
   "cases": [
     {
+      "id": "dates-1",
       "generator": "dates",
       "label": "unix epoch 1970-01-01T00:00:00.000Z",
       "value": "1970-01-01T00:00:00.000Z",
+      "type": "Date",
       "why": "Timestamp 0 is falsy, so `if (!time)` treats a valid date as missing, and west of UTC it is still 1969 locally.",
       "tags": [
         "epoch",
@@ -71,9 +73,11 @@
       ]
     },
     {
+      "id": "dates-2",
       "generator": "dates",
       "label": "1 ms before the epoch",
       "value": "1969-12-31T23:59:59.999Z",
+      "type": "Date",
       "why": "Negative timestamps: `ms % 1000` is -1, not 999, so splitting seconds and milliseconds with % and Math.floor disagree.",
       "tags": [
         "epoch",
@@ -82,9 +86,11 @@
       ]
     },
     {
+      "id": "dates-3",
       "generator": "dates",
       "label": "before 1970 with fractional seconds (1969-12-31T23:59:58.500Z)",
       "value": "1969-12-31T23:59:58.500Z",
+      "type": "Date",
       "why": "Truncating -1.5 s toward zero gives 23:59:59 instead of 23:59:58; Math.trunc vs Math.floor and integer division bugs live here.",
       "tags": [
         "pre-1970",
@@ -93,9 +99,11 @@
       ]
     },
     {
+      "id": "dates-4",
       "generator": "dates",
       "label": "moon landing 1969-07-20T20:17:40.123Z",
       "value": "1969-07-20T20:17:40.123Z",
+      "type": "Date",
       "why": "Negative timestamp with milliseconds: serializers that build \"seconds.millis\" from a negative value print a wrong or doubly negative fraction.",
       "tags": [
         "pre-1970",
@@ -104,9 +112,11 @@
       ]
     },
     {
+      "id": "dates-5",
       "generator": "dates",
       "label": "local mean time era 1850-01-01T00:00:00Z",
       "value": "1850-01-01T00:00:00.000Z",
+      "type": "Date",
       "why": "Before standard time, zones used local mean time with second level offsets (Sao Paulo was -03:06:28); getTimezoneOffset() reports whole minutes, so local arithmetic drifts by seconds.",
       "tags": [
         "pre-1970",
@@ -115,9 +125,11 @@
       ]
     },
     {
+      "id": "dates-6",
       "generator": "dates",
       "label": "year 0 (0000-01-01T00:00:00Z)",
       "value": "0000-01-01T00:00:00.000Z",
+      "type": "Date",
       "why": "Date.UTC(0, 0, 1) and new Date(0, 0, 1) map years 0 to 99 to 1900 to 1999, and toISOString() yields \"0000\", which \"1 BC\" formatting must handle.",
       "tags": [
         "far-past",
@@ -125,9 +137,11 @@
       ]
     },
     {
+      "id": "dates-7",
       "generator": "dates",
       "label": "negative year (-000001-01-01T00:00:00Z)",
       "value": "-000001-01-01T00:00:00.000Z",
+      "type": "Date",
       "why": "toISOString() produces an expanded, signed year \"-000001\"; regexes that expect four digits reject it.",
       "tags": [
         "far-past",
@@ -135,18 +149,22 @@
       ]
     },
     {
+      "id": "dates-8",
       "generator": "dates",
       "label": "year 2038 limit 2038-01-19T03:14:07Z",
       "value": "2038-01-19T03:14:07.000Z",
+      "type": "Date",
       "why": "Last second representable as a signed 32 bit Unix time; anything that stores seconds in an int32 (or uses `| 0`) is fine here.",
       "tags": [
         "y2038"
       ]
     },
     {
+      "id": "dates-9",
       "generator": "dates",
       "label": "year 2038 overflow 2038-01-19T03:14:08Z",
       "value": "2038-01-19T03:14:08.000Z",
+      "type": "Date",
       "why": "One second past the int32 limit: `(ms / 1000) | 0` wraps to 1901-12-13, and so do 32 bit database columns.",
       "tags": [
         "y2038",
@@ -154,9 +172,11 @@
       ]
     },
     {
+      "id": "dates-10",
       "generator": "dates",
       "label": "last instant of year 9999",
       "value": "9999-12-31T23:59:59.999Z",
+      "type": "Date",
       "why": "Largest instant with a four digit year; one millisecond later toISOString() switches to \"+010000\".",
       "tags": [
         "far-future",
@@ -164,9 +184,11 @@
       ]
     },
     {
+      "id": "dates-11",
       "generator": "dates",
       "label": "year 10000 (+010000-01-01T00:00:00.000Z)",
       "value": "+010000-01-01T00:00:00.000Z",
+      "type": "Date",
       "why": "toISOString() returns a six digit signed year; parsers, databases and YYYY format strings break.",
       "tags": [
         "far-future",
@@ -174,9 +196,11 @@
       ]
     },
     {
+      "id": "dates-12",
       "generator": "dates",
       "label": "maximum Date (+275760-09-13T00:00:00.000Z)",
       "value": "+275760-09-13T00:00:00.000Z",
+      "type": "Date",
       "why": "Largest valid Date. Adding 1 ms produces Invalid Date, so \"end of time\" sentinels overflow.",
       "tags": [
         "far-future",
@@ -184,9 +208,11 @@
       ]
     },
     {
+      "id": "dates-13",
       "generator": "dates",
       "label": "minimum Date (-271821-04-20T00:00:00.000Z)",
       "value": "-271821-04-20T00:00:00.000Z",
+      "type": "Date",
       "why": "Smallest valid Date. Subtracting anything produces Invalid Date, and local offsets west of UTC push the local wall clock out of range.",
       "tags": [
         "far-past",
@@ -194,18 +220,22 @@
       ]
     },
     {
+      "id": "dates-14",
       "generator": "dates",
       "label": "invalid date",
       "value": "Invalid Date",
+      "type": "Date",
       "why": "getTime() is NaN, toISOString() throws RangeError, JSON.stringify gives null and every comparison is false.",
       "tags": [
         "invalid"
       ]
     },
     {
+      "id": "dates-15",
       "generator": "dates",
       "label": "date-only string parsed as UTC (new Date(\"2026-03-01\"))",
       "value": "2026-03-01T00:00:00.000Z",
+      "type": "Date",
       "why": "Date-only ISO strings are UTC midnight, while date-time strings without Z are local; west of UTC this date displays as February 28.",
       "tags": [
         "parsing",
@@ -213,9 +243,11 @@
       ]
     },
     {
+      "id": "dates-16",
       "generator": "dates",
       "label": "leap day 2024-02-29",
       "value": "2024-02-29T12:00:00.000Z",
+      "type": "Date",
       "why": "Adding a year with setFullYear(y + 1) lands on 2025-03-01 because Feb 29 2025 does not exist; birthdays and anniversaries drift.",
       "tags": [
         "leap",
@@ -223,27 +255,33 @@
       ]
     },
     {
+      "id": "dates-17",
       "generator": "dates",
       "label": "leap day 2000-02-29 (400 year rule)",
       "value": "2000-02-29T12:00:00.000Z",
+      "type": "Date",
       "why": "2000 is a leap year because it is divisible by 400, unlike 1900 and 2100; a \"divisible by 100 means not leap\" rule rejects it.",
       "tags": [
         "leap"
       ]
     },
     {
+      "id": "dates-18",
       "generator": "dates",
       "label": "not a leap year 2100-02-28",
       "value": "2100-02-28T12:00:00.000Z",
+      "type": "Date",
       "why": "2100 is not a leap year; `year % 4 === 0` claims Feb 29 2100 exists and the day after this is computed wrong.",
       "tags": [
         "leap"
       ]
     },
     {
+      "id": "dates-19",
       "generator": "dates",
       "label": "month end 2026-01-31",
       "value": "2026-01-31T12:00:00.000Z",
+      "type": "Date",
       "why": "setMonth(month + 1) on January 31 overflows to March 3, because February 31 does not exist.",
       "tags": [
         "month-end",
@@ -251,9 +289,11 @@
       ]
     },
     {
+      "id": "dates-20",
       "generator": "dates",
       "label": "month end 2026-03-31",
       "value": "2026-03-31T12:00:00.000Z",
+      "type": "Date",
       "why": "Adding one month to March 31 gives May 1, since April has 30 days; \"same day next month\" needs clamping.",
       "tags": [
         "month-end",
@@ -261,9 +301,11 @@
       ]
     },
     {
+      "id": "dates-21",
       "generator": "dates",
       "label": "last millisecond of 2026 (UTC)",
       "value": "2026-12-31T23:59:59.999Z",
+      "type": "Date",
       "why": "Range queries ending at 23:59:59 miss this millisecond; month index 11 plus one must roll over into the next year.",
       "tags": [
         "month-end",
@@ -271,36 +313,44 @@
       ]
     },
     {
+      "id": "dates-22",
       "generator": "dates",
       "label": "2027-01-01 is in ISO week 53 of 2026",
       "value": "2027-01-01T12:00:00.000Z",
+      "type": "Date",
       "why": "ISO week years differ from calendar years: this Friday belongs to week 53 of 2026, so `getFullYear()` plus week number is wrong.",
       "tags": [
         "week"
       ]
     },
     {
+      "id": "dates-23",
       "generator": "dates",
       "label": "2024-12-30 is in ISO week 1 of 2025",
       "value": "2024-12-30T12:00:00.000Z",
+      "type": "Date",
       "why": "A Monday in December that belongs to week 1 of the next ISO year; \"yyyy-ww\" built from the calendar year shows 2024-01.",
       "tags": [
         "week"
       ]
     },
     {
+      "id": "dates-24",
       "generator": "dates",
       "label": "2023-01-01 is a Sunday in ISO week 52 of 2022",
       "value": "2023-01-01T12:00:00.000Z",
+      "type": "Date",
       "why": "ISO weeks start on Monday, US weeks on Sunday: this day is week 52 of 2022 in ISO but week 1 of 2023 in US numbering.",
       "tags": [
         "week"
       ]
     },
     {
+      "id": "dates-25",
       "generator": "dates",
       "label": "America/New_York 2026: 1 ms before spring forward (2026-03-08 01:59 local)",
       "value": "2026-03-08T06:59:59.999Z",
+      "type": "Date",
       "why": "Last instant before clocks jump from 02:00 to 03:00 (UTC-05:00 to UTC-04:00); adding 60 minutes of wall time here is not 60 minutes of real time.",
       "tags": [
         "dst",
@@ -310,9 +360,11 @@
       "zone": "America/New_York"
     },
     {
+      "id": "dates-26",
       "generator": "dates",
       "label": "America/New_York 2026: spring forward (2026-03-08 03:00 local)",
       "value": "2026-03-08T07:00:00.000Z",
+      "type": "Date",
       "why": "Clocks jump from 02:00 to 03:00; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23 hours long.",
       "tags": [
         "dst",
@@ -322,9 +374,11 @@
       "zone": "America/New_York"
     },
     {
+      "id": "dates-27",
       "generator": "dates",
       "label": "America/New_York 2026: fall back, first 01:30 (2026-11-01)",
       "value": "2026-11-01T05:30:00.000Z",
+      "type": "Date",
       "why": "Clocks fall back from 02:00 to 01:00, so 01:30 happens twice; this is the first one (UTC-04:00). Parsing the local time picks one of the two.",
       "tags": [
         "dst",
@@ -335,9 +389,11 @@
       "zone": "America/New_York"
     },
     {
+      "id": "dates-28",
       "generator": "dates",
       "label": "America/New_York 2026: fall back, second 01:30 (2026-11-01)",
       "value": "2026-11-01T06:30:00.000Z",
+      "type": "Date",
       "why": "Same wall clock reading as the first 01:30, 60 minutes later (UTC-05:00); sorting or deduplicating by local time breaks and that local day is 25 hours long.",
       "tags": [
         "dst",
@@ -348,9 +404,11 @@
       "zone": "America/New_York"
     },
     {
+      "id": "dates-29",
       "generator": "dates",
       "label": "America/New_York: last instant of 2025 local time",
       "value": "2026-01-01T04:59:59.999Z",
+      "type": "Date",
       "why": "Local time is 2025-12-31 23:59:59.999 (UTC-05:00) but the UTC year is already 2026; a year check with getUTCFullYear() is off by one.",
       "tags": [
         "year-boundary",
@@ -360,9 +418,11 @@
       "ref": "https://github.com/github/relative-time-element/pull/384"
     },
     {
+      "id": "dates-30",
       "generator": "dates",
       "label": "America/Sao_Paulo 2018: fall back, first 23:30 (2018-02-17)",
       "value": "2018-02-18T01:30:00.000Z",
+      "type": "Date",
       "why": "Clocks fall back from 00:00 to 23:00, so 23:30 happens twice; this is the first one (UTC-02:00). Parsing the local time picks one of the two.",
       "tags": [
         "dst",
@@ -373,9 +433,11 @@
       "zone": "America/Sao_Paulo"
     },
     {
+      "id": "dates-31",
       "generator": "dates",
       "label": "America/Sao_Paulo 2018: fall back, second 23:30 (2018-02-17)",
       "value": "2018-02-18T02:30:00.000Z",
+      "type": "Date",
       "why": "Same wall clock reading as the first 23:30, 60 minutes later (UTC-03:00); sorting or deduplicating by local time breaks and that local day is 25 hours long.",
       "tags": [
         "dst",
@@ -386,9 +448,11 @@
       "zone": "America/Sao_Paulo"
     },
     {
+      "id": "dates-32",
       "generator": "dates",
       "label": "America/Sao_Paulo 2018: 1 ms before spring forward (2018-11-03 23:59 local)",
       "value": "2018-11-04T02:59:59.999Z",
+      "type": "Date",
       "why": "Last instant before clocks jump from 00:00 to 01:00 (UTC-03:00 to UTC-02:00); adding 60 minutes of wall time here is not 60 minutes of real time.",
       "tags": [
         "dst",
@@ -398,9 +462,11 @@
       "zone": "America/Sao_Paulo"
     },
     {
+      "id": "dates-33",
       "generator": "dates",
       "label": "America/Sao_Paulo 2018: spring forward (2018-11-04 01:00 local)",
       "value": "2018-11-04T03:00:00.000Z",
+      "type": "Date",
       "why": "Clocks jump from 00:00 to 01:00; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23 hours long. Midnight does not exist that day, so new Date(2018, 10, 4) returns 01:00.",
       "tags": [
         "dst",
@@ -410,9 +476,11 @@
       "zone": "America/Sao_Paulo"
     },
     {
+      "id": "dates-34",
       "generator": "dates",
       "label": "America/Sao_Paulo: last instant of 2017 local time",
       "value": "2018-01-01T01:59:59.999Z",
+      "type": "Date",
       "why": "Local time is 2017-12-31 23:59:59.999 (UTC-02:00) but the UTC year is already 2018; a year check with getUTCFullYear() is off by one.",
       "tags": [
         "year-boundary",
@@ -422,9 +490,11 @@
       "ref": "https://github.com/github/relative-time-element/pull/384"
     },
     {
+      "id": "dates-35",
       "generator": "dates",
       "label": "Europe/London 2026: 1 ms before spring forward (2026-03-29 00:59 local)",
       "value": "2026-03-29T00:59:59.999Z",
+      "type": "Date",
       "why": "Last instant before clocks jump from 01:00 to 02:00 (UTC+00:00 to UTC+01:00); adding 60 minutes of wall time here is not 60 minutes of real time.",
       "tags": [
         "dst",
@@ -434,9 +504,11 @@
       "zone": "Europe/London"
     },
     {
+      "id": "dates-36",
       "generator": "dates",
       "label": "Europe/London 2026: spring forward (2026-03-29 02:00 local)",
       "value": "2026-03-29T01:00:00.000Z",
+      "type": "Date",
       "why": "Clocks jump from 01:00 to 02:00; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23 hours long.",
       "tags": [
         "dst",
@@ -446,9 +518,11 @@
       "zone": "Europe/London"
     },
     {
+      "id": "dates-37",
       "generator": "dates",
       "label": "Europe/London 2026: fall back, first 01:30 (2026-10-25)",
       "value": "2026-10-25T00:30:00.000Z",
+      "type": "Date",
       "why": "Clocks fall back from 02:00 to 01:00, so 01:30 happens twice; this is the first one (UTC+01:00). Parsing the local time picks one of the two.",
       "tags": [
         "dst",
@@ -459,9 +533,11 @@
       "zone": "Europe/London"
     },
     {
+      "id": "dates-38",
       "generator": "dates",
       "label": "Europe/London 2026: fall back, second 01:30 (2026-10-25)",
       "value": "2026-10-25T01:30:00.000Z",
+      "type": "Date",
       "why": "Same wall clock reading as the first 01:30, 60 minutes later (UTC+00:00); sorting or deduplicating by local time breaks and that local day is 25 hours long.",
       "tags": [
         "dst",
@@ -472,9 +548,11 @@
       "zone": "Europe/London"
     },
     {
+      "id": "dates-39",
       "generator": "dates",
       "label": "Australia/Lord_Howe 2026: fall back, first 01:45 (2026-04-05)",
       "value": "2026-04-04T14:45:00.000Z",
+      "type": "Date",
       "why": "Clocks fall back from 02:00 to 01:30, so 01:45 happens twice; this is the first one (UTC+11:00). Parsing the local time picks one of the two.",
       "tags": [
         "dst",
@@ -486,9 +564,11 @@
       "zone": "Australia/Lord_Howe"
     },
     {
+      "id": "dates-40",
       "generator": "dates",
       "label": "Australia/Lord_Howe 2026: fall back, second 01:45 (2026-04-05)",
       "value": "2026-04-04T15:15:00.000Z",
+      "type": "Date",
       "why": "Same wall clock reading as the first 01:45, 30 minutes later (UTC+10:30); sorting or deduplicating by local time breaks and that local day is 24.5 hours long.",
       "tags": [
         "dst",
@@ -500,9 +580,11 @@
       "zone": "Australia/Lord_Howe"
     },
     {
+      "id": "dates-41",
       "generator": "dates",
       "label": "Australia/Lord_Howe 2026: 1 ms before spring forward (2026-10-04 01:59 local)",
       "value": "2026-10-03T15:29:59.999Z",
+      "type": "Date",
       "why": "Last instant before clocks jump from 02:00 to 02:30 (UTC+10:30 to UTC+11:00); adding 30 minutes of wall time here is not 30 minutes of real time.",
       "tags": [
         "dst",
@@ -513,9 +595,11 @@
       "zone": "Australia/Lord_Howe"
     },
     {
+      "id": "dates-42",
       "generator": "dates",
       "label": "Australia/Lord_Howe 2026: spring forward (2026-10-04 02:30 local)",
       "value": "2026-10-03T15:30:00.000Z",
+      "type": "Date",
       "why": "Clocks jump from 02:00 to 02:30; local times in between do not exist, so building a Date from local fields shifts it and that local day is 23.5 hours long.",
       "tags": [
         "dst",
@@ -526,9 +610,11 @@
       "zone": "Australia/Lord_Howe"
     },
     {
+      "id": "dates-43",
       "generator": "dates",
       "label": "Australia/Lord_Howe: first instant of 2026 local time",
       "value": "2025-12-31T13:00:00.000Z",
+      "type": "Date",
       "why": "Local time is 2026-01-01 00:00 (UTC+11:00) but the UTC year is still 2025; a year check with getUTCFullYear() is off by one.",
       "tags": [
         "year-boundary",
@@ -538,9 +624,11 @@
       "ref": "https://github.com/github/relative-time-element/pull/384"
     },
     {
+      "id": "dates-44",
       "generator": "dates",
       "label": "Asia/Kathmandu: first instant of 2026 local time",
       "value": "2025-12-31T18:15:00.000Z",
+      "type": "Date",
       "why": "Local time is 2026-01-01 00:00 (UTC+05:45) but the UTC year is still 2025; a year check with getUTCFullYear() is off by one.",
       "tags": [
         "year-boundary",
@@ -551,9 +639,11 @@
       "ref": "https://github.com/github/relative-time-element/pull/384"
     },
     {
+      "id": "dates-45",
       "generator": "dates",
       "label": "Pacific/Kiritimati: first instant of 2026 local time",
       "value": "2025-12-31T10:00:00.000Z",
+      "type": "Date",
       "why": "Local time is 2026-01-01 00:00 (UTC+14:00) but the UTC year is still 2025; a year check with getUTCFullYear() is off by one. This zone is among the first places on Earth to enter the new year.",
       "tags": [
         "year-boundary",
@@ -563,9 +653,11 @@
       "ref": "https://github.com/github/relative-time-element/pull/384"
     },
     {
+      "id": "dates-46",
       "generator": "dates",
       "label": "Pacific/Pago_Pago: last instant of 2025 local time",
       "value": "2026-01-01T10:59:59.999Z",
+      "type": "Date",
       "why": "Local time is 2025-12-31 23:59:59.999 (UTC-11:00) but the UTC year is already 2026; a year check with getUTCFullYear() is off by one. This zone is among the last places on Earth to leave the old year.",
       "tags": [
         "year-boundary",
@@ -575,9 +667,11 @@
       "ref": "https://github.com/github/relative-time-element/pull/384"
     },
     {
+      "id": "timeZones-1",
       "generator": "timeZones",
       "label": "UTC",
       "value": "\"UTC\"",
+      "type": "string",
       "why": "The control zone: offset 0 all year. Bugs that only show up away from UTC hide here, which is why CI should not run only in UTC.",
       "tags": [
         "utc",
@@ -585,9 +679,11 @@
       ]
     },
     {
+      "id": "timeZones-2",
       "generator": "timeZones",
       "label": "America/New_York",
       "value": "\"America/New_York\"",
+      "type": "string",
       "why": "UTC-05:00 with US DST rules: the classic negative offset where UTC midnight is the previous local day.",
       "tags": [
         "negative",
@@ -595,9 +691,11 @@
       ]
     },
     {
+      "id": "timeZones-3",
       "generator": "timeZones",
       "label": "America/Los_Angeles",
       "value": "\"America/Los_Angeles\"",
+      "type": "string",
       "why": "UTC-08:00: late enough that evening events land on the next UTC day.",
       "tags": [
         "negative",
@@ -605,9 +703,11 @@
       ]
     },
     {
+      "id": "timeZones-4",
       "generator": "timeZones",
       "label": "America/Sao_Paulo",
       "value": "\"America/Sao_Paulo\"",
+      "type": "string",
       "why": "UTC-03:00; used DST with midnight transitions until 2019, so historical dates have days without 00:00.",
       "tags": [
         "negative",
@@ -616,9 +716,11 @@
       ]
     },
     {
+      "id": "timeZones-5",
       "generator": "timeZones",
       "label": "America/St_Johns",
       "value": "\"America/St_Johns\"",
+      "type": "string",
       "why": "UTC-03:30: a half hour offset with DST in the Americas; code that assumes whole hours breaks.",
       "tags": [
         "negative",
@@ -627,9 +729,11 @@
       ]
     },
     {
+      "id": "timeZones-6",
       "generator": "timeZones",
       "label": "Europe/London",
       "value": "\"Europe/London\"",
+      "type": "string",
       "why": "UTC+00:00 in winter but +01:00 in summer: tests that pass in January fail in July.",
       "tags": [
         "dst",
@@ -637,9 +741,11 @@
       ]
     },
     {
+      "id": "timeZones-7",
       "generator": "timeZones",
       "label": "Europe/Dublin",
       "value": "\"Europe/Dublin\"",
+      "type": "string",
       "why": "The tz database models Irish time with a negative DST save (standard time in summer), which trips code that reads the isDST flag of tz libraries.",
       "tags": [
         "dst",
@@ -647,9 +753,11 @@
       ]
     },
     {
+      "id": "timeZones-8",
       "generator": "timeZones",
       "label": "Africa/Casablanca",
       "value": "\"Africa/Casablanca\"",
+      "type": "string",
       "why": "UTC+01:00 that drops to +00:00 during Ramadan each year, so transitions move with the lunar calendar.",
       "tags": [
         "dst",
@@ -657,9 +765,11 @@
       ]
     },
     {
+      "id": "timeZones-9",
       "generator": "timeZones",
       "label": "Asia/Kolkata",
       "value": "\"Asia/Kolkata\"",
+      "type": "string",
       "why": "UTC+05:30, no DST: the most populous half hour offset.",
       "tags": [
         "positive",
@@ -667,9 +777,11 @@
       ]
     },
     {
+      "id": "timeZones-10",
       "generator": "timeZones",
       "label": "Asia/Kathmandu",
       "value": "\"Asia/Kathmandu\"",
+      "type": "string",
       "why": "UTC+05:45: a quarter hour offset that breaks `offset / 60` rounding and hour only offset pickers.",
       "tags": [
         "positive",
@@ -677,9 +789,11 @@
       ]
     },
     {
+      "id": "timeZones-11",
       "generator": "timeZones",
       "label": "Asia/Tehran",
       "value": "\"Asia/Tehran\"",
+      "type": "string",
       "why": "UTC+03:30; abolished DST in 2022, so historical and current rules differ.",
       "tags": [
         "positive",
@@ -688,9 +802,11 @@
       ]
     },
     {
+      "id": "timeZones-12",
       "generator": "timeZones",
       "label": "Australia/Adelaide",
       "value": "\"Australia/Adelaide\"",
+      "type": "string",
       "why": "UTC+09:30 / +10:30: southern hemisphere DST plus a half hour offset.",
       "tags": [
         "positive",
@@ -700,9 +816,11 @@
       ]
     },
     {
+      "id": "timeZones-13",
       "generator": "timeZones",
       "label": "Australia/Lord_Howe",
       "value": "\"Australia/Lord_Howe\"",
+      "type": "string",
       "why": "UTC+10:30 / +11:00: DST shifts by only 30 minutes, so \"DST adds one hour\" is false.",
       "tags": [
         "positive",
@@ -713,9 +831,11 @@
       ]
     },
     {
+      "id": "timeZones-14",
       "generator": "timeZones",
       "label": "Pacific/Chatham",
       "value": "\"Pacific/Chatham\"",
+      "type": "string",
       "why": "UTC+12:45 / +13:45: quarter hour offset with DST, far east of the date line.",
       "tags": [
         "positive",
@@ -725,9 +845,11 @@
       ]
     },
     {
+      "id": "timeZones-15",
       "generator": "timeZones",
       "label": "Pacific/Kiritimati",
       "value": "\"Pacific/Kiritimati\"",
+      "type": "string",
       "why": "UTC+14:00, the largest offset: local dates are a full day ahead of most of the Americas and the first to reach New Year.",
       "tags": [
         "positive",
@@ -735,9 +857,11 @@
       ]
     },
     {
+      "id": "timeZones-16",
       "generator": "timeZones",
       "label": "Pacific/Apia",
       "value": "\"Pacific/Apia\"",
+      "type": "string",
       "why": "Samoa skipped 2011-12-30 entirely when it moved across the date line; day counting across that date is off by one.",
       "tags": [
         "positive",
@@ -746,9 +870,11 @@
       ]
     },
     {
+      "id": "timeZones-17",
       "generator": "timeZones",
       "label": "Pacific/Pago_Pago",
       "value": "\"Pacific/Pago_Pago\"",
+      "type": "string",
       "why": "UTC-11:00, among the last places to leave a year; local dates lag a day behind most of Asia.",
       "tags": [
         "negative",
@@ -756,9 +882,11 @@
       ]
     },
     {
+      "id": "timeZones-18",
       "generator": "timeZones",
       "label": "Antarctica/Troll",
       "value": "\"Antarctica/Troll\"",
+      "type": "string",
       "why": "UTC+00:00 in winter and +02:00 in summer: a two hour DST jump.",
       "tags": [
         "dst",
@@ -766,9 +894,11 @@
       ]
     },
     {
+      "id": "strings-1",
       "generator": "strings",
       "label": "empty string",
       "value": "\"\"",
+      "type": "string",
       "why": "Falsy, length 0: `if (!name)` and `str[0].toUpperCase()` both misbehave.",
       "tags": [
         "empty",
@@ -776,9 +906,11 @@
       ]
     },
     {
+      "id": "strings-2",
       "generator": "strings",
       "label": "single space",
       "value": "\" \"",
+      "type": "string",
       "why": "Truthy but blank: passes `if (str)` checks and fails after trim().",
       "tags": [
         "whitespace",
@@ -786,9 +918,11 @@
       ]
     },
     {
+      "id": "strings-3",
       "generator": "strings",
       "label": "mixed ASCII whitespace",
       "value": "\" \\t\\n\\r\\u000B\\u000C \"",
+      "type": "string",
       "why": "Every ASCII whitespace character; trim() returns an empty string but `str.length > 0` validators accept it.",
       "tags": [
         "whitespace",
@@ -796,9 +930,11 @@
       ]
     },
     {
+      "id": "strings-4",
       "generator": "strings",
       "label": "no-break space (U+00A0)",
       "value": "\"a\\u00A0b\"",
+      "type": "string",
       "why": "Arrives from HTML &nbsp; and copy paste; \\s and trim() treat it as whitespace but split(\" \") and many tokenizers do not.",
       "tags": [
         "whitespace",
@@ -806,9 +942,11 @@
       ]
     },
     {
+      "id": "strings-5",
       "generator": "strings",
       "label": "ideographic space (U+3000)",
       "value": "\"\\u3000\\u65E5\\u672C\\u3000\"",
+      "type": "string",
       "why": "Full width space used in CJK text; trim() removes it, byte based or ASCII only trimming does not.",
       "tags": [
         "whitespace",
@@ -816,9 +954,11 @@
       ]
     },
     {
+      "id": "strings-6",
       "generator": "strings",
       "label": "zero width space (U+200B)",
       "value": "\"foo\\u200Bbar\"",
+      "type": "string",
       "why": "Invisible and not whitespace for trim() or \\s, so it looks identical to \"foobar\" but is not equal to it.",
       "tags": [
         "invisible",
@@ -826,9 +966,11 @@
       ]
     },
     {
+      "id": "strings-7",
       "generator": "strings",
       "label": "byte order mark prefix (U+FEFF)",
       "value": "\"\\uFEFFid\"",
+      "type": "string",
       "why": "Left by Windows editors at the start of files: CSV headers become \"\\uFEFFid\" and JSON.parse of BOM prefixed text throws.",
       "tags": [
         "invisible",
@@ -836,27 +978,33 @@
       ]
     },
     {
+      "id": "strings-8",
       "generator": "strings",
       "label": "soft hyphen (U+00AD)",
       "value": "\"co\\u00ADoperate\"",
+      "type": "string",
       "why": "Invisible unless a line breaks there, so search and equality fail on text that looks the same.",
       "tags": [
         "invisible"
       ]
     },
     {
+      "id": "strings-9",
       "generator": "strings",
       "label": "very long string (100000 chars)",
       "value": "\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...\" (100000 chars)",
+      "type": "string",
       "why": "Exceeds column and header limits, overflows layouts and exposes quadratic algorithms and backtracking regexes.",
       "tags": [
         "long"
       ]
     },
     {
+      "id": "strings-10",
       "generator": "strings",
       "label": "emoji outside the BMP (U+1F600)",
       "value": "\"\\u{1F600}\"",
+      "type": "string",
       "why": "One visible character but length 2 (a surrogate pair); charAt(0) and str[0] return half of it.",
       "tags": [
         "emoji",
@@ -865,9 +1013,11 @@
       ]
     },
     {
+      "id": "strings-11",
       "generator": "strings",
       "label": "ZWJ family emoji (man, woman, girl, boy)",
       "value": "\"\\u{1F468}\\u200D\\u{1F469}\\u200D\\u{1F467}\\u200D\\u{1F466}\"",
+      "type": "string",
       "why": "Seven code points joined by zero width joiners render as one glyph with length 11; splitting by code point shows four people.",
       "tags": [
         "emoji",
@@ -877,9 +1027,11 @@
       ]
     },
     {
+      "id": "strings-12",
       "generator": "strings",
       "label": "flag emoji (regional indicators B and R)",
       "value": "\"\\u{1F1E7}\\u{1F1F7}\"",
+      "type": "string",
       "why": "A flag is two regional indicator letters; cutting between them leaves letters and reversing them names another country or none.",
       "tags": [
         "emoji",
@@ -888,9 +1040,11 @@
       ]
     },
     {
+      "id": "strings-13",
       "generator": "strings",
       "label": "skin tone modifier (thumbs up, medium)",
       "value": "\"\\u{1F44D}\\u{1F3FD}\"",
+      "type": "string",
       "why": "Base emoji plus a modifier: one grapheme, two code points, four code units; truncating after the base drops the tone.",
       "tags": [
         "emoji",
@@ -899,9 +1053,11 @@
       ]
     },
     {
+      "id": "strings-14",
       "generator": "strings",
       "label": "emoji with variation selector (red heart)",
       "value": "\"\\u2764\\uFE0F\"",
+      "type": "string",
       "why": "U+2764 plus U+FE0F: removing \"invisible\" characters changes emoji presentation, and the base alone is in the BMP.",
       "tags": [
         "emoji",
@@ -910,9 +1066,11 @@
       ]
     },
     {
+      "id": "strings-15",
       "generator": "strings",
       "label": "keycap sequence (digit one)",
       "value": "\"1\\uFE0F\\u20E3\"",
+      "type": "string",
       "why": "Starts with an ASCII digit, so /^\\d/ matches what renders as a single keycap symbol.",
       "tags": [
         "emoji",
@@ -921,9 +1079,11 @@
       ]
     },
     {
+      "id": "strings-16",
       "generator": "strings",
       "label": "surrogate pair cut by slice(0, 10)",
       "value": "\"abcdefghi\\u{1F600}\"",
+      "type": "string",
       "why": "The emoji starts at index 9, so slice(0, 10) keeps only its high surrogate and produces malformed UTF-16.",
       "tags": [
         "surrogate",
@@ -933,9 +1093,11 @@
       "ref": "https://github.com/google/budoux/pull/1411"
     },
     {
+      "id": "strings-17",
       "generator": "strings",
       "label": "surrogate pair at the end for trimEnd style truncation",
       "value": "\"Done \\u{1F389}\"",
+      "type": "string",
       "why": "Truncating \"to N code units\" from the end lands inside the pair; output ends in a lone surrogate that renders as U+FFFD.",
       "tags": [
         "surrogate",
@@ -945,9 +1107,11 @@
       "ref": "https://github.com/microsoft/vscode-js-debug/pull/2423"
     },
     {
+      "id": "strings-18",
       "generator": "strings",
       "label": "lone high surrogate",
       "value": "\"a\\uD83Db\"",
+      "type": "string",
       "why": "Malformed UTF-16: encodeURIComponent throws URIError, TextEncoder writes U+FFFD and isWellFormed() is false.",
       "tags": [
         "surrogate",
@@ -955,9 +1119,11 @@
       ]
     },
     {
+      "id": "strings-19",
       "generator": "strings",
       "label": "lone low surrogate",
       "value": "\"\\uDE00\"",
+      "type": "string",
       "why": "A trailing surrogate with no lead: string comparison works but encoding, hashing and JSON round trips through UTF-8 change it.",
       "tags": [
         "surrogate",
@@ -965,9 +1131,11 @@
       ]
     },
     {
+      "id": "strings-20",
       "generator": "strings",
       "label": "precomposed e acute (NFC)",
       "value": "\"caf\\u00E9\"",
+      "type": "string",
       "why": "Length 4. Compare with the decomposed form: same rendering, different code points.",
       "tags": [
         "normalization",
@@ -975,9 +1143,11 @@
       ]
     },
     {
+      "id": "strings-21",
       "generator": "strings",
       "label": "decomposed e acute (NFD)",
       "value": "\"cafe\\u0301\"",
+      "type": "string",
       "why": "Length 5 and !== the NFC form; macOS file names and some keyboards produce this form. Use normalize() before comparing.",
       "tags": [
         "normalization",
@@ -985,9 +1155,11 @@
       ]
     },
     {
+      "id": "strings-22",
       "generator": "strings",
       "label": "stacked combining marks",
       "value": "\"Z\\u0351\\u036B\\u0343\\u036A\\u0302\\u036B\\u033D\\u034F\\u0334\\u0319\"",
+      "type": "string",
       "why": "One base letter with ten combining marks: one grapheme, eleven code units, and rendering that escapes its line box.",
       "tags": [
         "combining",
@@ -995,18 +1167,22 @@
       ]
     },
     {
+      "id": "strings-23",
       "generator": "strings",
       "label": "leading combining mark",
       "value": "\"\\u0301abc\"",
+      "type": "string",
       "why": "A combining mark with nothing to attach to; it combines with whatever precedes the string after concatenation.",
       "tags": [
         "combining"
       ]
     },
     {
+      "id": "strings-24",
       "generator": "strings",
       "label": "Hangul syllables (precomposed)",
       "value": "\"\\uD55C\\uAD6D\\uC5B4\"",
+      "type": "string",
       "why": "Korean syllable blocks. NFD splits each into two or three jamo, so lengths change after normalization.",
       "tags": [
         "script",
@@ -1015,9 +1191,11 @@
       ]
     },
     {
+      "id": "strings-25",
       "generator": "strings",
       "label": "Hangul jamo (decomposed)",
       "value": "\"\\u1112\\u1161\\u11AB\"",
+      "type": "string",
       "why": "Three jamo that render as one syllable and equal the first syllable of the previous case only after NFC normalization.",
       "tags": [
         "script",
@@ -1026,9 +1204,11 @@
       ]
     },
     {
+      "id": "strings-26",
       "generator": "strings",
       "label": "right to left text mixed with Latin and digits",
       "value": "\"abc \\u05E9\\u05DC\\u05D5\\u05DD 123\"",
+      "type": "string",
       "why": "Hebrew mixed with Latin and numbers: visual order differs from memory order, which breaks cursor math and naive truncation with ellipsis.",
       "tags": [
         "rtl",
@@ -1037,9 +1217,11 @@
       ]
     },
     {
+      "id": "strings-27",
       "generator": "strings",
       "label": "Arabic text",
       "value": "\"\\u0645\\u0631\\u062D\\u0628\\u0627\"",
+      "type": "string",
       "why": "Right to left script with contextual letter shapes; per code point styling or splitting breaks the joining.",
       "tags": [
         "rtl",
@@ -1047,9 +1229,11 @@
       ]
     },
     {
+      "id": "strings-28",
       "generator": "strings",
       "label": "right to left override (U+202E)",
       "value": "\"invoice\\u202Etxt.exe\"",
+      "type": "string",
       "why": "Displays as \"invoiceexe.txt\": the Trojan Source trick (CVE-2021-42574) for file names and code review.",
       "tags": [
         "bidi",
@@ -1058,9 +1242,11 @@
       ]
     },
     {
+      "id": "strings-29",
       "generator": "strings",
       "label": "bidi isolate controls (U+2067, U+2069)",
       "value": "\"user\\u2067admin\\u2069\"",
+      "type": "string",
       "why": "Invisible directional isolates change display order; strip or escape them in identifiers and logs.",
       "tags": [
         "bidi",
@@ -1069,9 +1255,11 @@
       ]
     },
     {
+      "id": "strings-30",
       "generator": "strings",
       "label": "Turkish dotted and dotless i",
       "value": "\"I\\u0130\\u0131i\"",
+      "type": "string",
       "why": "Capital dotted I lowercases to i plus U+0307 (length grows), and toLocaleLowerCase(\"tr\") maps I to dotless i; case insensitive keys break.",
       "tags": [
         "casing",
@@ -1079,9 +1267,11 @@
       ]
     },
     {
+      "id": "strings-31",
       "generator": "strings",
       "label": "German sharp s",
       "value": "\"stra\\u00DFe\"",
+      "type": "string",
       "why": "toUpperCase() gives \"STRASSE\" (length 6 to 7), so upper and lower case comparisons disagree and length based layouts shift.",
       "tags": [
         "casing",
@@ -1089,9 +1279,11 @@
       ]
     },
     {
+      "id": "strings-32",
       "generator": "strings",
       "label": "Greek final sigma",
       "value": "\"\\u039F\\u0394\\u039F\\u03A3\"",
+      "type": "string",
       "why": "Lowercasing the whole word yields a final sigma at the end; lowercasing letter by letter does not, so results differ.",
       "tags": [
         "casing",
@@ -1099,9 +1291,11 @@
       ]
     },
     {
+      "id": "strings-33",
       "generator": "strings",
       "label": "null character",
       "value": "\"a\\u0000b\"",
+      "type": "string",
       "why": "Terminates C strings, is rejected by PostgreSQL text columns and disappears in some loggers.",
       "tags": [
         "control",
@@ -1109,27 +1303,33 @@
       ]
     },
     {
+      "id": "strings-34",
       "generator": "strings",
       "label": "CRLF newline",
       "value": "\"line1\\r\\nline2\"",
+      "type": "string",
       "why": "split(\"\\n\") leaves a trailing \"\\r\" on each line; Windows files and HTTP headers use this form.",
       "tags": [
         "newline"
       ]
     },
     {
+      "id": "strings-35",
       "generator": "strings",
       "label": "CR only newline",
       "value": "\"line1\\rline2\"",
+      "type": "string",
       "why": "Classic Mac line ending: code that only looks for \\n sees one line.",
       "tags": [
         "newline"
       ]
     },
     {
+      "id": "strings-36",
       "generator": "strings",
       "label": "line separator (U+2028)",
       "value": "\"a\\u2028b\"",
+      "type": "string",
       "why": "A JavaScript line terminator: `.` in a regex does not match it, and it broke inline scripts and JSONP before ES2019.",
       "tags": [
         "newline",
@@ -1137,9 +1337,11 @@
       ]
     },
     {
+      "id": "strings-37",
       "generator": "strings",
       "label": "paragraph separator (U+2029)",
       "value": "\"a\\u2029b\"",
+      "type": "string",
       "why": "Another JavaScript line terminator that most text editors render as nothing; line counting tools disagree about it.",
       "tags": [
         "newline",
@@ -1147,9 +1349,11 @@
       ]
     },
     {
+      "id": "strings-38",
       "generator": "strings",
       "label": "vertical tab and form feed",
       "value": "\"a\\u000Bb\\u000Cc\"",
+      "type": "string",
       "why": "Rarely seen whitespace that XML 1.0 forbids and some JSON encoders escape inconsistently.",
       "tags": [
         "control",
@@ -1157,9 +1361,11 @@
       ]
     },
     {
+      "id": "strings-39",
       "generator": "strings",
       "label": "HTML markup as text",
       "value": "\"<script>alert(\\\"x\\\")</script>\"",
+      "type": "string",
       "why": "Must render as literal text; any innerHTML or template without escaping executes it.",
       "tags": [
         "injection",
@@ -1167,9 +1373,11 @@
       ]
     },
     {
+      "id": "strings-40",
       "generator": "strings",
       "label": "already escaped HTML",
       "value": "\"&lt;b&gt; &amp;amp;\"",
+      "type": "string",
       "why": "Escaping twice shows \"&amp;lt;\" to users; unescaping on input then escaping on output corrupts it.",
       "tags": [
         "injection",
@@ -1177,9 +1385,11 @@
       ]
     },
     {
+      "id": "strings-41",
       "generator": "strings",
       "label": "SQL quote and comment",
       "value": "\"Robert'); DROP TABLE Students;--\"",
+      "type": "string",
       "why": "A quote ends a string literal in hand built SQL; also tests that names with apostrophes survive a round trip.",
       "tags": [
         "injection",
@@ -1187,9 +1397,11 @@
       ]
     },
     {
+      "id": "strings-42",
       "generator": "strings",
       "label": "regex metacharacters",
       "value": "\".*+?^${}()|[]\\\\\"",
+      "type": "string",
       "why": "Passing user text to new RegExp() throws on \"(\" or matches everything with \".*\"; escape it first.",
       "tags": [
         "injection",
@@ -1197,9 +1409,11 @@
       ]
     },
     {
+      "id": "strings-43",
       "generator": "strings",
       "label": "template placeholders",
       "value": "\"${7*7} {{7*7}} %s %d\"",
+      "type": "string",
       "why": "Text that looks like template or printf syntax; any second pass through a formatter changes it.",
       "tags": [
         "injection",
@@ -1207,9 +1421,11 @@
       ]
     },
     {
+      "id": "strings-44",
       "generator": "strings",
       "label": "__proto__ as a key",
       "value": "\"__proto__\"",
+      "type": "string",
       "why": "Used as an object key it sets the prototype instead of a property; use Map or Object.create(null) for user keys.",
       "tags": [
         "injection",
@@ -1217,18 +1433,22 @@
       ]
     },
     {
+      "id": "strings-45",
       "generator": "strings",
       "label": "the word null",
       "value": "\"null\"",
+      "type": "string",
       "why": "A real surname and a common placeholder: systems that treat \"null\" as missing lose data.",
       "tags": [
         "falsy-text"
       ]
     },
     {
+      "id": "strings-46",
       "generator": "strings",
       "label": "Arabic-Indic digits",
       "value": "\"\\u0663\\u0664\"",
+      "type": "string",
       "why": "Unicode digits: Number() and parseInt return NaN and \\d only matches ASCII 0 to 9, yet users type these.",
       "tags": [
         "digits",
@@ -1236,9 +1456,11 @@
       ]
     },
     {
+      "id": "strings-47",
       "generator": "strings",
       "label": "full width digits",
       "value": "\"\\uFF11\\uFF12\\uFF13\"",
+      "type": "string",
       "why": "Typed by CJK input methods; look like 123 but fail /^\\d+$/ and Number().",
       "tags": [
         "digits",
@@ -1246,9 +1468,11 @@
       ]
     },
     {
+      "id": "strings-48",
       "generator": "strings",
       "label": "Thai without spaces",
       "value": "\"\\u0E20\\u0E32\\u0E29\\u0E32\\u0E44\\u0E17\\u0E22\"",
+      "type": "string",
       "why": "Thai writes words without spaces and uses combining vowels; word wrapping and counting need Intl.Segmenter.",
       "tags": [
         "script",
@@ -1256,9 +1480,11 @@
       ]
     },
     {
+      "id": "strings-49",
       "generator": "strings",
       "label": "wide CJK characters",
       "value": "\"\\u4F60\\u597D\\uFF01\"",
+      "type": "string",
       "why": "Each character takes two terminal columns, so padEnd based tables and fixed width output misalign.",
       "tags": [
         "cjk",
@@ -1266,9 +1492,11 @@
       ]
     },
     {
+      "id": "numbers-1",
       "generator": "numbers",
       "label": "zero",
       "value": "0",
+      "type": "number",
       "why": "Falsy: `if (!count)` and `value || defaultValue` replace a legitimate 0.",
       "tags": [
         "zero",
@@ -1276,9 +1504,11 @@
       ]
     },
     {
+      "id": "numbers-2",
       "generator": "numbers",
       "label": "negative zero",
       "value": "-0",
+      "type": "number",
       "why": "-0 === 0 is true, but Object.is(-0, 0) is false, 1 / -0 is -Infinity and String(-0) is \"0\", so the sign silently disappears.",
       "tags": [
         "zero",
@@ -1287,9 +1517,11 @@
       ]
     },
     {
+      "id": "numbers-3",
       "generator": "numbers",
       "label": "NaN",
       "value": "NaN",
+      "type": "number",
       "why": "NaN !== NaN, indexOf cannot find it, JSON.stringify writes null and every comparison is false, so sorting with it is unstable.",
       "tags": [
         "nan",
@@ -1297,9 +1529,11 @@
       ]
     },
     {
+      "id": "numbers-4",
       "generator": "numbers",
       "label": "Infinity",
       "value": "Infinity",
+      "type": "number",
       "why": "JSON.stringify writes null, toFixed returns \"Infinity\" and a max-age or timeout of Infinity can mean \"never\" or overflow a timer.",
       "tags": [
         "infinity"
@@ -1307,9 +1541,11 @@
       "ref": "https://github.com/salesforce/tough-cookie/pull/644"
     },
     {
+      "id": "numbers-5",
       "generator": "numbers",
       "label": "-Infinity",
       "value": "-Infinity",
+      "type": "number",
       "why": "Math.max() of an empty list; a common reducer seed that leaks into output as \"-Infinity\".",
       "tags": [
         "infinity",
@@ -1317,9 +1553,11 @@
       ]
     },
     {
+      "id": "numbers-6",
       "generator": "numbers",
       "label": "MAX_SAFE_INTEGER",
       "value": "9007199254740991",
+      "type": "number",
       "why": "2^53 - 1, the largest integer where n + 1 is exact; IDs and counters past it stop being unique.",
       "tags": [
         "integer",
@@ -1327,9 +1565,11 @@
       ]
     },
     {
+      "id": "numbers-7",
       "generator": "numbers",
       "label": "MAX_SAFE_INTEGER + 1",
       "value": "9007199254740992",
+      "type": "number",
       "why": "2^53: here n + 1 === n, so loops never advance and 64 bit IDs from JSON collide.",
       "tags": [
         "integer",
@@ -1338,9 +1578,11 @@
       ]
     },
     {
+      "id": "numbers-8",
       "generator": "numbers",
       "label": "MAX_SAFE_INTEGER + 2",
       "value": "9007199254740992",
+      "type": "number",
       "why": "Is not representable: the literal 9007199254740993 rounds to 9007199254740992 before your code ever sees it.",
       "tags": [
         "integer",
@@ -1349,9 +1591,11 @@
       ]
     },
     {
+      "id": "numbers-9",
       "generator": "numbers",
       "label": "MIN_SAFE_INTEGER",
       "value": "-9007199254740991",
+      "type": "number",
       "why": "-(2^53 - 1), the negative safe integer limit; mirrors the positive overflow bugs.",
       "tags": [
         "integer",
@@ -1360,9 +1604,11 @@
       ]
     },
     {
+      "id": "numbers-10",
       "generator": "numbers",
       "label": "MIN_SAFE_INTEGER - 1",
       "value": "-9007199254740992",
+      "type": "number",
       "why": "First unsafe negative integer: Number.isSafeInteger is false and decrementing it is not exact.",
       "tags": [
         "integer",
@@ -1372,9 +1618,11 @@
       ]
     },
     {
+      "id": "numbers-11",
       "generator": "numbers",
       "label": "MAX_VALUE",
       "value": "1.7976931348623157e+308",
+      "type": "number",
       "why": "Largest finite double; doubling it or adding a large value gives Infinity.",
       "tags": [
         "limit",
@@ -1382,9 +1630,11 @@
       ]
     },
     {
+      "id": "numbers-12",
       "generator": "numbers",
       "label": "MIN_VALUE",
       "value": "5e-324",
+      "type": "number",
       "why": "Smallest positive double (5e-324), not the most negative number; code that uses it as \"minus infinity\" is wrong.",
       "tags": [
         "limit",
@@ -1392,9 +1642,11 @@
       ]
     },
     {
+      "id": "numbers-13",
       "generator": "numbers",
       "label": "EPSILON",
       "value": "2.220446049250313e-16",
+      "type": "number",
       "why": "Gap between 1 and the next double; only meaningful as a tolerance near 1, not for large or tiny values.",
       "tags": [
         "limit",
@@ -1402,9 +1654,11 @@
       ]
     },
     {
+      "id": "numbers-14",
       "generator": "numbers",
       "label": "2^32",
       "value": "4294967296",
+      "type": "number",
       "why": "Breaks `x | 0` and `x >>> 0` truncation, array index limits and 32 bit counters.",
       "tags": [
         "integer",
@@ -1412,9 +1666,11 @@
       ]
     },
     {
+      "id": "numbers-15",
       "generator": "numbers",
       "label": "2^31",
       "value": "2147483648",
+      "type": "number",
       "why": "Overflows signed 32 bit math: `(2 ** 31) | 0` is -2147483648.",
       "tags": [
         "integer",
@@ -1422,9 +1678,11 @@
       ]
     },
     {
+      "id": "numbers-16",
       "generator": "numbers",
       "label": "-0.5",
       "value": "-0.5",
+      "type": "number",
       "why": "Between -1 and 0: Math.trunc gives -0, Math.round gives -0, and code that formats the integer part then the fraction drops the minus sign.",
       "tags": [
         "negative",
@@ -1434,9 +1692,11 @@
       "ref": "https://github.com/mozilla/pdf.js/pull/22017"
     },
     {
+      "id": "numbers-17",
       "generator": "numbers",
       "label": "-0.0001",
       "value": "-0.0001",
+      "type": "number",
       "why": "A small negative between -1 and 0: formatting with toFixed(2) gives \"-0.00\", and splitting into integer and fraction parts loses the sign.",
       "tags": [
         "negative",
@@ -1446,9 +1706,11 @@
       "ref": "https://github.com/mozilla/pdf.js/pull/22017"
     },
     {
+      "id": "numbers-18",
       "generator": "numbers",
       "label": "-1e-7",
       "value": "-1e-7",
+      "type": "number",
       "why": "Very small negative: String() gives \"-1e-7\", so string based number formatting and regexes for digits fail.",
       "tags": [
         "negative",
@@ -1457,9 +1719,11 @@
       ]
     },
     {
+      "id": "numbers-19",
       "generator": "numbers",
       "label": "1e-7",
       "value": "1e-7",
+      "type": "number",
       "why": "Smallest magnitude where String() switches to exponent notation (\"1e-7\"), while 0.000001 still prints in full.",
       "tags": [
         "exponent",
@@ -1467,9 +1731,11 @@
       ]
     },
     {
+      "id": "numbers-20",
       "generator": "numbers",
       "label": "0.1 + 0.2",
       "value": "0.30000000000000004",
+      "type": "number",
       "why": "0.30000000000000004, not 0.3: exact equality on money and percentages fails; compare with a tolerance or use integers.",
       "tags": [
         "float",
@@ -1477,9 +1743,11 @@
       ]
     },
     {
+      "id": "numbers-21",
       "generator": "numbers",
       "label": "1.005",
       "value": "1.005",
+      "type": "number",
       "why": "Stored as 1.00499999999999989..., so (1.005).toFixed(2) is \"1.00\" and Math.round(1.005 * 100) / 100 is 1.",
       "tags": [
         "float",
@@ -1487,9 +1755,11 @@
       ]
     },
     {
+      "id": "numbers-22",
       "generator": "numbers",
       "label": "0.5 (round half)",
       "value": "0.5",
+      "type": "number",
       "why": "Math.round(0.5) is 1 but Math.round(-0.5) is -0 and toFixed uses a different rule: half rounding is not symmetric.",
       "tags": [
         "float",
@@ -1497,9 +1767,11 @@
       ]
     },
     {
+      "id": "numbers-23",
       "generator": "numbers",
       "label": "1e21",
       "value": "1e+21",
+      "type": "number",
       "why": "First integer where String() uses exponent notation (\"1e+21\"); toFixed also falls back to exponent form, breaking digit only checks.",
       "tags": [
         "exponent",
@@ -1507,9 +1779,11 @@
       ]
     },
     {
+      "id": "numbers-24",
       "generator": "numbers",
       "label": "999999999999999900000",
       "value": "999999999999999900000",
+      "type": "number",
       "why": "Largest round number below 1e21 that still prints all its digits; one step up the format changes.",
       "tags": [
         "exponent",
@@ -1517,9 +1791,11 @@
       ]
     },
     {
+      "id": "numbers-25",
       "generator": "numbers",
       "label": "negative integer",
       "value": "-42",
+      "type": "number",
       "why": "Modulo keeps the sign (-42 % 5 is -2), so \"positive modulo\" wraparound for indexes and calendars is wrong.",
       "tags": [
         "negative",
@@ -1527,18 +1803,22 @@
       ]
     },
     {
+      "id": "numbers-26",
       "generator": "numbers",
       "label": "non-integer array index",
       "value": "1.5",
+      "type": "number",
       "why": "arr[1.5] is undefined and creates a string property on write; Number.isInteger guards are often missing.",
       "tags": [
         "fraction"
       ]
     },
     {
+      "id": "numericStrings-1",
       "generator": "numericStrings",
       "label": "empty string",
       "value": "\"\"",
+      "type": "string",
       "why": "Number(\"\") is 0, not NaN, so empty form fields become zero.",
       "tags": [
         "empty",
@@ -1546,9 +1826,11 @@
       ]
     },
     {
+      "id": "numericStrings-2",
       "generator": "numericStrings",
       "label": "whitespace only",
       "value": "\"  \\n\\t \"",
+      "type": "string",
       "why": "Number(\"  \") is 0 as well; parseFloat returns NaN, so the two parsers disagree.",
       "tags": [
         "whitespace",
@@ -1556,18 +1838,22 @@
       ]
     },
     {
+      "id": "numericStrings-3",
       "generator": "numericStrings",
       "label": "padded number",
       "value": "\"  42  \"",
+      "type": "string",
       "why": "Number trims whitespace and accepts it; strict validators and parseInt with a regex may not.",
       "tags": [
         "whitespace"
       ]
     },
     {
+      "id": "numericStrings-4",
       "generator": "numericStrings",
       "label": "negative zero string",
       "value": "\"-0\"",
+      "type": "string",
       "why": "Number(\"-0\") is -0, which then prints as \"0\"; round trips lose the sign.",
       "tags": [
         "sign",
@@ -1575,18 +1861,22 @@
       ]
     },
     {
+      "id": "numericStrings-5",
       "generator": "numericStrings",
       "label": "leading zeros",
       "value": "\"007\"",
+      "type": "string",
       "why": "Decimal 7 for Number and parseInt, but octal in some legacy parsers and a string ID that must keep its zeros.",
       "tags": [
         "leading-zero"
       ]
     },
     {
+      "id": "numericStrings-6",
       "generator": "numericStrings",
       "label": "hex string",
       "value": "\"0x1A\"",
+      "type": "string",
       "why": "Number(\"0x1A\") is 26 and parseInt(\"0x1A\") is 26, but parseFloat(\"0x1A\") is 0.",
       "tags": [
         "radix",
@@ -1594,9 +1884,11 @@
       ]
     },
     {
+      "id": "numericStrings-7",
       "generator": "numericStrings",
       "label": "binary and octal prefixes",
       "value": "\"0b101\"",
+      "type": "string",
       "why": "Number(\"0b101\") is 5 while parseInt(\"0b101\") is 0; prefixes are accepted by one parser only.",
       "tags": [
         "radix",
@@ -1604,9 +1896,11 @@
       ]
     },
     {
+      "id": "numericStrings-8",
       "generator": "numericStrings",
       "label": "exponent notation",
       "value": "\"1e3\"",
+      "type": "string",
       "why": "Number gives 1000 but parseInt gives 1, so \"digits only\" assumptions break.",
       "tags": [
         "exponent",
@@ -1614,45 +1908,55 @@
       ]
     },
     {
+      "id": "numericStrings-9",
       "generator": "numericStrings",
       "label": "trailing garbage",
       "value": "\"12px\"",
+      "type": "string",
       "why": "parseInt and parseFloat return 12, Number returns NaN; lenient parsing hides bad input.",
       "tags": [
         "coercion"
       ]
     },
     {
+      "id": "numericStrings-10",
       "generator": "numericStrings",
       "label": "comma decimal separator",
       "value": "\"1,5\"",
+      "type": "string",
       "why": "Decimal comma used in most of Europe and Brazil: parseFloat gives 1 and Number gives NaN.",
       "tags": [
         "locale"
       ]
     },
     {
+      "id": "numericStrings-11",
       "generator": "numericStrings",
       "label": "thousands separators",
       "value": "\"1,234,567.89\"",
+      "type": "string",
       "why": "Grouped digits from formatted output; parseFloat stops at the first comma and returns 1.",
       "tags": [
         "locale"
       ]
     },
     {
+      "id": "numericStrings-12",
       "generator": "numericStrings",
       "label": "numeric separator literal",
       "value": "\"1_000\"",
+      "type": "string",
       "why": "Valid in JavaScript source but Number(\"1_000\") is NaN.",
       "tags": [
         "coercion"
       ]
     },
     {
+      "id": "numericStrings-13",
       "generator": "numericStrings",
       "label": "Infinity string",
       "value": "\"Infinity\"",
+      "type": "string",
       "why": "Number(\"Infinity\") is Infinity, so numeric validation accepts a word; JSON cannot represent it.",
       "tags": [
         "infinity",
@@ -1660,9 +1964,11 @@
       ]
     },
     {
+      "id": "numericStrings-14",
       "generator": "numericStrings",
       "label": "NaN string",
       "value": "\"NaN\"",
+      "type": "string",
       "why": "Number(\"NaN\") is NaN, which passes typeof === \"number\" checks after conversion.",
       "tags": [
         "nan",
@@ -1670,9 +1976,11 @@
       ]
     },
     {
+      "id": "numericStrings-15",
       "generator": "numericStrings",
       "label": "unsafe integer string",
       "value": "\"9007199254740993\"",
+      "type": "string",
       "why": "Parses to 9007199254740992: IDs from JSON or databases silently change; parse as BigInt or keep as string.",
       "tags": [
         "precision",
@@ -1680,18 +1988,22 @@
       ]
     },
     {
+      "id": "numericStrings-16",
       "generator": "numericStrings",
       "label": "plus sign",
       "value": "\"+5\"",
+      "type": "string",
       "why": "Accepted by Number but rejected by many /^\\d+$/ validators, and vice versa for UI masks.",
       "tags": [
         "sign"
       ]
     },
     {
+      "id": "numericStrings-17",
       "generator": "numericStrings",
       "label": "Arabic-Indic digits",
       "value": "\"\\u0664\\u0662\"",
+      "type": "string",
       "why": "Real digits for many users, but Number returns NaN; normalize with Intl or a digit map first.",
       "tags": [
         "unicode",
@@ -1699,9 +2011,11 @@
       ]
     },
     {
+      "id": "bigints-1",
       "generator": "bigints",
       "label": "0n",
       "value": "0n",
+      "type": "bigint",
       "why": "Falsy like 0, and -0n is just 0n (BigInt has no negative zero), so sign preserving code paths diverge from Number.",
       "tags": [
         "zero",
@@ -1709,18 +2023,22 @@
       ]
     },
     {
+      "id": "bigints-2",
       "generator": "bigints",
       "label": "-1n",
       "value": "-1n",
+      "type": "bigint",
       "why": "BigInt division truncates toward zero (-1n / 2n is 0n) and % keeps the sign.",
       "tags": [
         "negative"
       ]
     },
     {
+      "id": "bigints-3",
       "generator": "bigints",
       "label": "2^53 + 1 (first integer Number cannot hold)",
       "value": "9007199254740993n",
+      "type": "bigint",
       "why": "Number(2n ** 53n + 1n) rounds to 2^53; converting back to Number for math or JSON loses it.",
       "tags": [
         "precision",
@@ -1728,9 +2046,11 @@
       ]
     },
     {
+      "id": "bigints-4",
       "generator": "bigints",
       "label": "int64 max",
       "value": "9223372036854775807n",
+      "type": "bigint",
       "why": "Largest signed 64 bit integer (PostgreSQL bigint, Java long); one more overflows the column.",
       "tags": [
         "int64",
@@ -1738,9 +2058,11 @@
       ]
     },
     {
+      "id": "bigints-5",
       "generator": "bigints",
       "label": "int64 min",
       "value": "-9223372036854775808n",
+      "type": "bigint",
       "why": "Smallest signed 64 bit integer; its absolute value does not fit in int64.",
       "tags": [
         "int64",
@@ -1749,9 +2071,11 @@
       ]
     },
     {
+      "id": "bigints-6",
       "generator": "bigints",
       "label": "uint64 max",
       "value": "18446744073709551615n",
+      "type": "bigint",
       "why": "Largest unsigned 64 bit integer; BigInt.asIntN(64, n) turns it into -1n.",
       "tags": [
         "uint64",
@@ -1759,9 +2083,11 @@
       ]
     },
     {
+      "id": "bigints-7",
       "generator": "bigints",
       "label": "2^64 (overflows uint64)",
       "value": "18446744073709551616n",
+      "type": "bigint",
       "why": "Wraps to 0n with BigInt.asUintN(64, n); database drivers reject it.",
       "tags": [
         "uint64",
@@ -1769,9 +2095,11 @@
       ]
     },
     {
+      "id": "bigints-8",
       "generator": "bigints",
       "label": "1e30 as BigInt",
       "value": "1000000000000000000000000000000n",
+      "type": "bigint",
       "why": "Far beyond any Number integer: JSON.stringify throws TypeError for any BigInt, and mixing with Number in + throws.",
       "tags": [
         "large",
@@ -1779,9 +2107,11 @@
       ]
     },
     {
+      "id": "urls-1",
       "generator": "urls",
       "label": "localhost with port",
       "value": "\"http://localhost:3000/\"",
+      "type": "string",
       "why": "No dot in the host: \"must contain a TLD\" validators reject development URLs.",
       "tags": [
         "valid",
@@ -1789,9 +2119,11 @@
       ]
     },
     {
+      "id": "urls-2",
       "generator": "urls",
       "label": "credentials in URL",
       "value": "\"https://user:p%40ss@example.com/\"",
+      "type": "string",
       "why": "Userinfo with an encoded @; naive parsers split on the first @ and leak or mangle the password.",
       "tags": [
         "valid",
@@ -1800,9 +2132,11 @@
       ]
     },
     {
+      "id": "urls-3",
       "generator": "urls",
       "label": "IPv6 host with port",
       "value": "\"http://[::1]:8080/\"",
+      "type": "string",
       "why": "hostname is \"[::1]\" with brackets; splitting host and port on \":\" breaks.",
       "tags": [
         "valid",
@@ -1811,9 +2145,11 @@
       ]
     },
     {
+      "id": "urls-4",
       "generator": "urls",
       "label": "shorthand IPv4 (127.1)",
       "value": "\"http://127.1/\"",
+      "type": "string",
       "why": "The parser normalizes it to 127.0.0.1, so SSRF block lists that compare strings miss it.",
       "tags": [
         "valid",
@@ -1822,9 +2158,11 @@
       ]
     },
     {
+      "id": "urls-5",
       "generator": "urls",
       "label": "hex IPv4 (0x7f.0.0.1)",
       "value": "\"http://0x7f.0.0.1/\"",
+      "type": "string",
       "why": "Also loopback after normalization; another SSRF filter bypass.",
       "tags": [
         "valid",
@@ -1833,9 +2171,11 @@
       ]
     },
     {
+      "id": "urls-6",
       "generator": "urls",
       "label": "internationalized domain",
       "value": "\"https://\\u4F8B\\u3048.jp/\"",
+      "type": "string",
       "why": "hostname becomes punycode (\"xn--r8jz45g.jp\"), so comparing the input string with url.hostname fails.",
       "tags": [
         "valid",
@@ -1845,9 +2185,11 @@
       ]
     },
     {
+      "id": "urls-7",
       "generator": "urls",
       "label": "trailing dot in host",
       "value": "\"https://example.com./\"",
+      "type": "string",
       "why": "A fully qualified name that is a different origin from example.com for cookies, CORS and allow lists.",
       "tags": [
         "valid",
@@ -1855,9 +2197,11 @@
       ]
     },
     {
+      "id": "urls-8",
       "generator": "urls",
       "label": "uppercase scheme and host",
       "value": "\"HTTPS://EXAMPLE.COM/Path\"",
+      "type": "string",
       "why": "Scheme and host are lowercased but the path keeps its case; string compares of URLs disagree with the parser.",
       "tags": [
         "valid",
@@ -1865,9 +2209,11 @@
       ]
     },
     {
+      "id": "urls-9",
       "generator": "urls",
       "label": "explicit default port",
       "value": "\"https://example.com:443/\"",
+      "type": "string",
       "why": "url.port is \"\" because the default port is dropped; code expecting \"443\" breaks.",
       "tags": [
         "valid",
@@ -1875,9 +2221,11 @@
       ]
     },
     {
+      "id": "urls-10",
       "generator": "urls",
       "label": "port out of range",
       "value": "\"http://example.com:65536/\"",
+      "type": "string",
       "why": "Ports above 65535 make the URL invalid; regex validators accept any digits.",
       "tags": [
         "invalid",
@@ -1885,9 +2233,11 @@
       ]
     },
     {
+      "id": "urls-11",
       "generator": "urls",
       "label": "encoded slash in path",
       "value": "\"https://example.com/a%2Fb\"",
+      "type": "string",
       "why": "Servers and routers disagree on whether %2F is a path separator; decode once at the right layer.",
       "tags": [
         "valid",
@@ -1896,9 +2246,11 @@
       ]
     },
     {
+      "id": "urls-12",
       "generator": "urls",
       "label": "plus and space in query",
       "value": "\"https://example.com/?q=a+b&q=%20c\"",
+      "type": "string",
       "why": "URLSearchParams decodes \"+\" as a space but decodeURIComponent does not; the key also repeats.",
       "tags": [
         "valid",
@@ -1907,9 +2259,11 @@
       ]
     },
     {
+      "id": "urls-13",
       "generator": "urls",
       "label": "double encoded space",
       "value": "\"https://example.com/file%2520name\"",
+      "type": "string",
       "why": "Decoding twice turns %2520 into a space; decoding once gives \"%20\" literally.",
       "tags": [
         "valid",
@@ -1917,9 +2271,11 @@
       ]
     },
     {
+      "id": "urls-14",
       "generator": "urls",
       "label": "empty fragment",
       "value": "\"https://example.com/#\"",
+      "type": "string",
       "why": "url.hash is \"\" even though href ends with \"#\", so hash based checks see no fragment.",
       "tags": [
         "valid",
@@ -1927,9 +2283,11 @@
       ]
     },
     {
+      "id": "urls-15",
       "generator": "urls",
       "label": "dot segments in path",
       "value": "\"http://example.com/public/../secret\"",
+      "type": "string",
       "why": "Normalized to /secret by the parser; checks done on the raw string allow traversal.",
       "tags": [
         "valid",
@@ -1938,9 +2296,11 @@
       ]
     },
     {
+      "id": "urls-16",
       "generator": "urls",
       "label": "non ASCII path and query",
       "value": "\"https://example.com/\\u{1F600}?q=caf\\u00E9\"",
+      "type": "string",
       "why": "The parser percent encodes both as UTF-8, so href no longer equals the input.",
       "tags": [
         "valid",
@@ -1949,9 +2309,11 @@
       ]
     },
     {
+      "id": "urls-17",
       "generator": "urls",
       "label": "very long URL (8000 char path)",
       "value": "\"https://example.com/aaaaaaaaaaaaaaaaaaaa...\" (8020 chars)",
+      "type": "string",
       "why": "Exceeds common 2048 character limits and 8 KB request line limits in proxies and servers.",
       "tags": [
         "valid",
@@ -1959,9 +2321,11 @@
       ]
     },
     {
+      "id": "urls-18",
       "generator": "urls",
       "label": "javascript: scheme",
       "value": "\"javascript:alert(1)\"",
+      "type": "string",
       "why": "A valid URL that runs code when used as an href; allow list schemes instead of block listing.",
       "tags": [
         "valid",
@@ -1970,9 +2334,11 @@
       ]
     },
     {
+      "id": "urls-19",
       "generator": "urls",
       "label": "javascript: with a newline inside",
       "value": "\"java\\nscript:alert(1)\"",
+      "type": "string",
       "why": "The parser removes tabs and newlines, so this is javascript:alert(1); block lists that match the raw string miss it.",
       "tags": [
         "valid",
@@ -1981,9 +2347,11 @@
       ]
     },
     {
+      "id": "urls-20",
       "generator": "urls",
       "label": "data: URL with HTML",
       "value": "\"data:text/html,<script>alert(1)</script>\"",
+      "type": "string",
       "why": "Valid and executable in some contexts; never forward user supplied data URLs to href or src.",
       "tags": [
         "valid",
@@ -1992,9 +2360,11 @@
       ]
     },
     {
+      "id": "urls-21",
       "generator": "urls",
       "label": "file URL with Windows drive",
       "value": "\"file:///C:/Windows/win.ini\"",
+      "type": "string",
       "why": "host is empty and pathname is \"/C:/Windows/win.ini\" with a leading slash before the drive letter.",
       "tags": [
         "valid",
@@ -2003,9 +2373,11 @@
       ]
     },
     {
+      "id": "urls-22",
       "generator": "urls",
       "label": "mailto URL",
       "value": "\"mailto:user@example.com\"",
+      "type": "string",
       "why": "No host at all: url.host is \"\" and url.origin is \"null\".",
       "tags": [
         "valid",
@@ -2013,9 +2385,11 @@
       ]
     },
     {
+      "id": "urls-23",
       "generator": "urls",
       "label": "surrounding spaces",
       "value": "\"  https://example.com/  \"",
+      "type": "string",
       "why": "The parser strips leading and trailing spaces, so it is valid, but the stored string is not.",
       "tags": [
         "valid",
@@ -2023,9 +2397,11 @@
       ]
     },
     {
+      "id": "urls-24",
       "generator": "urls",
       "label": "protocol relative",
       "value": "\"//example.com/path\"",
+      "type": "string",
       "why": "Invalid without a base, but resolves to another host with one: \"starts with /\" open redirect checks pass it.",
       "tags": [
         "invalid",
@@ -2034,9 +2410,11 @@
       ]
     },
     {
+      "id": "urls-25",
       "generator": "urls",
       "label": "backslash relative",
       "value": "\"/\\\\example.com\"",
+      "type": "string",
       "why": "Browsers treat \"\\\" as \"/\" in http URLs, so this resolves to //example.com: a classic open redirect.",
       "tags": [
         "invalid",
@@ -2045,9 +2423,11 @@
       ]
     },
     {
+      "id": "urls-26",
       "generator": "urls",
       "label": "bare domain without scheme",
       "value": "\"example.com\"",
+      "type": "string",
       "why": "What users type, but not a URL: new URL throws and links become relative paths.",
       "tags": [
         "invalid",
@@ -2055,9 +2435,11 @@
       ]
     },
     {
+      "id": "urls-27",
       "generator": "urls",
       "label": "space in host",
       "value": "\"http://exa mple.com/\"",
+      "type": "string",
       "why": "Forbidden host code point; new URL throws.",
       "tags": [
         "invalid",
@@ -2065,9 +2447,11 @@
       ]
     },
     {
+      "id": "urls-28",
       "generator": "urls",
       "label": "empty string",
       "value": "\"\"",
+      "type": "string",
       "why": "new URL(\"\") throws; optional URL fields must be checked before parsing.",
       "tags": [
         "invalid",
@@ -2075,9 +2459,11 @@
       ]
     },
     {
+      "id": "emails-1",
       "generator": "emails",
       "label": "plus addressing",
       "value": "\"user+tag@example.com\"",
+      "type": "string",
       "why": "Gmail and others deliver it to \"user\"; validators that reject \"+\" lose real users.",
       "tags": [
         "valid",
@@ -2085,9 +2471,11 @@
       ]
     },
     {
+      "id": "emails-2",
       "generator": "emails",
       "label": "dots in local part",
       "value": "\"first.last@example.com\"",
+      "type": "string",
       "why": "Valid and common; some providers ignore the dots, so deduplication by string misses duplicates.",
       "tags": [
         "valid",
@@ -2095,9 +2483,11 @@
       ]
     },
     {
+      "id": "emails-3",
       "generator": "emails",
       "label": "apostrophe in local part",
       "value": "\"o'brien@example.com\"",
+      "type": "string",
       "why": "Valid; breaks SQL built by concatenation and regexes limited to [a-z0-9._].",
       "tags": [
         "valid",
@@ -2105,9 +2495,11 @@
       ]
     },
     {
+      "id": "emails-4",
       "generator": "emails",
       "label": "quoted local part with space",
       "value": "\"\\\"john doe\\\"@example.com\"",
+      "type": "string",
       "why": "A quoted string may contain spaces; nearly every regex rejects it and naive splitting on spaces breaks.",
       "tags": [
         "valid",
@@ -2115,9 +2507,11 @@
       ]
     },
     {
+      "id": "emails-5",
       "generator": "emails",
       "label": "quoted local part with @",
       "value": "\"\\\"a@b\\\"@example.com\"",
+      "type": "string",
       "why": "Splitting on the first \"@\" yields the wrong domain; use the last \"@\".",
       "tags": [
         "valid",
@@ -2125,9 +2519,11 @@
       ]
     },
     {
+      "id": "emails-6",
       "generator": "emails",
       "label": "IP address literal domain",
       "value": "\"user@[192.168.0.1]\"",
+      "type": "string",
       "why": "Domain literal in brackets; DNS based checks and domain allow lists do not expect it.",
       "tags": [
         "valid",
@@ -2135,9 +2531,11 @@
       ]
     },
     {
+      "id": "emails-7",
       "generator": "emails",
       "label": "dotless domain",
       "value": "\"user@localhost\"",
+      "type": "string",
       "why": "Valid syntax used on intranets and in tests, rejected by \"needs a TLD\" rules.",
       "tags": [
         "valid",
@@ -2145,9 +2543,11 @@
       ]
     },
     {
+      "id": "emails-8",
       "generator": "emails",
       "label": "uppercase address",
       "value": "\"USER@EXAMPLE.COM\"",
+      "type": "string",
       "why": "Domains are case insensitive, local parts technically are not; lowercasing everything can merge different mailboxes, not lowercasing creates duplicates.",
       "tags": [
         "valid",
@@ -2155,9 +2555,11 @@
       ]
     },
     {
+      "id": "emails-9",
       "generator": "emails",
       "label": "subdomains and long TLD",
       "value": "\"user@mail.sub.example.co.uk\"",
+      "type": "string",
       "why": "Multi label domains and two part public suffixes; \"last two labels\" logic picks co.uk.",
       "tags": [
         "valid",
@@ -2165,9 +2567,11 @@
       ]
     },
     {
+      "id": "emails-10",
       "generator": "emails",
       "label": "new generic TLD",
       "value": "\"user@example.photography\"",
+      "type": "string",
       "why": "TLDs longer than 4 letters exist; {2,4} quantifiers reject them.",
       "tags": [
         "valid",
@@ -2175,9 +2579,11 @@
       ]
     },
     {
+      "id": "emails-11",
       "generator": "emails",
       "label": "shortest realistic address",
       "value": "\"a@b.co\"",
+      "type": "string",
       "why": "Single character local part and short domain; minimum length rules are often too strict.",
       "tags": [
         "valid",
@@ -2185,9 +2591,11 @@
       ]
     },
     {
+      "id": "emails-12",
       "generator": "emails",
       "label": "64 character local part (maximum)",
       "value": "\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com\"",
+      "type": "string",
       "why": "The longest local part RFC 5321 allows; storage columns sized at 50 truncate it.",
       "tags": [
         "valid",
@@ -2196,9 +2604,11 @@
       ]
     },
     {
+      "id": "emails-13",
       "generator": "emails",
       "label": "internationalized local part",
       "value": "\"jos\\u00E9@example.com\"",
+      "type": "string",
       "why": "Valid with SMTPUTF8 (RFC 6531) but rejected by ASCII only servers; decide explicitly what you accept.",
       "tags": [
         "valid",
@@ -2207,9 +2617,11 @@
       ]
     },
     {
+      "id": "emails-14",
       "generator": "emails",
       "label": "internationalized domain",
       "value": "\"user@\\u4F8B\\u3048.jp\"",
+      "type": "string",
       "why": "The domain must be converted to punycode for DNS and SMTP; comparing raw strings fails.",
       "tags": [
         "valid",
@@ -2219,9 +2631,11 @@
       ]
     },
     {
+      "id": "emails-15",
       "generator": "emails",
       "label": "65 character local part (too long)",
       "value": "\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com\"",
+      "type": "string",
       "why": "One over the RFC 5321 limit; lenient validators accept it and the SMTP server rejects it later.",
       "tags": [
         "invalid",
@@ -2230,18 +2644,22 @@
       ]
     },
     {
+      "id": "emails-16",
       "generator": "emails",
       "label": "missing @",
       "value": "\"plainaddress\"",
+      "type": "string",
       "why": "No separator at all; code that splits on \"@\" gets one part and reads undefined.",
       "tags": [
         "invalid"
       ]
     },
     {
+      "id": "emails-17",
       "generator": "emails",
       "label": "missing local part",
       "value": "\"@example.com\"",
+      "type": "string",
       "why": "Empty local part; split(\"@\")[0] is \"\".",
       "tags": [
         "invalid",
@@ -2249,9 +2667,11 @@
       ]
     },
     {
+      "id": "emails-18",
       "generator": "emails",
       "label": "missing domain",
       "value": "\"user@\"",
+      "type": "string",
       "why": "Empty domain; split(\"@\")[1] is \"\".",
       "tags": [
         "invalid",
@@ -2259,18 +2679,22 @@
       ]
     },
     {
+      "id": "emails-19",
       "generator": "emails",
       "label": "two @ signs",
       "value": "\"user@@example.com\"",
+      "type": "string",
       "why": "Unquoted second \"@\" is invalid; splitting gives three parts.",
       "tags": [
         "invalid"
       ]
     },
     {
+      "id": "emails-20",
       "generator": "emails",
       "label": "leading dot",
       "value": "\".user@example.com\"",
+      "type": "string",
       "why": "A dot may not start the local part.",
       "tags": [
         "invalid",
@@ -2278,9 +2702,11 @@
       ]
     },
     {
+      "id": "emails-21",
       "generator": "emails",
       "label": "trailing dot in local part",
       "value": "\"user.@example.com\"",
+      "type": "string",
       "why": "A dot may not end the local part (some providers accept it anyway).",
       "tags": [
         "invalid",
@@ -2288,9 +2714,11 @@
       ]
     },
     {
+      "id": "emails-22",
       "generator": "emails",
       "label": "consecutive dots",
       "value": "\"us..er@example.com\"",
+      "type": "string",
       "why": "Consecutive dots are not allowed unquoted.",
       "tags": [
         "invalid",
@@ -2298,9 +2726,11 @@
       ]
     },
     {
+      "id": "emails-23",
       "generator": "emails",
       "label": "consecutive dots in domain",
       "value": "\"user@example..com\"",
+      "type": "string",
       "why": "Empty domain label; DNS lookups fail.",
       "tags": [
         "invalid",
@@ -2308,9 +2738,11 @@
       ]
     },
     {
+      "id": "emails-24",
       "generator": "emails",
       "label": "domain label starting with hyphen",
       "value": "\"user@-example.com\"",
+      "type": "string",
       "why": "Host labels may not start with a hyphen.",
       "tags": [
         "invalid",
@@ -2318,9 +2750,11 @@
       ]
     },
     {
+      "id": "emails-25",
       "generator": "emails",
       "label": "unquoted space",
       "value": "\"john doe@example.com\"",
+      "type": "string",
       "why": "Spaces need quoting; forms that do not trim also produce trailing spaces.",
       "tags": [
         "invalid",
@@ -2328,9 +2762,11 @@
       ]
     },
     {
+      "id": "emails-26",
       "generator": "emails",
       "label": "display name format",
       "value": "\"John Doe <john@example.com>\"",
+      "type": "string",
       "why": "A valid mailbox header, not a bare address; pasted from mail clients into address fields.",
       "tags": [
         "invalid",
@@ -2338,9 +2774,11 @@
       ]
     },
     {
+      "id": "paths-1",
       "generator": "paths",
       "label": "Windows absolute path",
       "value": "\"C:\\\\Users\\\\Ana\\\\file.txt\"",
+      "type": "string",
       "why": "Backslash separators: splitting on \"/\" returns one segment, and on POSIX this is a relative file name containing backslashes.",
       "tags": [
         "windows",
@@ -2348,9 +2786,11 @@
       ]
     },
     {
+      "id": "paths-2",
       "generator": "paths",
       "label": "Windows path with forward slashes",
       "value": "\"C:/Users/Ana/file.txt\"",
+      "type": "string",
       "why": "Windows accepts it, path.win32 understands it, path.posix treats it as relative.",
       "tags": [
         "windows",
@@ -2359,9 +2799,11 @@
       ]
     },
     {
+      "id": "paths-3",
       "generator": "paths",
       "label": "drive relative path",
       "value": "\"C:file.txt\"",
+      "type": "string",
       "why": "Relative to the current directory of drive C, not the root; path.win32.isAbsolute returns false.",
       "tags": [
         "windows",
@@ -2369,9 +2811,11 @@
       ]
     },
     {
+      "id": "paths-4",
       "generator": "paths",
       "label": "root relative on Windows",
       "value": "\"\\\\temp\\\\file.txt\"",
+      "type": "string",
       "why": "Absolute on the current drive only; the result depends on process.cwd() drive.",
       "tags": [
         "windows",
@@ -2379,9 +2823,11 @@
       ]
     },
     {
+      "id": "paths-5",
       "generator": "paths",
       "label": "UNC share path",
       "value": "\"\\\\\\\\server\\\\share\\\\folder\\\\file.txt\"",
+      "type": "string",
       "why": "Starts with two backslashes; the \"root\" is \\\\server\\share\\, so dirname and parent walking stop there.",
       "tags": [
         "windows",
@@ -2390,9 +2836,11 @@
       ]
     },
     {
+      "id": "paths-6",
       "generator": "paths",
       "label": "long path prefix",
       "value": "\"\\\\\\\\?\\\\C:\\\\very\\\\long\\\\path\"",
+      "type": "string",
       "why": "Disables normalization: \"/\" is not a separator and \"..\" is literal; needed beyond 260 characters.",
       "tags": [
         "windows",
@@ -2401,9 +2849,11 @@
       ]
     },
     {
+      "id": "paths-7",
       "generator": "paths",
       "label": "path longer than 260 characters",
       "value": "\"C:\\\\segment\\\\segment\\\\segment\\\\segment\\\\segme...\" (291 chars)",
+      "type": "string",
       "why": "Exceeds the classic MAX_PATH limit; many Windows tools fail without long path support.",
       "tags": [
         "windows",
@@ -2412,9 +2862,11 @@
       ]
     },
     {
+      "id": "paths-8",
       "generator": "paths",
       "label": "reserved device name",
       "value": "\"CON\"",
+      "type": "string",
       "why": "CON, PRN, AUX, NUL, COM1 and LPT1 cannot be file names on Windows, with any extension.",
       "tags": [
         "windows",
@@ -2422,9 +2874,11 @@
       ]
     },
     {
+      "id": "paths-9",
       "generator": "paths",
       "label": "reserved name with extension",
       "value": "\"aux.txt\"",
+      "type": "string",
       "why": "Still the AUX device on Windows; repositories with this file cannot be checked out there.",
       "tags": [
         "windows",
@@ -2432,9 +2886,11 @@
       ]
     },
     {
+      "id": "paths-10",
       "generator": "paths",
       "label": "trailing dot",
       "value": "\"file.\"",
+      "type": "string",
       "why": "Windows strips trailing dots, so \"file.\" and \"file\" are the same file there but different on POSIX.",
       "tags": [
         "windows",
@@ -2442,9 +2898,11 @@
       ]
     },
     {
+      "id": "paths-11",
       "generator": "paths",
       "label": "trailing space",
       "value": "\"file \"",
+      "type": "string",
       "why": "Windows strips trailing spaces as well; invisible in most UIs.",
       "tags": [
         "windows",
@@ -2453,9 +2911,11 @@
       ]
     },
     {
+      "id": "paths-12",
       "generator": "paths",
       "label": "case only difference",
       "value": "\"README.md\"",
+      "type": "string",
       "why": "Case insensitive on default Windows and macOS file systems, so readme.md and README.md collide.",
       "tags": [
         "windows",
@@ -2464,9 +2924,11 @@
       ]
     },
     {
+      "id": "paths-13",
       "generator": "paths",
       "label": "POSIX absolute path",
       "value": "\"/usr/local/bin\"",
+      "type": "string",
       "why": "Absolute on POSIX; on Windows path.win32 treats it as root relative on the current drive.",
       "tags": [
         "posix",
@@ -2474,9 +2936,11 @@
       ]
     },
     {
+      "id": "paths-14",
       "generator": "paths",
       "label": "trailing slash",
       "value": "\"dir/sub/\"",
+      "type": "string",
       "why": "basename(\"dir/sub/\") is \"sub\", but split(\"/\").pop() is \"\"; joining adds a double slash.",
       "tags": [
         "posix",
@@ -2484,9 +2948,11 @@
       ]
     },
     {
+      "id": "paths-15",
       "generator": "paths",
       "label": "repeated slashes",
       "value": "\"/a//b///c\"",
+      "type": "string",
       "why": "Equivalent to /a/b/c after normalization; string comparisons and cache keys disagree.",
       "tags": [
         "posix",
@@ -2494,9 +2960,11 @@
       ]
     },
     {
+      "id": "paths-16",
       "generator": "paths",
       "label": "root only",
       "value": "\"/\"",
+      "type": "string",
       "why": "dirname(\"/\") is \"/\" and basename is \"\"; loops that walk up until dirname changes must stop here.",
       "tags": [
         "posix",
@@ -2505,9 +2973,11 @@
       ]
     },
     {
+      "id": "paths-17",
       "generator": "paths",
       "label": "empty path",
       "value": "\"\"",
+      "type": "string",
       "why": "path.join(\"\", \"\") is \".\" and path.resolve(\"\") is the cwd; empty is not \"no path\".",
       "tags": [
         "posix",
@@ -2516,9 +2986,11 @@
       ]
     },
     {
+      "id": "paths-18",
       "generator": "paths",
       "label": "current directory",
       "value": "\".\"",
+      "type": "string",
       "why": "A path that refers to the cwd; extname(\".\") is \"\" and basename is \".\".",
       "tags": [
         "posix",
@@ -2527,9 +2999,11 @@
       ]
     },
     {
+      "id": "paths-19",
       "generator": "paths",
       "label": "parent directory traversal",
       "value": "\"../../etc/passwd\"",
+      "type": "string",
       "why": "Escapes the base directory after join; validate with path.relative after resolving.",
       "tags": [
         "posix",
@@ -2538,9 +3012,11 @@
       ]
     },
     {
+      "id": "paths-20",
       "generator": "paths",
       "label": "traversal hidden inside a path",
       "value": "\"uploads/./a/../../../secret\"",
+      "type": "string",
       "why": "Looks rooted in uploads/ but normalizes outside it.",
       "tags": [
         "posix",
@@ -2549,9 +3025,11 @@
       ]
     },
     {
+      "id": "paths-21",
       "generator": "paths",
       "label": "Windows traversal with backslashes",
       "value": "\"..\\\\..\\\\Windows\\\\win.ini\"",
+      "type": "string",
       "why": "Checks that only look for \"../\" miss backslash traversal on Windows.",
       "tags": [
         "windows",
@@ -2560,9 +3038,11 @@
       ]
     },
     {
+      "id": "paths-22",
       "generator": "paths",
       "label": "dotfile",
       "value": "\".env\"",
+      "type": "string",
       "why": "extname(\".env\") is \"\", not \".env\"; hidden on POSIX and easy to leak in static servers.",
       "tags": [
         "posix",
@@ -2571,9 +3051,11 @@
       ]
     },
     {
+      "id": "paths-23",
       "generator": "paths",
       "label": "double extension",
       "value": "\"archive.tar.gz\"",
+      "type": "string",
       "why": "extname gives \".gz\"; type detection and \"strip the extension\" give \"archive.tar\".",
       "tags": [
         "posix",
@@ -2582,9 +3064,11 @@
       ]
     },
     {
+      "id": "paths-24",
       "generator": "paths",
       "label": "spaces in names",
       "value": "\"My Documents/file name.txt\"",
+      "type": "string",
       "why": "Breaks unquoted shell commands and URL building without encoding.",
       "tags": [
         "posix",
@@ -2593,9 +3077,11 @@
       ]
     },
     {
+      "id": "paths-25",
       "generator": "paths",
       "label": "backslash in a POSIX file name",
       "value": "\"a\\\\b.txt\"",
+      "type": "string",
       "why": "A legal single file name on Linux that becomes two segments on Windows.",
       "tags": [
         "posix",
@@ -2603,9 +3089,11 @@
       ]
     },
     {
+      "id": "paths-26",
       "generator": "paths",
       "label": "NFC unicode name",
       "value": "\"caf\\u00E9.txt\"",
+      "type": "string",
       "why": "Precomposed form, as typed on Windows and Linux.",
       "tags": [
         "posix",
@@ -2615,9 +3103,11 @@
       ]
     },
     {
+      "id": "paths-27",
       "generator": "paths",
       "label": "NFD unicode name",
       "value": "\"cafe\\u0301.txt\"",
+      "type": "string",
       "why": "Decomposed form produced by older macOS file systems; looks the same as the NFC name but does not match it.",
       "tags": [
         "posix",
@@ -2626,9 +3116,11 @@
       ]
     },
     {
+      "id": "paths-28",
       "generator": "paths",
       "label": "emoji in file name",
       "value": "\"notes \\u{1F4DD}.md\"",
+      "type": "string",
       "why": "Surrogate pairs in a path: byte limits, truncation and some archive tools mishandle them.",
       "tags": [
         "posix",
@@ -2638,9 +3130,11 @@
       ]
     },
     {
+      "id": "paths-29",
       "generator": "paths",
       "label": "leading dash",
       "value": "\"-rf\"",
+      "type": "string",
       "why": "Interpreted as an option by command line tools unless passed after \"--\".",
       "tags": [
         "posix",
@@ -2648,9 +3142,11 @@
       ]
     },
     {
+      "id": "paths-30",
       "generator": "paths",
       "label": "newline in file name",
       "value": "\"a\\nb.txt\"",
+      "type": "string",
       "why": "Legal on Linux; breaks line based tools such as `find | xargs` and log parsing.",
       "tags": [
         "posix",
@@ -2658,9 +3154,11 @@
       ]
     },
     {
+      "id": "json-1",
       "generator": "json",
       "label": "deeply nested arrays (10000 levels)",
       "value": "\"[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[...\" (20000 chars)",
+      "type": "string",
       "why": "Valid JSON that overflows the stack of recursive walkers, deep equality checks and schema validators.",
       "tags": [
         "valid",
@@ -2668,9 +3166,11 @@
       ]
     },
     {
+      "id": "json-2",
       "generator": "json",
       "label": "deeply nested objects (10000 levels)",
       "value": "\"{\\\"a\\\":{\\\"a\\\":{\\\"a\\\":{\\\"a\\\":{\\\"a\\\":{\\\"a\\\":{\\\"a\\\":{\\\"a\\\":...\" (60001 chars)",
+      "type": "string",
       "why": "Same as nested arrays for code that recurses into object values, such as deep merge and clone helpers.",
       "tags": [
         "valid",
@@ -2678,9 +3178,11 @@
       ]
     },
     {
+      "id": "json-3",
       "generator": "json",
       "label": "duplicate keys",
       "value": "\"{\\\"a\\\":1,\\\"a\\\":2}\"",
+      "type": "string",
       "why": "Allowed by JSON.parse, which keeps the last value; other parsers keep the first or reject it, so validators and consumers disagree.",
       "tags": [
         "valid",
@@ -2689,9 +3191,11 @@
       ]
     },
     {
+      "id": "json-4",
       "generator": "json",
       "label": "integer above 2^53",
       "value": "\"{\\\"id\\\":9007199254740993}\"",
+      "type": "string",
       "why": "Parses to 9007199254740992: IDs silently change. Send large IDs as strings.",
       "tags": [
         "valid",
@@ -2700,9 +3204,11 @@
       ]
     },
     {
+      "id": "json-5",
       "generator": "json",
       "label": "huge exponent",
       "value": "\"1e400\"",
+      "type": "string",
       "why": "Valid JSON that parses to Infinity, which JSON.stringify then writes as null.",
       "tags": [
         "valid",
@@ -2711,9 +3217,11 @@
       ]
     },
     {
+      "id": "json-6",
       "generator": "json",
       "label": "negative zero",
       "value": "\"-0\"",
+      "type": "string",
       "why": "Parses to -0, but JSON.stringify(-0) is \"0\", so round trips lose the sign.",
       "tags": [
         "valid",
@@ -2721,9 +3229,11 @@
       ]
     },
     {
+      "id": "json-7",
       "generator": "json",
       "label": "number with trailing zeros",
       "value": "\"1.0\"",
+      "type": "string",
       "why": "Parses to 1 and stringifies as \"1\": signatures and hashes over JSON text change after a round trip.",
       "tags": [
         "valid",
@@ -2731,9 +3241,11 @@
       ]
     },
     {
+      "id": "json-8",
       "generator": "json",
       "label": "__proto__ key",
       "value": "\"{\\\"__proto__\\\":{\\\"isAdmin\\\":true}}\"",
+      "type": "string",
       "why": "JSON.parse creates an own property, but merging the result into another object with assignment pollutes its prototype.",
       "tags": [
         "valid",
@@ -2742,9 +3254,11 @@
       ]
     },
     {
+      "id": "json-9",
       "generator": "json",
       "label": "empty key",
       "value": "\"{\\\"\\\":1}\"",
+      "type": "string",
       "why": "Valid; path based libraries (a.b.c syntax) cannot address it.",
       "tags": [
         "valid",
@@ -2752,9 +3266,11 @@
       ]
     },
     {
+      "id": "json-10",
       "generator": "json",
       "label": "escaped lone surrogate",
       "value": "\"\\\"\\\\ud800\\\"\"",
+      "type": "string",
       "why": "Valid JSON that decodes to malformed UTF-16; re-encoding to UTF-8 or a database fails.",
       "tags": [
         "valid",
@@ -2763,9 +3279,11 @@
       ]
     },
     {
+      "id": "json-11",
       "generator": "json",
       "label": "line and paragraph separators",
       "value": "\"\\\"a\\u2028b\\u2029c\\\"\"",
+      "type": "string",
       "why": "Valid JSON that was invalid in JavaScript string literals before ES2019, which broke JSONP and inline script tags.",
       "tags": [
         "valid",
@@ -2773,9 +3291,11 @@
       ]
     },
     {
+      "id": "json-12",
       "generator": "json",
       "label": "top level string",
       "value": "\"\\\"just a string\\\"\"",
+      "type": "string",
       "why": "Valid JSON since RFC 7159; code that assumes an object reads properties of a string.",
       "tags": [
         "valid",
@@ -2783,9 +3303,11 @@
       ]
     },
     {
+      "id": "json-13",
       "generator": "json",
       "label": "top level null",
       "value": "\"null\"",
+      "type": "string",
       "why": "Valid JSON that parses to null; `const { a } = JSON.parse(text)` throws.",
       "tags": [
         "valid",
@@ -2793,9 +3315,11 @@
       ]
     },
     {
+      "id": "json-14",
       "generator": "json",
       "label": "whitespace around value",
       "value": "\" \\n\\t {\\\"a\\\":1} \\r\\n\"",
+      "type": "string",
       "why": "Valid; byte or regex based detectors that check the first character for \"{\" fail.",
       "tags": [
         "valid",
@@ -2803,9 +3327,11 @@
       ]
     },
     {
+      "id": "json-15",
       "generator": "json",
       "label": "byte order mark prefix",
       "value": "\"\\uFEFF{\\\"a\\\":1}\"",
+      "type": "string",
       "why": "Windows tools write a BOM; JSON.parse throws on it, so strip it when reading files.",
       "tags": [
         "invalid",
@@ -2813,9 +3339,11 @@
       ]
     },
     {
+      "id": "json-16",
       "generator": "json",
       "label": "trailing comma",
       "value": "\"[1,2,]\"",
+      "type": "string",
       "why": "Accepted by JavaScript and JSON5, rejected by JSON.parse.",
       "tags": [
         "invalid",
@@ -2823,9 +3351,11 @@
       ]
     },
     {
+      "id": "json-17",
       "generator": "json",
       "label": "comments",
       "value": "\"{\\\"a\\\":1 /* note */}\"",
+      "type": "string",
       "why": "Common in config files (JSONC) but invalid JSON.",
       "tags": [
         "invalid",
@@ -2833,9 +3363,11 @@
       ]
     },
     {
+      "id": "json-18",
       "generator": "json",
       "label": "single quotes",
       "value": "\"{'a':1}\"",
+      "type": "string",
       "why": "JavaScript object syntax, not JSON.",
       "tags": [
         "invalid",
@@ -2843,9 +3375,11 @@
       ]
     },
     {
+      "id": "json-19",
       "generator": "json",
       "label": "NaN literal",
       "value": "\"{\\\"a\\\":NaN}\"",
+      "type": "string",
       "why": "Python json.dumps writes NaN by default, and JSON.parse rejects it.",
       "tags": [
         "invalid",
@@ -2853,9 +3387,11 @@
       ]
     },
     {
+      "id": "json-20",
       "generator": "json",
       "label": "unquoted key",
       "value": "\"{a:1}\"",
+      "type": "string",
       "why": "JavaScript object literal syntax that JSON does not allow.",
       "tags": [
         "invalid",
@@ -2863,9 +3399,11 @@
       ]
     },
     {
+      "id": "json-21",
       "generator": "json",
       "label": "empty text",
       "value": "\"\"",
+      "type": "string",
       "why": "An empty response body is not JSON; JSON.parse(\"\") throws \"Unexpected end of JSON input\".",
       "tags": [
         "invalid",
@@ -2873,9 +3411,11 @@
       ]
     },
     {
+      "id": "json-22",
       "generator": "json",
       "label": "raw control character in string",
       "value": "\"\\\"a\\tb\\\"\"",
+      "type": "string",
       "why": "Unescaped tab inside a string is invalid JSON even though it looks harmless.",
       "tags": [
         "invalid",
@@ -2883,18 +3423,22 @@
       ]
     },
     {
+      "id": "arrays-1",
       "generator": "arrays",
       "label": "empty array",
       "value": "[]",
+      "type": "Array",
       "why": "Truthy even though empty; reduce without a seed throws and Math.max(...[]) is -Infinity.",
       "tags": [
         "empty"
       ]
     },
     {
+      "id": "arrays-2",
       "generator": "arrays",
       "label": "array with a hole",
       "value": "[1, <hole>, 3]",
+      "type": "Array",
       "why": "forEach, map and filter skip the hole but for...of and spread yield undefined, so the two styles disagree.",
       "tags": [
         "sparse",
@@ -2902,18 +3446,22 @@
       ]
     },
     {
+      "id": "arrays-3",
       "generator": "arrays",
       "label": "explicit undefined",
       "value": "[1, undefined, 3]",
+      "type": "Array",
       "why": "Looks like the hole case when printed, but every iteration method visits it and `1 in arr` is true.",
       "tags": [
         "undefined"
       ]
     },
     {
+      "id": "arrays-4",
       "generator": "arrays",
       "label": "length 5 with no elements",
       "value": "[<hole>, <hole>, <hole>, <hole>, <hole>]",
+      "type": "Array",
       "why": "new Array(5) has five holes: map returns holes, not values, and JSON.stringify writes nulls.",
       "tags": [
         "sparse",
@@ -2921,9 +3469,11 @@
       ]
     },
     {
+      "id": "arrays-5",
       "generator": "arrays",
       "label": "huge sparse length (2^32 - 1)",
       "value": "[\"first\", <hole>, <hole>, <hole>, <hole>, <hole>, ...] (length 4294967295)",
+      "type": "Array",
       "why": "The maximum array length: cheap to create, but any loop to length or Array.from runs four billion times.",
       "tags": [
         "sparse",
@@ -2932,18 +3482,22 @@
       ]
     },
     {
+      "id": "arrays-6",
       "generator": "arrays",
       "label": "NaN element",
       "value": "[NaN]",
+      "type": "Array",
       "why": "indexOf(NaN) is -1 while includes(NaN) is true; Set and Map treat NaN as equal to itself.",
       "tags": [
         "nan"
       ]
     },
     {
+      "id": "arrays-7",
       "generator": "arrays",
       "label": "-0 and 0",
       "value": "[-0, 0]",
+      "type": "Array",
       "why": "Set collapses them into one value and includes(-0) finds 0; Object.is tells them apart.",
       "tags": [
         "zero",
@@ -2951,18 +3505,22 @@
       ]
     },
     {
+      "id": "arrays-8",
       "generator": "arrays",
       "label": "numbers that sort as strings",
       "value": "[10, 9, 1, 100]",
+      "type": "Array",
       "why": "Default sort() compares strings, giving [1, 10, 100, 9]; always pass a comparator.",
       "tags": [
         "sort"
       ]
     },
     {
+      "id": "arrays-9",
       "generator": "arrays",
       "label": "undefined during sort",
       "value": "[3, undefined, 1]",
+      "type": "Array",
       "why": "sort() moves undefined to the end without calling the comparator, so comparators never see it.",
       "tags": [
         "sort",
@@ -2970,9 +3528,11 @@
       ]
     },
     {
+      "id": "arrays-10",
       "generator": "arrays",
       "label": "mixed number and numeric string",
       "value": "[1, \"1\"]",
+      "type": "Array",
       "why": "includes(\"1\") and Set treat them as different, while == and loose lookups do not.",
       "tags": [
         "mixed",
@@ -2980,36 +3540,44 @@
       ]
     },
     {
+      "id": "arrays-11",
       "generator": "arrays",
       "label": "nested empty arrays",
       "value": "[[[]]]",
+      "type": "Array",
       "why": "flat() and recursive flatten helpers must handle empty levels; String([[[]]]) is \"\".",
       "tags": [
         "nested"
       ]
     },
     {
+      "id": "arrays-12",
       "generator": "arrays",
       "label": "array with extra property",
       "value": "[1, 2]",
+      "type": "Array",
       "why": "for...in visits \"extra\" and Object.keys includes it, but length and JSON.stringify ignore it.",
       "tags": [
         "properties"
       ]
     },
     {
+      "id": "arrays-13",
       "generator": "arrays",
       "label": "frozen array",
       "value": "[1, 2, 3]",
+      "type": "Array",
       "why": "push and in place sort throw TypeError in strict mode; libraries that mutate input break.",
       "tags": [
         "frozen"
       ]
     },
     {
+      "id": "arrays-14",
       "generator": "arrays",
       "label": "500000 elements (too many to spread)",
       "value": "[0, 1, 2, 3, 4, 5, ...] (length 500000)",
+      "type": "Array",
       "why": "Math.max(...arr) and fn.apply(null, arr) exceed the argument limit and throw RangeError.",
       "tags": [
         "large",

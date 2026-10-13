@@ -1,13 +1,16 @@
 // Builds everything that is derived from the library itself:
 //   docs/catalog.json, assets/catalog.svg, the generated README sections,
-//   and the static site in docs/ (index, guides, sitemap, robots, 404),
-//   with code blocks highlighted by scripts/highlight-docs.mjs.
+//   and the static site in docs/ (the lab on index.html, the guides, sitemap,
+//   robots, 404), with code blocks highlighted by scripts/highlight-docs.mjs
+//   and the art from scripts/site-art.mjs. docs/style.css and docs/site.js
+//   are written by hand.
 // Usage: npm run docs   (builds the library first)
-import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { GUIDES } from './site-content.mjs';
 import { highlightDocs } from './highlight-docs.mjs';
+import { icon, jar, mascot, ridge, shelf, sprite } from './site-art.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const lib = await import(pathToFileURL(join(root, 'dist/index.js')).href);
@@ -17,7 +20,8 @@ const SITE = 'https://kwy404.github.io/edgegoat/';
 const REPO = 'https://github.com/kwy404/edgegoat';
 const NPM = 'https://www.npmjs.com/package/edgegoat';
 const CDN = 'https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/';
-const UPDATED = '2026-10-12';
+const PUBLISHED = '2026-10-12';
+const UPDATED = '2026-10-13';
 const BS = String.fromCharCode(92);
 
 const write = (file, text) => {
@@ -53,14 +57,14 @@ const GRID = [
   { icon: 'helpers', fns: [], en: ['Helpers', 'withTimeZone, withFrozenTime, check, assertNoThrow'], pt: ['Helpers', 'withTimeZone, withFrozenTime, check, assertNoThrow'], alt: 'Stopwatch icon for the time zone and frozen time test helpers' },
 ];
 
-// Sibling projects, listed in the site footer and in README.md.
+// Sibling projects, listed in the site footer and in README.md (never this one).
 const PROJECTS = [
-  ['graphemely', 'https://kwy404.github.io/graphemely/', 'Truncate, slice and count strings with emoji safely, by grapheme cluster.'],
-  ['edgegoat', 'https://kwy404.github.io/edgegoat/', 'Edge case test inputs for JavaScript: time zones, DST, unicode, -0 and NaN.'],
+  ['Monsoon', 'https://kwy404.github.io/monsoon/', 'Utility-first CSS from a CDN with no build step, a whole theme from one seed color.'],
+  ['Voodoo.js', 'https://kwy404.github.io/Voodoo.js/', 'The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.'],
+  ['breakhound', 'https://kwy404.github.io/breakhound/', 'Find bugs in any JavaScript or TypeScript library automatically, no tests required.'],
   ['vueleap', 'https://kwy404.github.io/vueleap/', 'Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.'],
+  ['graphemely', 'https://kwy404.github.io/graphemely/', 'Truncate, slice and count strings with emoji safely, by grapheme cluster.'],
   ['numberparrot', 'https://kwy404.github.io/numberparrot/', 'Parse localized number and currency strings back into real numbers, for any locale.'],
-  ['breakhound', 'https://github.com/kwy404/breakhound', 'Find bugs in any JavaScript or TypeScript library automatically, no tests required.'],
-  ['Voodoo.js', 'https://github.com/kwy404/Voodoo.js', 'The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.'],
 ];
 
 function escapeCodePoints(s) {
@@ -107,17 +111,24 @@ export function display(value, depth = 0) {
   return String(value);
 }
 
+/** Kind of value, shown in the site's inspector. */
+function kind(value) {
+  if (value instanceof Date) return 'Date';
+  if (Array.isArray(value)) return 'Array';
+  return typeof value;
+}
+
 const cases = [];
 const counts = {};
 for (const g of GENERATORS) {
   const list = lib[g.fn]();
   counts[g.fn] = list.length;
-  for (const c of list) {
-    const entry = { generator: g.fn, label: c.label, value: display(c.value), why: c.why, tags: [...c.tags] };
+  list.forEach((c, n) => {
+    const entry = { id: `${g.fn}-${n + 1}`, generator: g.fn, label: c.label, value: display(c.value), type: kind(c.value), why: c.why, tags: [...c.tags] };
     if (c.zone) entry.zone = c.zone;
     if (c.ref) entry.ref = c.ref;
     cases.push(entry);
-  }
+  });
 }
 const total = cases.length;
 const gridCount = (fns) => fns.reduce((n, f) => n + counts[f], 0);
@@ -235,49 +246,173 @@ for (const [file, lang] of [
   write(file, text);
 }
 
-// ------------------------------------------------------------ site
-const esc = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
+// ------------------------------------------------------------ site
+// The site is a laboratory: the home page is the catalog explorer itself
+// (generator rail, specimen grid, inspector), and the guides are lab notes
+// with a tab bar per category. Styled with Monsoon from the CDN plus
+// docs/style.css; interactive parts are Voodoo.js (docs/site.js).
+const esc = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+const strip = (html) => html.replace(/<[^>]+>/g, '').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&').replaceAll('&quot;', '"');
+
+const MONSOON_CSS = 'https://cdn.jsdelivr.net/npm/monsooncss@0.2.0/dist/monsoon.min.css';
+const MONSOON_JS = 'https://cdn.jsdelivr.net/npm/monsooncss@0.2.0/dist/monsoon.js';
 const VOODOO = 'https://cdn.jsdelivr.net/npm/voodoojs@1.0.0/dist/voodoo.full.min.js';
+const AUTHOR = 'https://github.com/kwy404';
+const LINKEDIN = 'https://www.linkedin.com/in/alexandre-silva-173687256/';
 
 // Restores a saved light or dark choice before the first paint. Voodoo.js
-// (v-theme-toggle) writes the choice to localStorage under voodoo:theme and
-// applies it once the deferred bundle runs; this only avoids a flash before that.
-const THEME_BOOT = `<script>try{var t=localStorage.getItem('voodoo:theme');if(t==='"light"'||t==='"dark"')t=t.slice(1,-1);if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t}}catch(e){}</script>`;
+// (v-theme-toggle) stores the choice in localStorage under voodoo:theme, raw
+// or as JSON; "system" (or nothing) leaves data-theme off.
+const THEME_BOOT = `<script>(function(){try{var t=localStorage.getItem('voodoo:theme');if(t&&t.charAt(0)==='"')t=JSON.parse(t);var r=document.documentElement;if(t==='light'||t==='dark'){r.setAttribute('data-theme',t);r.style.colorScheme=t}}catch(e){}})();</script>`;
 
-const ICON_THEME = '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg>';
-const ICON_MENU = '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+// Guide categories: the tab bar on every guide page.
+const GROUPS = [
+  { id: 'time', name: 'Time', icon: 'dates', slugs: ['test-timezones-javascript.html', 'test-daylight-saving-time-jest.html', 'test-dates-before-1970.html', 'mock-date-javascript.html'] },
+  { id: 'unicode', name: 'Unicode', icon: 'strings', slugs: ['unicode-test-strings.html'] },
+  { id: 'numbers', name: 'Numbers', icon: 'numbers', slugs: ['javascript-number-edge-cases.html', 'javascript-negative-zero.html'] },
+  { id: 'method', name: 'Method', icon: 'all', slugs: ['property-based-testing-edge-cases.html'] },
+];
+// The specimens each guide is about, shown in its side panel and linked to the lab.
+const RELATED = {
+  'test-timezones-javascript.html': { gen: 'timeZones', tags: [] },
+  'test-daylight-saving-time-jest.html': { gen: 'dates', tags: ['dst'] },
+  'test-dates-before-1970.html': { gen: 'dates', tags: ['pre-1970', 'far-past', 'epoch'] },
+  'mock-date-javascript.html': { gen: 'dates', tags: ['year-boundary', 'leap', 'month-end'] },
+  'unicode-test-strings.html': { gen: 'strings', tags: ['surrogate', 'emoji', 'normalization', 'bidi', 'invisible'] },
+  'javascript-number-edge-cases.html': { gen: 'numbers', tags: [] },
+  'javascript-negative-zero.html': { gen: 'numbers', tags: ['zero', 'sign'] },
+  'property-based-testing-edge-cases.html': { gen: 'numbers', tags: ['nan', 'infinity', 'precision'] },
+};
+const groupOf = (slug) => GROUPS.find((g) => g.slugs.includes(slug));
+const guideBySlug = (slug) => GUIDES.find((g) => g.slug === slug);
+const relatedCases = ({ gen, tags }) => cases.filter((c) => c.generator === gen && (!tags.length || c.tags.some((t) => tags.includes(t))));
+const labHref = (prefix, { gen, tags }) => `${prefix}?gen=${gen}${tags.length ? `&amp;tags=${tags.join(',')}` : ''}#catalog`;
 
-// FAQ as a Voodoo.js accordion. Questions and answers stay in the static HTML;
-// without JavaScript every answer is simply open.
-export function faqAccordion(faq) {
-  const items = faq
-    .map(
-      ([q, a], i) => `<div class="faq-item" v-accordion-item${i === 0 ? '="open"' : ''}>
-      <button type="button" class="faq-q">${esc(q)}</button>
-      <div class="faq-a"><p>${a}</p></div>
-    </div>`,
-    )
-    .join('\n    ');
-  return `<div class="faq" v-accordion>
-    ${items}
-  </div>`;
+// Tags offered in the command palette.
+const PALETTE_TAGS = ['dst', 'year-boundary', 'surrogate', 'emoji', 'normalization', 'bidi', 'sign', 'nan', 'precision', 'traversal', 'windows', 'security', 'invalid', 'sparse'];
+
+const slugify = (s) => s.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+// Source form of a code block. scripts/highlight-docs.mjs turns it into a
+// highlighted, editor style block at the end of the build.
+const code = (text, lang = 'js', title) =>
+  `<pre><code class="language-${lang}"${title ? ` data-title="${esc(title)}"` : ''}>${esc(text.trim())}</code></pre>`;
+
+const themeButton = () => `<button type="button" class="icon-btn theme-btn" v-theme-toggle.cycle aria-label="Color theme: system, light or dark" title="Color theme">
+      <span class="ti ti-system">${icon('ui-system')}</span><span class="ti ti-light">${icon('ui-sun')}</span><span class="ti ti-dark">${icon('ui-moon')}</span>
+    </button>`;
+
+function palette(prefix) {
+  const item = (attrs, ic, text, extra = '') => `<a class="command-palette-item" ${attrs}>${ic}<span>${text}</span>${extra}</a>`;
+  const gens = GENERATORS.map((g) => item(`href="${prefix}?gen=${g.fn}#catalog" data-gen="${g.fn}" data-keywords="${esc(g.title)} generator"`, icon(g.fn), `${g.fn}()`, `<span class="command-palette-shortcut">${counts[g.fn]}</span>`)).join('\n      ');
+  const tagCount = (t) => cases.filter((c) => c.tags.includes(t)).length;
+  const tags = PALETTE_TAGS.map((t) => item(`href="${prefix}?tags=${t}#catalog" data-tag="${t}" data-keywords="tag filter"`, icon('ui-tag'), `Tag: ${t}`, `<span class="command-palette-shortcut">${tagCount(t)}</span>`)).join('\n      ');
+  const guides = GUIDES.map((g) => item(`href="${prefix}${g.slug}" data-keywords="guide ${esc(g.about.join(' '))}"`, icon('ui-book'), esc(g.h1))).join('\n      ');
+  return `<dialog id="palette" class="modal modal-top" aria-label="Search the lab">
+  <div class="command-palette" data-m-command data-m-command-hotkey="mod+k" data-m-command-empty="Nothing on this shelf. Try another word.">
+    <label class="command-palette-search"><input class="command-palette-input" placeholder="Search generators, tags and guides" aria-label="Search generators, tags and guides"></label>
+    <div class="command-palette-list">
+      <p class="command-palette-heading">Generators</p>
+      ${gens}
+      <p class="command-palette-heading">Tags</p>
+      ${tags}
+      <p class="command-palette-heading">Guides</p>
+      ${guides}
+      <p class="command-palette-heading">Links</p>
+      ${item(`href="${REPO}" data-keywords="source code repository"`, icon('brand-github'), 'GitHub repository')}
+      ${item(`href="${NPM}" data-keywords="package install"`, icon('brand-npm'), 'edgegoat on npm')}
+      ${item(`href="${prefix}catalog.json" data-keywords="data download export"`, icon('ui-json'), 'catalog.json')}
+      ${item(`href="${REPO}/blob/main/CHANGELOG.md" data-keywords="releases versions"`, icon('ui-steps'), 'Changelog')}
+      <button type="button" class="command-palette-item" data-action="theme" data-keywords="dark light mode appearance">${icon('ui-moon')}<span>Switch color theme</span></button>
+    </div>
+    <div class="command-palette-footer"><span><kbd>Up</kbd> <kbd>Down</kbd> to move</span><span><kbd>Enter</kbd> to open</span><span><kbd>Esc</kbd> to close</span></div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button aria-label="Close search">Close</button></form>
+</dialog>`;
 }
 
-export function layout({ slug, title, description, body, jsonld, type = 'article', scripts = [] }) {
+function topbar(prefix, current) {
+  const link = (href, text, key) => `<a href="${href}" class="navbar-link"${current === key ? ' aria-current="page"' : ''}>${text}</a>`;
+  const links = [
+    link(`${prefix}#catalog`, 'Lab', 'lab'),
+    link(`${prefix}${GUIDES[0].slug}`, 'Guides', 'guides'),
+    link(`${prefix}#quick-start`, 'Quick start', 'start'),
+    link(`${prefix}catalog.json`, 'catalog.json', 'json'),
+  ].join('');
+  return `<header class="navbar navbar-sticky navbar-blur topbar">
+  <div class="navbar-start">
+    <a href="${prefix}" class="navbar-brand brand" aria-label="edgegoat home">${mascot(prefix, 30)}<span class="wordmark">edge<b>goat</b></span></a>
+    <a href="${REPO}/blob/main/CHANGELOG.md" class="badge badge-sm badge-outline ver" title="Changelog">v${pkg.version}</a>
+  </div>
+  <nav class="navbar-center navbar-nav" aria-label="Main">${links}</nav>
+  <div class="navbar-end">
+    <button type="button" class="search-btn" data-open-palette aria-haspopup="dialog" aria-controls="palette">${icon('ui-search')}<span class="search-btn-label">Search</span><span class="kbd-pair" aria-hidden="true"><kbd class="kbd kbd-xs">Ctrl</kbd><kbd class="kbd kbd-xs">K</kbd></span></button>
+    <a href="${REPO}" class="icon-btn" aria-label="edgegoat on GitHub">${icon('brand-github')}</a>
+    ${themeButton()}
+    <details class="navbar-mobile"><summary class="navbar-burger" aria-label="Menu"></summary><nav class="navbar-mobile-panel" aria-label="Mobile">${links}<a href="${REPO}" class="navbar-link">GitHub</a><a href="${NPM}" class="navbar-link">npm</a></nav></details>
+  </div>
+</header>`;
+}
+
+function footer(prefix) {
+  return `<footer class="site-footer">
+  ${ridge('ridge footer-ridge')}
+  <div class="footer wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="${prefix}" class="navbar-brand brand">${mascot(prefix, 34)}<span class="wordmark">edge<b>goat</b></span></a>
+        <p>The inputs that break code, ready to drop into your tests. ${total} specimens, zero dependencies, MIT licensed.</p>
+        <p class="made">Made by <a href="${AUTHOR}" rel="me noopener">Alexandre Kohler</a> <span class="footer-social"><a href="${AUTHOR}" rel="me noopener" aria-label="Alexandre Kohler on GitHub">${icon('brand-github')}</a><a href="${LINKEDIN}" rel="me noopener" aria-label="Alexandre Kohler on LinkedIn">${icon('brand-linkedin')}</a></span></p>
+        <p class="built">Built with <a href="https://kwy404.github.io/monsoon/">Monsoon</a>. Interactive parts built with <a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a>.</p>
+      </div>
+      <nav aria-label="Guides">
+        <p class="footer-title">Lab notes</p>
+        <ul class="footer-links">
+          ${GUIDES.map((g) => `<li><a href="${prefix}${g.slug}">${esc(g.nav)}</a></li>`).join('\n          ')}
+        </ul>
+      </nav>
+      <nav aria-label="Project">
+        <p class="footer-title">edgegoat</p>
+        <ul class="footer-links">
+          <li><a href="${prefix}#catalog">Specimen lab</a></li>
+          <li><a href="${prefix}catalog.json">catalog.json</a></li>
+          <li><a href="${REPO}">GitHub</a></li>
+          <li><a href="${NPM}">npm</a></li>
+          <li><a href="${REPO}/blob/main/CHANGELOG.md">Changelog</a></li>
+          <li><a href="${REPO}/blob/main/CONTRIBUTING.md">Contributing</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="More from kwy404" class="footer-more">
+        <p class="footer-title">More from kwy404</p>
+        <ul class="footer-links">
+          ${PROJECTS.map(([name, href, line]) => `<li><a href="${href}">${esc(name)}</a><span>${esc(line)}</span></li>`).join('\n          ')}
+        </ul>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <p>MIT license. Ledge the goat walks the edges so your code does not fall off them.</p>
+      <p><a href="${prefix}sitemap.xml">Sitemap</a></p>
+    </div>
+  </div>
+</footer>`;
+}
+
+export function layout({ slug, title, description, body, jsonld, type = 'article', current = '', bodyClass = '' }) {
   const url = SITE + (slug === 'index.html' ? '' : slug);
-  const home = slug === 'index.html' ? '' : './';
+  const prefix = './';
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+${THEME_BOOT}
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${url}">
 <meta name="author" content="Alexandre Kohler">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#2E9C8A">
+<meta name="theme-color" content="#0e8f9c">
 <meta property="og:type" content="${type}">
 <meta property="og:site_name" content="edgegoat">
 <meta property="og:title" content="${esc(title)}">
@@ -292,83 +427,162 @@ export function layout({ slug, title, description, body, jsonld, type = 'article
 <meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${SITE}og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-${THEME_BOOT}
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="${MONSOON_CSS}">
 <link rel="stylesheet" href="style.css">
-<noscript><style>.site-nav { display: flex; }</style></noscript>
+<script src="${MONSOON_JS}" defer></script>
 <script src="${VOODOO}" defer></script>
-${scripts.map((s) => `<script src="${s}" defer></script>\n`).join('')}<script type="application/ld+json">
+<script src="site.js" defer></script>
+<script type="application/ld+json">
 ${JSON.stringify(jsonld, null, 2)}
 </script>
 </head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-<header class="site-header" v-data="{ menu: false }" @keydown.esc="menu = false">
-  <div class="wrap header-row">
-    <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt="Ledge the goat, edgegoat logo"><span>edge<b>goat</b></span></a>
-    <nav id="site-nav" class="site-nav" :class="{ open: menu }" aria-label="Main">
-      <a href="${home}#catalog" @click="menu = false">Catalog</a>
-      <a href="${home}#how-it-works" @click="menu = false">How it works</a>
-      <a href="${home}#guides" @click="menu = false">Guides</a>
-      <a href="${home}#faq" @click="menu = false">FAQ</a>
-      <a href="${REPO}">GitHub</a>
-      <a href="${NPM}">npm</a>
-    </nav>
-    <div class="header-actions">
-      <button type="button" class="icon-button" v-theme-toggle v-cloak aria-label="Toggle dark mode" title="Toggle dark mode">${ICON_THEME}</button>
-      <button type="button" class="icon-button menu-button" v-cloak @click="menu = !menu" :aria-expanded="menu ? 'true' : 'false'" aria-controls="site-nav" aria-label="Menu">${ICON_MENU}</button>
-    </div>
-  </div>
-</header>
+<body class="antialiased${bodyClass ? ` ${bodyClass}` : ''}">
+${sprite()}
+<a href="#main" class="skip-link">Skip to content</a>
+${topbar(prefix, current)}
+${palette(prefix)}
 <main id="main">
 ${body}
 </main>
-<footer class="site-footer">
-  <div class="wrap footer-grid">
-    <div class="footer-brand">
-      <a class="brand" href="./"><img src="assets/mascot.svg" width="36" height="36" alt=""><span>edge<b>goat</b></span></a>
-      <p>The inputs that break code, ready to drop into your tests. Zero dependencies, MIT licensed.</p>
-      <p class="footer-links"><a href="${REPO}">GitHub</a> <a href="${NPM}">npm</a> <a href="catalog.json">catalog.json</a> <a href="${REPO}/blob/main/CHANGELOG.md">Changelog</a></p>
-    </div>
-    <div>
-      <h2 class="footer-title">Guides</h2>
-      <ul class="footer-list">
-        ${GUIDES.map((g) => `<li><a href="${g.slug}">${esc(g.nav)}</a></li>`).join('\n        ')}
-      </ul>
-    </div>
-    <div class="footer-more">
-      <h2 class="footer-title">More from kwy404</h2>
-      <ul class="footer-list projects">
-        ${PROJECTS.map(([name, href, line]) => `<li><a href="${href}">${esc(name)}</a><span>${esc(line)}</span></li>`).join('\n        ')}
-      </ul>
-    </div>
-  </div>
-  <div class="wrap footer-bottom">
-    <p>Made by <a href="https://github.com/kwy404">Alexandre Kohler</a>. MIT license.</p>
-    <p class="credit">Interactive parts built with <a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a>.</p>
-  </div>
-</footer>
+${footer(prefix)}
 </body>
 </html>
 `;
 }
 
-// Source form of a code block. scripts/highlight-docs.mjs turns it into a
-// highlighted, editor style block at the end of the build.
-const code = (text, lang = 'js', title) =>
-  `<pre><code class="language-${lang}"${title ? ` data-title="${esc(title)}"` : ''}>${esc(text.trim())}</code></pre>`;
+// ------------------------------------------------------------ home: the lab
+const pad = (n) => String(n).padStart(3, '0');
 
-// Each case stays in the static HTML. Voodoo.js only shows, hides and selects
-// them. Text that may contain braces carries v-pre so it is never read as a
+// One grid row per case. The rows stay in the static HTML (indexable and
+// readable without JavaScript); Voodoo.js only filters and selects them.
+// Text that may contain braces carries v-pre so it is never read as a
 // template expression.
-function caseArticle(c, i) {
-  const tags = c.tags.map((t) => `<button type="button" class="tag" @click="toggleTag('${t}')">${esc(t)}</button>`).join('');
-  const ref = c.ref ? ` <a class="ref" href="${esc(c.ref)}">real bug</a>` : '';
-  return `<li class="case" v-show="isShown(${i})" :class="{ picked: pick === ${i} }">
-  <div class="case-head"><code class="gen">${c.generator}()</code><h3 v-pre>${esc(c.label)}</h3><button type="button" class="more" v-cloak @click="open(${i})" :aria-expanded="pick === ${i} ? 'true' : 'false'" aria-controls="detail">Details</button></div>
-  <code class="value">${esc(c.value)}</code>
-  <p v-pre>${esc(c.why)}${ref}</p>
-  <div class="tags" role="group" aria-label="Tags, select to filter">${tags}</div>
-</li>`;
+function caseRow(c, i) {
+  const shown = c.tags.slice(0, 1).map((t) => `<span class="badge badge-sm" v-pre>${esc(t)}</span>`).join('');
+  const more = c.tags.length > 1 ? `<span class="badge badge-sm badge-outline" title="${esc(c.tags.slice(1).join(', '))}">+${c.tags.length - 1}</span>` : '';
+  return `<tr id="${c.id}" v-show="isShown(${i})" :class="{ 'is-picked': pick === ${i} }" @click="open(${i}, true)">
+  <td class="col-no">${pad(i + 1)}</td>
+  <td><button type="button" class="row-btn" :aria-pressed="pick === ${i} ? 'true' : 'false'" aria-controls="inspector"><span class="row-label" v-pre>${esc(c.label)}</span></button><span class="row-gen">${icon(c.generator, 'ic ic-xs')}${c.generator}()</span></td>
+  <td class="col-value"><code v-pre>${esc(c.value)}</code></td>
+  <td class="col-tags">${shown}${more}</td>
+</tr>`;
+}
+
+function rail() {
+  const gen = (fn, title, n) => `<button type="button" class="rail-item" :class="{ 'is-on': gen === '${fn}' }" :aria-pressed="gen === '${fn}' ? 'true' : 'false'" @click="setGen('${fn}')">${icon(fn || 'all')}<span class="rail-name">${title}</span><span class="badge badge-sm rail-count" v-text="countFor('${fn}', ${n})">${n}</span></button>`;
+  return `<nav class="rail" aria-label="Filter by generator and tag">
+    <p class="rail-title">Shelves</p>
+    <div class="rail-gens">
+      ${gen('', 'All specimens', total)}
+      ${GENERATORS.map((g) => gen(g.fn, `${g.fn}()`, counts[g.fn])).join('\n      ')}
+    </div>
+    <div class="rail-tags" v-cloak>
+      <p class="rail-title"><span>Tags</span><button type="button" class="rail-more" v-show="moreTags()" @click="allTags = !allTags" v-text="allTags ? 'Fewer' : 'All tags'"></button></p>
+      <div class="rail-tag-list" role="group" aria-label="Filter by tag, any of">
+        <button type="button" class="rail-tag" v-for="t in tagList()" :key="t.name" :class="{ 'is-on': tags.includes(t.name) }" :aria-pressed="tags.includes(t.name) ? 'true' : 'false'" @click="toggleTag(t.name)"><span v-text="t.name"></span><span class="rail-tag-n" v-text="t.count"></span></button>
+      </div>
+    </div>
+  </nav>`;
+}
+
+function inspector() {
+  return `<aside id="inspector" class="splitter-pane inspector" data-min="26" aria-label="Specimen inspector" :class="{ 'is-open': sheet }" @keydown.esc="closeSheet()">
+      <div class="inspector-in" v-cloak v-if="current()">
+        <div class="insp-head">
+          ${jar({ dynamic: "'#i-' + current().generator", cls: 'jar-art insp-jar' })}
+          <div class="insp-title">
+            <p class="insp-kicker"><span>Specimen <span v-text="'#' + no()"></span></span><span class="badge badge-sm badge-soft badge-primary" v-text="current().generator + '()'"></span><span class="badge badge-sm badge-outline" v-text="current().type"></span></p>
+            <h2 id="insp-label" tabindex="-1" v-text="current().label"></h2>
+          </div>
+          <button type="button" class="icon-btn insp-close" @click="closeSheet()" aria-label="Close the inspector">${icon('ui-close')}</button>
+        </div>
+        <section class="insp-block" aria-labelledby="insp-value-h">
+          <div class="insp-block-head"><h3 id="insp-value-h">Value</h3><span class="insp-meta" v-text="stats()"></span><button type="button" class="copy-btn copy-btn-sm" v-copy-from="#insp-value" v-copy-label="Copied" aria-label="Copy the escaped value">${icon('ui-copy')}${icon('ui-check')}<span>Copy</span></button></div>
+          <pre class="insp-value" tabindex="0"><code id="insp-value" v-text="current().value"></code></pre>
+          <ol class="cp-strip" v-if="points().length" aria-label="Code points">
+            <li v-for="(p, k) in points()" :key="k" :class="{ 'is-esc': p.esc }"><span class="cp-ch" v-text="p.ch"></span><span class="cp-u" v-text="p.u"></span></li>
+          </ol>
+          <p class="cp-more" v-if="pointsMore()" v-text="pointsMore()"></p>
+        </section>
+        <section class="insp-block" aria-labelledby="insp-why-h">
+          <h3 id="insp-why-h">Why it breaks code</h3>
+          <p class="insp-why" v-text="current().why"></p>
+          <p class="insp-zone" v-if="current().zone">${icon('timeZones')}<span>Time zone</span> <code v-text="current().zone"></code></p>
+          <p class="insp-ref" v-if="current().ref"><a :href="current().ref" class="link link-primary">${icon('ui-bug')}Read the real bug or spec</a></p>
+        </section>
+        <section class="insp-block" aria-labelledby="insp-tags-h">
+          <h3 id="insp-tags-h">Tags</h3>
+          <div class="insp-tags"><button type="button" class="tag tag-primary" v-for="t in current().tags" :key="t" :class="{ 'is-on': tags.includes(t) }" :aria-pressed="tags.includes(t) ? 'true' : 'false'" @click="toggleTag(t)" v-text="t"></button></div>
+        </section>
+        <section class="insp-block insp-code" aria-label="Ready to paste test">
+          <div class="tabs tabs-line tabs-sm" role="tablist" aria-label="Test snippet">
+            <input type="radio" name="snippet" class="tab" aria-label="This specimen" checked>
+            <div class="tab-content" role="tabpanel">
+              <div class="ed ed-live">
+                <div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="js" aria-hidden="true">JS</span><span class="ed-title">specimen.test.js</span></span><button type="button" class="copy-btn ed-copy" v-copy-from="#snip-case" v-copy-label="Copied" aria-label="Copy the test for this specimen">${icon('ui-copy')}${icon('ui-check')}<span>Copy</span></button></div>
+                <pre id="snip-case" class="shiki numbered" tabindex="0"><code v-html="hl(caseSnippet())"></code></pre>
+              </div>
+            </div>
+            <input type="radio" name="snippet" class="tab" aria-label="Current filter">
+            <div class="tab-content" role="tabpanel">
+              <div class="ed ed-live">
+                <div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="js" aria-hidden="true">JS</span><span class="ed-title">edge-cases.test.js</span></span><button type="button" class="copy-btn ed-copy" v-copy-from="#snip-filter" v-copy-label="Copied" aria-label="Copy the test for the current filter">${icon('ui-copy')}${icon('ui-check')}<span>Copy</span></button></div>
+                <pre id="snip-filter" class="shiki numbered" tabindex="0"><code v-html="hl(filterSnippet())"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="insp-empty empty-state" v-else>
+        ${jar({ glyph: 'i-all', cls: 'jar-art empty-jar' })}
+        <h2 class="empty-state-title">Pick a specimen</h2>
+        <p class="empty-state-description">Select any row to see its value as escaped code points, why it breaks code and a <code>test.each</code> you can paste.</p>
+      </div>
+    </aside>`;
+}
+
+function lab() {
+  return `<section id="catalog" class="lab-wrap" aria-labelledby="lab-h" v-component="edge-lab">
+  <h2 id="lab-h" class="sr-only">Specimen lab: every edge case in the catalog</h2>
+  <div class="lab" v-resource="cat:./catalog.json">
+    ${rail()}
+    <div class="lab-main splitter" data-m-splitter data-m-splitter-sizes="60,40" data-m-splitter-persist="edgegoat-lab" data-m-splitter-label="Resize the inspector">
+      <div class="splitter-pane grid-pane data-table" data-min="38">
+        <div class="data-table-toolbar lab-toolbar">
+          <label class="search-field data-table-filter lab-search">
+            <input id="q" type="search" class="input input-sm" v-model="q" placeholder="Search ${total} specimens: dst, surrogate, -0" aria-label="Search specimens" autocomplete="off" spellcheck="false">
+            <kbd class="search-field-shortcut">/</kbd>
+          </label>
+          <div class="active-filters" v-cloak>
+            <button type="button" class="chip chip-sm chip-primary" v-if="gen" @click="gen = ''" :aria-label="'Remove generator filter ' + gen"><span v-text="gen + '()'"></span>${icon('ui-close', 'ic ic-xs')}</button>
+            <button type="button" class="chip chip-sm" v-for="t in tags" :key="t" @click="toggleTag(t)" :aria-label="'Remove tag filter ' + t"><span v-text="t"></span>${icon('ui-close', 'ic ic-xs')}</button>
+            <button type="button" class="btn btn-ghost btn-xs" v-show="tags.length || q || gen" @click="reset()">Clear</button>
+          </div>
+          <p class="data-table-status" role="status" v-text="status(${total})">${total} specimens</p>
+        </div>
+        <div class="data-table-scroll lab-scroll" tabindex="-1" @keydown="keys($event)">
+          <table class="table table-compact table-hover table-pin-header lab-table">
+            <caption class="sr-only">All ${total} edge cases. Select a row to inspect it.</caption>
+            <thead><tr><th scope="col" class="col-no">No.</th><th scope="col">Specimen</th><th scope="col">Value</th><th scope="col" class="col-tags">Tags</th></tr></thead>
+            <tbody id="cases">
+${cases.map(caseRow).join('\n')}
+            </tbody>
+          </table>
+          <div class="empty-state lab-empty" v-cloak v-if="loaded() && !visible.length">
+            ${mascot('./', 72)}
+            <h3 class="empty-state-title">No specimen on this shelf</h3>
+            <p class="empty-state-description">Nothing matches the current search and filters.</p>
+            <div class="empty-state-actions"><button type="button" class="btn btn-sm btn-outline btn-neutral" @click="reset()">Clear the filters</button></div>
+          </div>
+        </div>
+        <div class="data-table-footer lab-foot"><span class="data-table-info">Generated from edgegoat ${pkg.version}. Emoji and invisible characters are shown as escapes.</span><span class="keys-hint"><kbd class="kbd kbd-xs">Up</kbd> <kbd class="kbd kbd-xs">Down</kbd> move <kbd class="kbd kbd-xs">/</kbd> search</span></div>
+      </div>
+      ${inspector()}
+    </div>
+    <div class="sheet-backdrop" v-cloak :class="{ 'is-open': sheet }" @click="closeSheet()" aria-hidden="true"></div>
+  </div>
+</section>`;
 }
 
 const INSTALL = [
@@ -378,79 +592,13 @@ const INSTALL = [
   ['bun', 'bun add --dev edgegoat'],
 ];
 
-function catalogUi() {
-  const chips = GENERATORS.map(
-    (g) =>
-      `<button type="button" class="chip" :class="{ on: gen === '${g.fn}' }" :aria-pressed="gen === '${g.fn}' ? 'true' : 'false'" @click="setGen('${g.fn}')">${g.fn}() <span class="n" v-text="countFor('${g.fn}', ${counts[g.fn]})">${counts[g.fn]}</span></button>`,
-  ).join('\n      ');
-  return `<div class="catalog-ui" v-resource="cat:./catalog.json">
-  <div class="filters" role="search">
-    <label for="q">Search cases</label>
-    <input id="q" type="search" v-model="q" placeholder="Try dst, surrogate, -0, traversal" autocomplete="off" spellcheck="false">
-  </div>
-  <div class="chips" role="group" aria-label="Filter by generator">
-      <button type="button" class="chip" :class="{ on: gen === '' }" :aria-pressed="gen === '' ? 'true' : 'false'" @click="setGen('')">All <span class="n" v-text="countFor('', ${total})">${total}</span></button>
-      ${chips}
-  </div>
-  <div class="tag-filter" v-cloak>
-    <span class="tag-filter-label" id="tag-filter-label">Tags, any of:</span>
-    <div class="chips" role="group" aria-labelledby="tag-filter-label">
-      <button type="button" class="chip small" v-for="t in tagList()" :key="t.name" :class="{ on: tags.includes(t.name) }" :aria-pressed="tags.includes(t.name) ? 'true' : 'false'" @click="toggleTag(t.name)"><span v-text="t.name"></span> <span class="n" v-text="t.count"></span></button>
-      <button type="button" class="chip small ghost" v-show="moreTags()" @click="allTags = !allTags" v-text="allTags ? 'Fewer tags' : 'More tags'"></button>
-      <button type="button" class="chip small ghost" v-show="tags.length || q || gen" @click="reset()">Clear filters</button>
-    </div>
-  </div>
-  <p id="status" class="status" role="status" v-text="status(${total})">Showing ${total} of ${total} cases.</p>
-  <details class="snippet" v-cloak>
-    <summary>Use this filter in a test</summary>
-    <div class="code-block live">
-      <div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">edge-cases.test.js</span></span><button type="button" class="copy" v-copy-from="#filter-snippet" v-copy-label="Copied" aria-label="Copy the test for the current filter">Copy</button></div>
-      <pre class="snippet-code" tabindex="0"><code id="filter-snippet" v-text="filterSnippet()"></code></pre>
-    </div>
-  </details>
-  <div class="catalog-body">
-    <div class="case-list">
-    <ol id="cases" class="cases">
-${cases.map(caseArticle).join('\n')}
-    </ol>
-    <button type="button" class="button ghost show-all" v-cloak v-show="hiddenCount()" @click="showAll = true" v-text="'Show ' + hiddenCount() + ' more cases'"></button>
-    </div>
-    <aside id="detail" class="detail" v-cloak :class="{ open: pick >= 0 }" aria-label="Case details" @keydown.esc="close()">
-      <div v-if="current()">
-        <div class="detail-head">
-          <code class="gen" v-text="current().generator + '()'"></code>
-          <button type="button" class="close" @click="close()" aria-label="Close case details">Close</button>
-        </div>
-        <h3 id="detail-title" tabindex="-1" v-text="current().label"></h3>
-        <dl>
-          <dt>Value</dt>
-          <dd><code class="value" v-text="current().value"></code></dd>
-          <dt>Why it breaks code</dt>
-          <dd v-text="current().why"></dd>
-          <dt v-if="current().zone">Time zone</dt>
-          <dd v-if="current().zone"><code v-text="current().zone"></code></dd>
-          <dt>Tags</dt>
-          <dd class="tags"><button type="button" class="tag" v-for="t in current().tags" :key="t" @click="toggleTag(t)" v-text="t"></button></dd>
-        </dl>
-        <p v-if="current().ref"><a :href="current().ref">Read the real bug or spec</a></p>
-        <div class="code-block live">
-          <div class="code-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-tab"><span class="file-icon" data-lang="js" aria-hidden="true">JS</span><span class="code-title">edge-case.test.js</span></span><button type="button" class="copy" v-copy-from="#case-snippet" v-copy-label="Copied" aria-label="Copy the test for this case">Copy</button></div>
-          <pre class="snippet-code" tabindex="0"><code id="case-snippet" v-text="caseSnippet()"></code></pre>
-        </div>
-      </div>
-      <p v-else class="hint">Select <strong>Details</strong> on any case to see its value, why it breaks code and a ready to paste test.</p>
-    </aside>
-  </div>
-</div>`;
-}
-
 const BUGS = [
-  ['github/relative-time-element#384', 'https://github.com/github/relative-time-element/pull/384', 'The "is this the current year?" check used UTC instead of the display time zone, so dates near New Year showed or hid the year incorrectly.'],
-  ['mozilla/pdf.js#22017', 'https://github.com/mozilla/pdf.js/pull/22017', 'util.printf dropped the sign of negative numbers greater than -1, such as -0.5.'],
-  ['google/budoux#1411', 'https://github.com/google/budoux/pull/1411', 'Text segmentation could split a surrogate pair, producing half an emoji.'],
-  ['microsoft/vscode-js-debug#2423', 'https://github.com/microsoft/vscode-js-debug/pull/2423', 'trimEnd style truncation could cut a surrogate pair in half.'],
-  ['salesforce/tough-cookie#644', 'https://github.com/salesforce/tough-cookie/pull/644', 'A cookie with an infinite max-age has to be treated as never expiring.'],
-  ['vuejs/core#15618', 'https://github.com/vuejs/core/pull/15618', 'A fix in the Vue 3 compat build.'],
+  ['github/relative-time-element#384', 'https://github.com/github/relative-time-element/pull/384', 'dates', 'The "is this the current year?" check used UTC instead of the display time zone, so dates near New Year showed or hid the year incorrectly.'],
+  ['mozilla/pdf.js#22017', 'https://github.com/mozilla/pdf.js/pull/22017', 'numbers', 'util.printf dropped the sign of negative numbers greater than -1, such as -0.5.'],
+  ['google/budoux#1411', 'https://github.com/google/budoux/pull/1411', 'strings', 'Text segmentation could split a surrogate pair, producing half an emoji.'],
+  ['microsoft/vscode-js-debug#2423', 'https://github.com/microsoft/vscode-js-debug/pull/2423', 'strings', 'trimEnd style truncation could cut a surrogate pair in half.'],
+  ['salesforce/tough-cookie#644', 'https://github.com/salesforce/tough-cookie/pull/644', 'numbers', 'A cookie with an infinite max-age has to be treated as never expiring.'],
+  ['vuejs/core#15618', 'https://github.com/vuejs/core/pull/15618', 'urls', 'A fix in the Vue 3 compat build.'],
 ];
 
 const SHOWCASE = `import { describe, expect, test } from 'vitest';
@@ -482,128 +630,111 @@ const INDEX_FAQ = [
   ['Does it add weight to my bundle?', 'It is a dev dependency with zero runtime dependencies, shipped as ESM and CommonJS with TypeScript types. It only runs in your tests.'],
 ];
 
-function heroTerminal() {
-  const tabs = INSTALL.map(([pm], i) => `<button type="button" class="term-tab" v-tab="${pm}" aria-selected="${i === 0}">${pm}</button>`).join('\n        ');
-  const panels = INSTALL.map(([pm, cmd], i) => `<div class="term-panel" v-tab-panel="${pm}"${i ? ' hidden' : ''}>
-      ${code(cmd, 'sh', 'Terminal')}
-    </div>`).join('\n    ');
-  return `<div class="terminal" v-tabs>
-    <div class="term-bar">
-      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      <div class="term-tabs" role="tablist" aria-label="Package manager">
-        ${tabs}
-      </div>
-    </div>
-    ${panels}
-  </div>`;
-}
-
 const STEPS = [
   ['Install', 'Add edgegoat as a dev dependency. No configuration, no runtime dependencies.'],
-  ['Pick the inputs', 'Call a generator and filter it with <code>{ tags }</code> or <code>{ exclude }</code>: DST gaps, surrogate pairs, <code>-0</code>, path traversal.'],
+  ['Pick the specimens', 'Call a generator and filter it with <code>{ tags }</code> or <code>{ exclude }</code>: DST gaps, surrogate pairs, <code>-0</code>, path traversal.'],
   ['Run them with test.each', 'Each case has a <code>label</code> for the test title and a <code>why</code> for the failure, so a red test tells you what broke.'],
 ];
 
+// FAQ as a Monsoon accordion: native <details>, open without any script.
+function faqAccordion(faq, name) {
+  return `<div class="accordion collapse-plus faq" v-pre>
+    ${faq.map(([q, a], i) => `<details class="collapse" name="${name}"${i === 0 ? ' open' : ''}><summary class="collapse-title">${esc(q)}</summary><div class="collapse-content"><p>${a}</p></div></details>`).join('\n    ')}
+  </div>`;
+}
+
+function installTabs(name) {
+  return `<div class="tabs tabs-boxed tabs-sm install-tabs" role="tablist" aria-label="Package manager">
+    ${INSTALL.map(([pm, cmd], i) => `<input type="radio" name="${name}" class="tab" aria-label="${pm}"${i === 0 ? ' checked' : ''}>
+    <div class="tab-content" role="tabpanel">${code(cmd, 'sh', 'Terminal')}</div>`).join('\n    ')}
+  </div>`;
+}
+
 function indexPage() {
-  const tiles = GRID.map((g) => {
-    const n = g.fns.length ? `${gridCount(g.fns)} cases` : '4 functions';
-    return `<li class="tile"><img src="assets/icons/${g.icon}.svg" width="44" height="44" alt="${esc(g.alt)}"><div><h3>${esc(g.en[0])} <span class="count">${n}</span></h3><p>${esc(g.en[1])}</p></div></li>`;
-  }).join('\n      ');
+  const stat = (n, label) => `<div class="stat"><p class="stat-value">${n}</p><p class="stat-title">${label}</p></div>`;
+  const tagTotal = new Set(cases.flatMap((c) => c.tags)).size;
   const body = `
-<section class="hero">
-  <div class="hero-bg" aria-hidden="true"></div>
-  <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <p class="eyebrow"><span>v${pkg.version}</span> ${total} cases, ${GENERATORS.length} generators, zero dependencies</p>
-      <h1>edgegoat: <span class="grad">edge case test inputs</span> for JavaScript</h1>
-      <p class="tagline">The inputs that break code, ready to drop into your tests.</p>
-      <p class="hero-text">Curated, documented edge cases for <strong>time zones</strong>, <strong>daylight saving time</strong>, <strong>dates before 1970</strong>, <strong>unicode test strings</strong>, <strong>-0 and NaN</strong>, URLs, paths and JSON. Each one says why it breaks code. Works with Vitest, Jest, node:test and Mocha, in TypeScript or JavaScript.</p>
-      <div class="cta">
-        <a class="button" href="#catalog">Browse the catalog</a>
-        <a class="button ghost" href="${REPO}">View on GitHub</a>
+<section class="intro" aria-labelledby="intro-h">
+  <div class="wrap intro-grid">
+    <div>
+      <p class="eyebrow">${icon('ui-jar')}<span>Specimen catalog, v${pkg.version}</span></p>
+      <h1 id="intro-h">edgegoat: <span class="hl">edge case test inputs</span> for JavaScript</h1>
+      <p class="lede">The inputs that break code, ready to drop into your tests. Curated specimens for <strong>time zones</strong>, <strong>daylight saving time</strong>, <strong>dates before 1970</strong>, <strong>unicode test strings</strong>, <strong>-0 and NaN</strong>, URLs, paths and JSON, each with the reason it breaks code. For Vitest, Jest, node:test and Mocha.</p>
+      <div class="intro-actions">
+        <div class="mini-term">${code(INSTALL[0][1], 'sh', 'Terminal')}</div>
+        <a class="btn btn-primary" href="#catalog">Open the lab ${icon('ui-arrow')}</a>
+        <a class="btn btn-outline btn-neutral" href="${GUIDES[0].slug}">${icon('ui-book')}Read the guides</a>
       </div>
-      <p class="badges">
-        <a href="${NPM}"><img src="https://img.shields.io/npm/v/edgegoat?color=2E9C8A&amp;label=npm" height="20" alt="edgegoat npm version"></a>
-        <a href="${NPM}"><img src="https://img.shields.io/npm/dm/edgegoat?color=2E9C8A" height="20" alt="edgegoat npm downloads per month"></a>
-        <a href="${REPO}/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-2E9C8A" height="20" alt="MIT license"></a>
-      </p>
     </div>
-    <div class="hero-side">
-      <img class="hero-mascot" src="assets/mascot.svg" width="200" height="200" alt="Ledge, the edgegoat mascot: a mountain goat standing on the edge of a cliff">
-      ${heroTerminal()}
+    <div class="intro-side">
+      ${shelf()}
+      <div class="stats intro-stats">
+        ${stat(total, 'specimens')}
+        ${stat(GENERATORS.length, 'generators')}
+        ${stat(tagTotal, 'tags')}
+        ${stat(0, 'dependencies')}
+      </div>
     </div>
   </div>
+  ${ridge('ridge intro-ridge')}
 </section>
 
-<section id="quick-start" class="band">
-  <div class="wrap">
-    <p class="kicker">Quick start</p>
-    <h2>Edge cases in a real test suite</h2>
-    <p class="section-lede">Every generator returns an array of <code>{ label, value, why, tags }</code> objects, so it plugs straight into <code>test.each</code>. Filter with <code>{ tags: [...] }</code> or <code>{ exclude: [...] }</code>, pick zones with <code>dates({ zone: 'Europe/Berlin' })</code>.</p>
-    <div class="showcase">
+${lab()}
+
+<div>
+<section id="quick-start" class="nb-section" aria-labelledby="qs-h">
+  <div class="wrap nb-grid">
+    <div class="nb-head">
+      <p class="kicker">${icon('ui-terminal')}Procedure</p>
+      <h2 id="qs-h">Edge cases in a real test suite</h2>
+      <p>Every generator returns an array of <code>{ label, value, why, tags }</code> objects, so it plugs straight into <code>test.each</code>. Filter with <code>{ tags: [...] }</code> or <code>{ exclude: [...] }</code>, pick zones with <code>dates({ zone: 'Europe/Berlin' })</code>.</p>
+      <ol id="how-it-works" class="procedure">
+        ${STEPS.map(([h, p], i) => `<li><span class="proc-n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><div><h3>${esc(h)}</h3><p>${p}</p></div></li>`).join('\n        ')}
+      </ol>
+      ${installTabs('pm')}
+    </div>
+    <div class="nb-code">
       ${code(SHOWCASE, 'ts', 'dates.test.ts')}
     </div>
   </div>
 </section>
 
-<section id="how-it-works" class="band soft">
+<section id="bugs" class="nb-section nb-alt" aria-labelledby="bugs-h">
   <div class="wrap">
-    <p class="kicker">How it works</p>
-    <h2>Three steps, no setup</h2>
-    <ol class="steps">
-      ${STEPS.map(([h, p], i) => `<li><span class="step-n" aria-hidden="true">${i + 1}</span><h3>${esc(h)}</h3><p>${p}</p></li>`).join('\n      ')}
-    </ol>
-  </div>
-</section>
-
-<section id="categories" class="band">
-  <div class="wrap">
-    <p class="kicker">What is in the box</p>
-    <h2>${total} cases across ${GENERATORS.length} generators</h2>
-    <ul class="tiles">
-      ${tiles}
+    <div class="nb-title">
+      <p class="kicker">${icon('ui-bug')}Field samples</p>
+      <h2 id="bugs-h">Bugs these inputs found</h2>
+      <p>Real bugs of this kind, fixed upstream by the author of edgegoat in widely used projects. The library packages the inputs that exposed them.</p>
+    </div>
+    <ul class="samples">
+      ${BUGS.map(([name, url, gen, text], i) => `<li class="sample"><div class="sample-head">${icon(gen, 'ic sample-ic')}<span class="sample-no">Sample ${String.fromCharCode(65 + i)}</span></div><a href="${url}" class="sample-link">${esc(name)}</a><p>${esc(text)}</p></li>`).join('\n      ')}
     </ul>
   </div>
 </section>
 
-<section id="bugs" class="band soft">
+<section id="guides" class="nb-section" aria-labelledby="guides-h">
   <div class="wrap">
-    <p class="kicker">Proof</p>
-    <h2>Bugs these inputs found</h2>
-    <p class="section-lede">Real bugs of this kind, fixed upstream by the author of edgegoat in widely used projects. The library packages the inputs that exposed them.</p>
-    <ul class="bugs">
-      ${BUGS.map(([name, url, text]) => `<li><a href="${url}">${esc(name)}</a><p>${esc(text)}</p></li>`).join('\n      ')}
+    <div class="nb-title">
+      <p class="kicker">${icon('ui-book')}Lab notes</p>
+      <h2 id="guides-h">Guides</h2>
+      <p>One bug class per guide: the bug explained, a naive implementation that fails, and the edgegoat test that catches it.</p>
+    </div>
+    <ul class="notes">
+      ${GUIDES.map((g) => `<li><a href="${g.slug}" class="note">${icon(groupOf(g.slug).icon, 'ic note-ic')}<span class="note-cat">${groupOf(g.slug).name}</span><strong>${esc(g.h1)}</strong><span class="note-desc">${esc(g.description)}</span><span class="note-n">${relatedCases(RELATED[g.slug]).length} specimens</span></a></li>`).join('\n      ')}
     </ul>
   </div>
 </section>
 
-<section id="catalog" class="band" v-component="edge-catalog">
-  <div class="wrap">
-    <p class="kicker">Catalog</p>
-    <h2>Search the catalog</h2>
-    <p class="section-lede">All ${total} cases, generated from the published library. Also available as <a href="catalog.json">catalog.json</a>. Emoji and invisible characters are shown as escaped code points. Pick a generator or a tag to narrow the list, open <strong>Details</strong> on a case, and copy a ready <code>test.each</code> for the current filter.</p>
-    ${catalogUi()}
-  </div>
-</section>
-
-<section id="guides" class="band soft">
-  <div class="wrap">
-    <p class="kicker">Guides</p>
-    <h2>Guides</h2>
-    <ul class="guides">
-      ${GUIDES.map((g) => `<li><a href="${g.slug}"><strong>${esc(g.h1)}</strong><span>${esc(g.description)}</span></a></li>`).join('\n      ')}
-    </ul>
-  </div>
-</section>
-
-<section id="faq" class="band">
+<section id="faq" class="nb-section nb-alt" aria-labelledby="faq-h">
   <div class="wrap narrow">
-    <p class="kicker">FAQ</p>
-    <h2>Frequently asked questions</h2>
-    ${faqAccordion(INDEX_FAQ)}
+    <div class="nb-title">
+      <p class="kicker">${icon('ui-steps')}FAQ</p>
+      <h2 id="faq-h">Frequently asked questions</h2>
+    </div>
+    ${faqAccordion(INDEX_FAQ, 'faq')}
   </div>
-</section>`;
-  const strip = (html) => html.replace(/<[^>]+>/g, '').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&').replaceAll('&quot;', '"');
+</section>
+</div>`;
   const jsonld = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -618,8 +749,17 @@ function indexPage() {
         license: 'https://opensource.org/licenses/MIT',
         version: pkg.version,
         keywords: pkg.keywords.join(', '),
-        author: { '@type': 'Person', name: 'Alexandre Kohler', url: 'https://github.com/kwy404' },
+        author: { '@type': 'Person', name: 'Alexandre Kohler', url: AUTHOR, sameAs: [AUTHOR, LINKEDIN] },
         image: `${SITE}og.png`,
+      },
+      {
+        '@type': 'Dataset',
+        name: 'edgegoat edge case catalog',
+        description: `${total} documented edge case test inputs for JavaScript, each with a label, a value, the reason it breaks code and tags.`,
+        url: `${SITE}#catalog`,
+        license: 'https://opensource.org/licenses/MIT',
+        creator: { '@type': 'Person', name: 'Alexandre Kohler', url: AUTHOR },
+        distribution: { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE}catalog.json` },
       },
       {
         '@type': 'FAQPage',
@@ -634,34 +774,81 @@ function indexPage() {
     body,
     jsonld,
     type: 'website',
-    scripts: ['site.js'],
+    current: 'lab',
   });
 }
 
+// ------------------------------------------------------------ guides: lab notes
+function guideTabs(slug) {
+  const group = groupOf(slug);
+  const top = GROUPS.map((g) => {
+    const on = g === group;
+    return `<a href="${g.slugs[0]}" class="tab"${on ? ' aria-current="page"' : ''}>${icon(g.icon)}${g.name}<span class="badge badge-xs${on ? ' badge-primary' : ''}">${g.slugs.length}</span></a>`;
+  }).join('');
+  const sub = group.slugs.map((s) => `<a href="${s}" class="tab"${s === slug ? ' aria-current="page"' : ''}>${esc(guideBySlug(s).nav)}</a>`).join('');
+  return `<div class="dash-tabs">
+  <div class="wrap">
+    <nav class="tabs tabs-line cat-tabs" aria-label="Guide categories"><a href="./#catalog" class="tab">${icon('all')}Lab</a>${top}</nav>
+    <nav class="tabs tabs-pills tabs-sm sub-tabs" aria-label="${group.name} guides">${sub}</nav>
+  </div>
+</div>`;
+}
+
 function guidePage(g) {
+  const group = groupOf(g.slug);
+  const rel = RELATED[g.slug];
+  const specimens = relatedCases(rel);
+  const words = strip(g.lede + g.sections.map(([, html]) => html).join(' ')).split(/\s+/).length;
+  const minutes = Math.max(2, Math.round(words / 200));
+  const sections = g.sections.map(([h, html]) => [h, slugify(h), html.replace(/<table>/g, '<div class="table-wrap"><table class="table table-compact">').replace(/<\/table>/g, '</table></div>')]);
+  const toc = [...sections.map(([h, id]) => [h, id]), ['FAQ', 'faq']];
+  const panel = specimens.slice(0, 8).map((c) => `<li><a href="./?case=${c.id}#catalog" class="spec-row"><span class="spec-label" v-pre>${esc(c.label)}</span><code v-pre>${esc(c.value.length > 46 ? `${c.value.slice(0, 43)}...` : c.value)}</code></a></li>`).join('\n          ');
   const others = GUIDES.filter((o) => o.slug !== g.slug)
-    .map((o) => `<li><a href="${o.slug}">${esc(o.h1)}</a></li>`)
-    .join('\n    ');
+    .map((o) => `<li><a href="${o.slug}" class="note">${icon(groupOf(o.slug).icon, 'ic note-ic')}<span class="note-cat">${groupOf(o.slug).name}</span><strong>${esc(o.h1)}</strong></a></li>`)
+    .join('\n      ');
   const body = `
-<div class="wrap">
-<article class="guide">
-  <p class="crumbs"><a href="./">edgegoat</a> <span aria-hidden="true">/</span> Guides</p>
-  <h1>${esc(g.h1)}</h1>
-  <p class="lede">${g.lede}</p>
-  ${g.sections.map(([h, html]) => `<section><h2>${esc(h)}</h2>\n${html}\n</section>`).join('\n  ')}
-  <section>
-    <h2>FAQ</h2>
-    ${faqAccordion(g.faq)}
-  </section>
-  <section>
-    <h2>More guides</h2>
-    <ul>
-    ${others}
+${guideTabs(g.slug)}
+<div class="wrap dash">
+  <header class="dash-head">
+    <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="./">edgegoat</a></li><li><a href="${group.slugs[0]}">${group.name}</a></li><li><span aria-current="page">${esc(g.nav)}</span></li></ol></nav>
+    <h1>${esc(g.h1)}</h1>
+    <p class="lede" v-pre>${g.lede}</p>
+    <div class="stats dash-stats">
+      <div class="stat"><p class="stat-title">Specimens</p><p class="stat-value">${specimens.length}</p><p class="stat-desc">${rel.gen}()${rel.tags.length ? `, ${rel.tags.length} tag${rel.tags.length > 1 ? 's' : ''}` : ''}</p></div>
+      <div class="stat"><p class="stat-title">Reading time</p><p class="stat-value">${minutes} min</p><p class="stat-desc">${sections.length} sections</p></div>
+      <div class="stat"><p class="stat-title">Updated</p><p class="stat-value stat-date">${UPDATED}</p><p class="stat-desc">edgegoat ${pkg.version}</p></div>
+    </div>
+  </header>
+  <div class="dash-grid">
+    <article class="prose dash-article">
+      ${sections.map(([h, id, html]) => `<section id="${id}" class="dash-card" aria-labelledby="${id}-h"><h2 id="${id}-h">${esc(h)}</h2>\n${html}\n</section>`).join('\n      ')}
+      <section id="faq" class="dash-card" aria-labelledby="faq-h"><h2 id="faq-h">FAQ</h2>
+        ${faqAccordion(g.faq, 'faq')}
+      </section>
+    </article>
+    <aside class="dash-side" aria-label="Related specimens and contents">
+      <div class="side-card">
+        <div class="side-head">${jar({ glyph: `i-${rel.gen}`, cls: 'jar-art side-jar' })}<div><p class="side-kicker">From the lab</p><p class="side-title">${specimens.length} specimens for this note</p></div></div>
+        <ul class="spec-list">
+          ${panel}
+        </ul>
+        <a href="${labHref('./', rel)}" class="btn btn-sm btn-primary side-btn">Open them in the lab ${icon('ui-arrow')}</a>
+      </div>
+      <nav class="side-card toc-card" aria-labelledby="toc-h">
+        <p id="toc-h" class="toc-title">On this page</p>
+        <ul class="toc">
+          ${toc.map(([h, id]) => `<li><a href="#${id}">${esc(h)}</a></li>`).join('\n          ')}
+        </ul>
+      </nav>
+    </aside>
+  </div>
+  <section class="more-notes" aria-labelledby="more-h">
+    <h2 id="more-h">More lab notes</h2>
+    <ul class="notes notes-sm">
+      ${others}
     </ul>
   </section>
-</article>
 </div>`;
-  const strip = (html) => html.replace(/<[^>]+>/g, '').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&').replaceAll('&quot;', '"');
   const jsonld = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -671,13 +858,22 @@ function guidePage(g) {
         description: g.description,
         url: SITE + g.slug,
         image: `${SITE}og.png`,
-        datePublished: UPDATED,
+        datePublished: PUBLISHED,
         dateModified: UPDATED,
         inLanguage: 'en',
         proficiencyLevel: 'Intermediate',
-        author: { '@type': 'Person', name: 'Alexandre Kohler', url: 'https://github.com/kwy404' },
+        author: { '@type': 'Person', name: 'Alexandre Kohler', url: AUTHOR, sameAs: [AUTHOR, LINKEDIN] },
         about: g.about,
+        timeRequired: `PT${minutes}M`,
         isPartOf: { '@type': 'WebSite', name: 'edgegoat', url: SITE },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'edgegoat', item: SITE },
+          { '@type': 'ListItem', position: 2, name: group.name, item: SITE + group.slugs[0] },
+          { '@type': 'ListItem', position: 3, name: g.nav, item: SITE + g.slug },
+        ],
       },
       {
         '@type': 'FAQPage',
@@ -685,7 +881,7 @@ function guidePage(g) {
       },
     ],
   };
-  return layout({ slug: g.slug, title: g.title, description: g.description, body, jsonld });
+  return layout({ slug: g.slug, title: g.title, description: g.description, body, jsonld, current: 'guides' });
 }
 
 write('docs/index.html', indexPage());
@@ -698,19 +894,27 @@ write(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+${THEME_BOOT}
 <title>Page not found | edgegoat</title>
 <meta name="robots" content="noindex">
-${THEME_BOOT}
-<meta name="color-scheme" content="light dark">
 <link rel="icon" href="/edgegoat/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="${MONSOON_CSS}">
 <link rel="stylesheet" href="/edgegoat/style.css">
 </head>
-<body>
-<main id="main" class="wrap notfound">
-  <img src="/edgegoat/assets/mascot.svg" width="160" height="160" alt="Ledge the goat looking over the cliff edge">
-  <h1>This page fell off the edge</h1>
-  <p>The page you were looking for does not exist. Ledge checked every ledge.</p>
-  <p><a class="button" href="/edgegoat/">Back to edgegoat</a></p>
+<body class="antialiased page-404">
+${sprite()}
+<main id="main" class="lost">
+  <div class="lost-card">
+    ${jar({ glyph: 'i-paths', cls: 'jar-art lost-jar', label: '404' })}
+    <p class="kicker">Specimen missing</p>
+    <h1>This page fell off the edge</h1>
+    <p>The page you were looking for is not on any shelf. Ledge checked every ledge.</p>
+    <p class="lost-actions"><a class="btn btn-primary" href="/edgegoat/">Back to the lab</a> <a class="btn btn-outline btn-neutral" href="/edgegoat/${GUIDES[0].slug}">Read the guides</a></p>
+    <p class="lost-made"><img src="/edgegoat/assets/mascot.svg" width="28" height="28" alt="" class="mascot"> Made by <a href="${AUTHOR}" rel="me noopener">Alexandre Kohler</a> (<a href="${LINKEDIN}" rel="me noopener">LinkedIn</a>). Built with <a href="https://kwy404.github.io/monsoon/">Monsoon</a>. Interactive parts built with <a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a>.</p>
+    <p class="lost-more">More from kwy404: ${PROJECTS.map(([name, href]) => `<a href="${href}">${esc(name)}</a>`).join(', ')}.</p>
+  </div>
+  ${ridge('ridge lost-ridge')}
 </main>
 </body>
 </html>
@@ -721,8 +925,8 @@ write(
   'docs/sitemap.xml',
   `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${SITE}</loc><lastmod>${UPDATED}</lastmod><priority>1.0</priority></url>
-${GUIDES.map((g) => `  <url><loc>${SITE}${g.slug}</loc><lastmod>${UPDATED}</lastmod><priority>0.8</priority></url>`).join('\n')}
+  <url><loc>${SITE}</loc><lastmod>${UPDATED}</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+${GUIDES.map((g) => `  <url><loc>${SITE}${g.slug}</loc><lastmod>${UPDATED}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join('\n')}
 </urlset>
 `,
 );
@@ -730,10 +934,11 @@ write('docs/robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${SITE}sitemap.xml
 write('docs/.nojekyll', '');
 
 // Static files the site needs from assets/.
-mkdirSync(join(root, 'docs/assets/icons'), { recursive: true });
+mkdirSync(join(root, 'docs/assets'), { recursive: true });
 copyFileSync(join(root, 'assets/mascot.svg'), join(root, 'docs/assets/mascot.svg'));
 copyFileSync(join(root, 'assets/favicon.svg'), join(root, 'docs/favicon.svg'));
-for (const f of readdirSync(join(root, 'assets/icons'))) copyFileSync(join(root, 'assets/icons', f), join(root, 'docs/assets/icons', f));
+// The site draws its icons inline (scripts/site-art.mjs); the old copies go.
+rmSync(join(root, 'docs/assets/icons'), { recursive: true, force: true });
 // Syntax highlighting is part of the build, so the generated docs check covers it.
 const highlighted = await highlightDocs();
 console.log(`highlighted code in ${highlighted.length} pages`);

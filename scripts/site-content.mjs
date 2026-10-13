@@ -4,8 +4,8 @@
 
 const esc = (s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 const code = (text, lang = 'js') => `<pre><code class="language-${lang}">${esc(text.trim())}</code></pre>`;
-const fails = (text) => `<div class="callout fail"><strong>Fails:</strong> ${text}</div>`;
-const tip = (text) => `<div class="callout tip">${text}</div>`;
+const fails = (text) => `<div class="callout callout-danger"><p class="callout-title">Fails on</p><p>${text}</p></div>`;
+const tip = (text) => `<div class="callout callout-info"><p class="callout-title">Note</p><p>${text}</p></div>`;
 
 export const GUIDES = [
   {
@@ -506,7 +506,7 @@ ${tip('Code that captured <code>Date</code> or <code>Date.now</code> before the 
       [
         'What each approach is good at',
         `<table>
-<thead><tr><th></th><th>fast-check</th><th>edgegoat</th><th>big-list-of-naughty-strings</th></tr></thead>
+<thead><tr><th scope="col">Aspect</th><th>fast-check</th><th>edgegoat</th><th>big-list-of-naughty-strings</th></tr></thead>
 <tbody>
 <tr><th scope="row">Inputs</th><td>Random, generated from arbitraries</td><td>Curated, deterministic</td><td>Curated raw strings</td></tr>
 <tr><th scope="row">Finds</th><td>Unknown bugs, with shrinking</td><td>Known bug classes, every run</td><td>String handling bugs</td></tr>

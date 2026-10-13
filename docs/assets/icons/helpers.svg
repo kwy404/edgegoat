@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Helpers icon">
-  <title>Helpers</title>
-  <rect width="48" height="48" rx="12" fill="#2E9C8A" fill-opacity="0.14"/>
-  <circle cx="24" cy="26" r="12" fill="none" stroke="#2E9C8A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M20 9h8M24 9v5M24 26v-7" fill="none" stroke="#2E9C8A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M24 26l6 4" fill="none" stroke="#F2A93B" stroke-width="3" stroke-linecap="round"/>
-</svg>
