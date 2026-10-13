@@ -1,6 +1,6 @@
 {
   "name": "edgegoat",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Edge case test inputs for JavaScript and TypeScript: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON, ready for Vitest, Jest, node:test and Mocha.",
   "keywords": [
     "edge cases",
