@@ -65,6 +65,7 @@ test.each(dates({ tags: ['dst'] }))('$label', ({ value, zone }) => {
 - [Como o edgegoat se compara ao fast-check e à big-list-of-naughty-strings?](#como-o-edgegoat-se-compara-ao-fast-check-e-à-big-list-of-naughty-strings)
 - [Onde estão os guias?](#onde-estão-os-guias)
 - [Como contribuir?](#como-contribuir)
+- [Mais de kwy404](#mais-de-kwy404)
 - [Licença](#licença)
 
 ## Como instalo o edgegoat?
@@ -172,6 +173,22 @@ O site fica em **[kwy404.github.io/edgegoat](https://kwy404.github.io/edgegoat/)
 ## Como contribuir?
 
 Novos casos são bem-vindos quando já quebraram código real. Todo caso precisa de um `why` e, de preferência, de um link para um bug real. Veja o [CONTRIBUTING.md](https://github.com/kwy404/edgegoat/blob/main/CONTRIBUTING.md).
+
+## Mais de kwy404
+
+<!-- more:start -->
+- [Monsoon](https://kwy404.github.io/monsoon/): CSS utilitário direto do CDN, sem etapa de build, com um tema inteiro a partir de uma cor.
+- [Voodoo.js](https://kwy404.github.io/Voodoo.js/): O framework JavaScript que começa pelo HTML: diretivas reativas e JSX em um arquivo HTML simples.
+- [breakhound](https://kwy404.github.io/breakhound/): Encontra bugs em qualquer biblioteca JavaScript ou TypeScript automaticamente, sem escrever testes.
+- [vueleap](https://kwy404.github.io/vueleap/): Migra de Vue 2 para Vue 3 com um comando, com as flags exatas do @vue/compat que você precisa.
+- [graphemely](https://kwy404.github.io/graphemely/): Trunca, corta e conta strings com emoji com segurança, por cluster de grafemas.
+- [numberparrot](https://kwy404.github.io/numberparrot/): Converte números e moedas localizados de volta em números de verdade, para qualquer locale.
+- [cookieowl](https://kwy404.github.io/cookieowl/): Banner de cookies gratuito para LGPD e GDPR que bloqueia rastreadores de verdade antes do consentimento.
+- [installkite](https://kwy404.github.io/installkite/): Torne qualquer site instalável e com funcionamento offline com um comando.
+- [a11ymedic](https://kwy404.github.io/a11ymedic/): O verificador de acessibilidade que explica cada problema e entrega a correção exata.
+- [fontsketch](https://kwy404.github.io/fontsketch/): Crie uma fonte com a sua letra, grátis e no navegador.
+- [kastor](https://kwy404.github.io/kastor/): O ORM para TypeScript para PostgreSQL, MySQL, SQLite, SQL Server, Oracle, MongoDB e mais.
+<!-- more:end -->
 
 ## Licença
 

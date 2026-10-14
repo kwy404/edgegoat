@@ -57,14 +57,19 @@ const GRID = [
   { icon: 'helpers', fns: [], en: ['Helpers', 'withTimeZone, withFrozenTime, check, assertNoThrow'], pt: ['Helpers', 'withTimeZone, withFrozenTime, check, assertNoThrow'], alt: 'Stopwatch icon for the time zone and frozen time test helpers' },
 ];
 
-// Sibling projects, listed in the site footer and in README.md (never this one).
+// Sibling projects, listed in the site footer and in both READMEs (never this one).
 const PROJECTS = [
-  ['Monsoon', 'https://kwy404.github.io/monsoon/', 'Utility-first CSS from a CDN with no build step, a whole theme from one seed color.'],
-  ['Voodoo.js', 'https://kwy404.github.io/Voodoo.js/', 'The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.'],
-  ['breakhound', 'https://kwy404.github.io/breakhound/', 'Find bugs in any JavaScript or TypeScript library automatically, no tests required.'],
-  ['vueleap', 'https://kwy404.github.io/vueleap/', 'Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.'],
-  ['graphemely', 'https://kwy404.github.io/graphemely/', 'Truncate, slice and count strings with emoji safely, by grapheme cluster.'],
-  ['numberparrot', 'https://kwy404.github.io/numberparrot/', 'Parse localized number and currency strings back into real numbers, for any locale.'],
+  ['Monsoon', 'https://kwy404.github.io/monsoon/', 'Utility-first CSS from a CDN with no build step, a whole theme from one seed color.', 'CSS utilitário direto do CDN, sem etapa de build, com um tema inteiro a partir de uma cor.'],
+  ['Voodoo.js', 'https://kwy404.github.io/Voodoo.js/', 'The HTML first JavaScript framework: reactive directives and JSX in a plain HTML file.', 'O framework JavaScript que começa pelo HTML: diretivas reativas e JSX em um arquivo HTML simples.'],
+  ['breakhound', 'https://kwy404.github.io/breakhound/', 'Find bugs in any JavaScript or TypeScript library automatically, no tests required.', 'Encontra bugs em qualquer biblioteca JavaScript ou TypeScript automaticamente, sem escrever testes.'],
+  ['vueleap', 'https://kwy404.github.io/vueleap/', 'Migrate Vue 2 to Vue 3 with one command, with the exact @vue/compat flags you need.', 'Migra de Vue 2 para Vue 3 com um comando, com as flags exatas do @vue/compat que você precisa.'],
+  ['graphemely', 'https://kwy404.github.io/graphemely/', 'Truncate, slice and count strings with emoji safely, by grapheme cluster.', 'Trunca, corta e conta strings com emoji com segurança, por cluster de grafemas.'],
+  ['numberparrot', 'https://kwy404.github.io/numberparrot/', 'Parse localized number and currency strings back into real numbers, for any locale.', 'Converte números e moedas localizados de volta em números de verdade, para qualquer locale.'],
+  ['cookieowl', 'https://kwy404.github.io/cookieowl/', 'Free cookie consent banner for LGPD and GDPR that really blocks trackers before consent.', 'Banner de cookies gratuito para LGPD e GDPR que bloqueia rastreadores de verdade antes do consentimento.'],
+  ['installkite', 'https://kwy404.github.io/installkite/', 'Make any website installable and offline capable with one command.', 'Torne qualquer site instalável e com funcionamento offline com um comando.'],
+  ['a11ymedic', 'https://kwy404.github.io/a11ymedic/', 'The accessibility checker that explains every problem and gives the exact fix.', 'O verificador de acessibilidade que explica cada problema e entrega a correção exata.'],
+  ['fontsketch', 'https://kwy404.github.io/fontsketch/', 'Turn your handwriting into a font, free in your browser.', 'Crie uma fonte com a sua letra, grátis e no navegador.'],
+  ['kastor', 'https://kwy404.github.io/kastor/', 'The TypeScript ORM for PostgreSQL, MySQL, SQLite, SQL Server, Oracle, MongoDB and more.', 'O ORM para TypeScript para PostgreSQL, MySQL, SQLite, SQL Server, Oracle, MongoDB e mais.'],
 ];
 
 function escapeCodePoints(s) {
@@ -242,7 +247,7 @@ for (const [file, lang] of [
   text = replaceBetween(text, 'grid', grid(lang));
   text = text.replace(/<!-- total -->\d+<!-- \/total -->/g, `<!-- total -->${total}<!-- /total -->`);
   if (lang === 'en') text = replaceBetween(text, 'catalog', catalogTables());
-  if (lang === 'en') text = replaceBetween(text, 'more', PROJECTS.map(([name, href, line]) => `- [${name}](${href}): ${line}`).join('\n'));
+  text = replaceBetween(text, 'more', PROJECTS.map(([name, href, en, pt]) => `- [${name}](${href}): ${lang === 'en' ? en : pt}`).join('\n'));
   write(file, text);
 }
 
