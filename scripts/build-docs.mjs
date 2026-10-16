@@ -5,12 +5,13 @@
 //   and the art from scripts/site-art.mjs. docs/style.css and docs/site.js
 //   are written by hand.
 // Usage: npm run docs   (builds the library first)
-import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { transform } from 'esbuild';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { GUIDES } from './site-content.mjs';
 import { highlightDocs } from './highlight-docs.mjs';
-import { icon, jar, mascot, ridge, shelf, sprite } from './site-art.mjs';
+import { icon, jar, mascot, ridge, sprite } from './site-art.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const lib = await import(pathToFileURL(join(root, 'dist/index.js')).href);
@@ -200,11 +201,6 @@ function catalogSvg() {
 write('assets/catalog.svg', catalogSvg());
 
 // ------------------------------------------------------------ README sections
-const mdCell = (s) => s.replaceAll('|', BS + '|').replaceAll('\n', ' ');
-const mdCode = (s) => {
-  const short = s.length > 48 ? `${s.slice(0, 45)}...` : s;
-  return '`' + mdCell(short).replaceAll('`', "'") + '`';
-};
 
 function grid(lang) {
   const cells = GRID.map((g) => {
@@ -216,21 +212,6 @@ function grid(lang) {
   const rows = [];
   for (let i = 0; i < cells.length; i += 3) rows.push(`<tr>\n${cells.slice(i, i + 3).join('\n')}\n</tr>`);
   return `<table>\n${rows.join('\n')}\n</table>`;
-}
-
-function catalogTables() {
-  return GENERATORS.map((g) => {
-    const list = cases.filter((c) => c.generator === g.fn);
-    const rows = list.map((c) => `| ${mdCell(c.label)} | ${mdCode(c.value)} | ${mdCell(c.why)} |`).join('\n');
-    return `<details>
-<summary><strong><code>${g.fn}()</code></strong>: ${list.length} cases</summary>
-
-| Label | Value | Why it breaks code |
-| --- | --- | --- |
-${rows}
-
-</details>`;
-  }).join('\n\n');
 }
 
 function replaceBetween(text, name, content) {
@@ -246,7 +227,6 @@ for (const [file, lang] of [
   let text = readFileSync(join(root, file), 'utf8');
   text = replaceBetween(text, 'grid', grid(lang));
   text = text.replace(/<!-- total -->\d+<!-- \/total -->/g, `<!-- total -->${total}<!-- /total -->`);
-  if (lang === 'en') text = replaceBetween(text, 'catalog', catalogTables());
   text = replaceBetween(text, 'more', PROJECTS.map(([name, href, en, pt]) => `- [${name}](${href}): ${lang === 'en' ? en : pt}`).join('\n'));
   write(file, text);
 }
@@ -273,21 +253,16 @@ const THEME_BOOT = `<script>(function(){try{var t=localStorage.getItem('voodoo:t
 
 // Guide categories: the tab bar on every guide page.
 const GROUPS = [
-  { id: 'time', name: 'Time', icon: 'dates', slugs: ['test-timezones-javascript.html', 'test-daylight-saving-time-jest.html', 'test-dates-before-1970.html', 'mock-date-javascript.html'] },
+  { id: 'time', name: 'Time', icon: 'dates', slugs: ['test-timezones-javascript.html', 'test-daylight-saving-time-jest.html'] },
   { id: 'unicode', name: 'Unicode', icon: 'strings', slugs: ['unicode-test-strings.html'] },
-  { id: 'numbers', name: 'Numbers', icon: 'numbers', slugs: ['javascript-number-edge-cases.html', 'javascript-negative-zero.html'] },
-  { id: 'method', name: 'Method', icon: 'all', slugs: ['property-based-testing-edge-cases.html'] },
+  { id: 'numbers', name: 'Numbers', icon: 'numbers', slugs: ['javascript-number-edge-cases.html'] },
 ];
 // The specimens each guide is about, shown in its side panel and linked to the lab.
 const RELATED = {
   'test-timezones-javascript.html': { gen: 'timeZones', tags: [] },
   'test-daylight-saving-time-jest.html': { gen: 'dates', tags: ['dst'] },
-  'test-dates-before-1970.html': { gen: 'dates', tags: ['pre-1970', 'far-past', 'epoch'] },
-  'mock-date-javascript.html': { gen: 'dates', tags: ['year-boundary', 'leap', 'month-end'] },
   'unicode-test-strings.html': { gen: 'strings', tags: ['surrogate', 'emoji', 'normalization', 'bidi', 'invisible'] },
   'javascript-number-edge-cases.html': { gen: 'numbers', tags: [] },
-  'javascript-negative-zero.html': { gen: 'numbers', tags: ['zero', 'sign'] },
-  'property-based-testing-edge-cases.html': { gen: 'numbers', tags: ['nan', 'infinity', 'precision'] },
 };
 const groupOf = (slug) => GROUPS.find((g) => g.slugs.includes(slug));
 const guideBySlug = (slug) => GUIDES.find((g) => g.slug === slug);
@@ -340,10 +315,10 @@ function palette(prefix) {
 function topbar(prefix, current) {
   const link = (href, text, key) => `<a href="${href}" class="navbar-link"${current === key ? ' aria-current="page"' : ''}>${text}</a>`;
   const links = [
+    link(`${prefix}#try`, 'Try it', 'try'),
     link(`${prefix}#catalog`, 'Lab', 'lab'),
     link(`${prefix}${GUIDES[0].slug}`, 'Guides', 'guides'),
     link(`${prefix}#quick-start`, 'Quick start', 'start'),
-    link(`${prefix}catalog.json`, 'catalog.json', 'json'),
   ].join('');
   return `<header class="navbar navbar-sticky navbar-blur topbar">
   <div class="navbar-start">
@@ -372,7 +347,7 @@ function footer(prefix) {
         <p class="built">Built with <a href="https://kwy404.github.io/monsoon/">Monsoon</a>. Interactive parts built with <a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a>.</p>
       </div>
       <nav aria-label="Guides">
-        <p class="footer-title">Lab notes</p>
+        <p class="footer-title">Guides</p>
         <ul class="footer-links">
           ${GUIDES.map((g) => `<li><a href="${prefix}${g.slug}">${esc(g.nav)}</a></li>`).join('\n          ')}
         </ul>
@@ -413,6 +388,7 @@ export function layout({ slug, title, description, body, jsonld, type = 'article
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 ${THEME_BOOT}
+<script src="seasons.js"></script>
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${url}">
@@ -603,7 +579,6 @@ const BUGS = [
   ['google/budoux#1411', 'https://github.com/google/budoux/pull/1411', 'strings', 'Text segmentation could split a surrogate pair, producing half an emoji.'],
   ['microsoft/vscode-js-debug#2423', 'https://github.com/microsoft/vscode-js-debug/pull/2423', 'strings', 'trimEnd style truncation could cut a surrogate pair in half.'],
   ['salesforce/tough-cookie#644', 'https://github.com/salesforce/tough-cookie/pull/644', 'numbers', 'A cookie with an infinite max-age has to be treated as never expiring.'],
-  ['vuejs/core#15618', 'https://github.com/vuejs/core/pull/15618', 'urls', 'A fix in the Vue 3 compat build.'],
 ];
 
 const SHOWCASE = `import { describe, expect, test } from 'vitest';
@@ -632,7 +607,6 @@ const INDEX_FAQ = [
   ['Does edgegoat generate random data?', 'No. Every call returns the same cases, so failures are reproducible. DST instants are computed from the runtime tz database, so they are deterministic for a given Node.js version.'],
   ['How do I run a test in another time zone?', 'Wrap it in <code>withTimeZone(zone, fn)</code>. In Node.js it sets <code>process.env.TZ</code>, which applies to <code>Date</code> and <code>Intl</code> immediately, and restores the previous zone afterwards, even when the function throws.'],
   ['Why are emoji shown as escapes in the catalog?', 'So you can see exactly what is in each string. Invisible characters, combining marks and surrogate pairs look identical or empty when rendered, so the catalog prints code points such as <code>\\u{1F600}</code> instead.'],
-  ['Does it add weight to my bundle?', 'It is a dev dependency with zero runtime dependencies, shipped as ESM and CommonJS with TypeScript types. It only runs in your tests.'],
 ];
 
 const STEPS = [
@@ -655,30 +629,102 @@ function installTabs(name) {
   </div>`;
 }
 
-function indexPage() {
-  const stat = (n, label) => `<div class="stat"><p class="stat-value">${n}</p><p class="stat-title">${label}</p></div>`;
-  const tagTotal = new Set(cases.flatMap((c) => c.tags)).size;
-  const body = `
-<section class="intro" aria-labelledby="intro-h">
-  <div class="wrap intro-grid">
-    <div>
-      <p class="eyebrow">${icon('ui-jar')}<span>Specimen catalog, v${pkg.version}</span></p>
-      <h1 id="intro-h">edgegoat: <span class="hl">edge case test inputs</span> for JavaScript</h1>
-      <p class="lede">The inputs that break code, ready to drop into your tests. Curated specimens for <strong>time zones</strong>, <strong>daylight saving time</strong>, <strong>dates before 1970</strong>, <strong>unicode test strings</strong>, <strong>-0 and NaN</strong>, URLs, paths and JSON, each with the reason it breaks code. For Vitest, Jest, node:test and Mocha.</p>
-      <div class="intro-actions">
-        <div class="mini-term">${code(INSTALL[0][1], 'sh', 'Terminal')}</div>
-        <a class="btn btn-primary" href="#catalog">Open the lab ${icon('ui-arrow')}</a>
-        <a class="btn btn-outline btn-neutral" href="${GUIDES[0].slug}">${icon('ui-book')}Read the guides</a>
+// ------------------------------------------------------------ home: try it
+// Friendly names for the type picker of the demo.
+const TRY_TYPES = [
+  ['strings', 'Text'],
+  ['numbers', 'Numbers'],
+  ['dates', 'Dates'],
+  ['emails', 'Emails'],
+  ['urls', 'URLs'],
+  ['paths', 'File paths'],
+  ['json', 'JSON'],
+  ['arrays', 'Arrays'],
+  ['timeZones', 'Time zones'],
+  ['numericStrings', 'Numeric text'],
+  ['bigints', 'BigInts'],
+];
+const TRY_SHOWN = 6;
+
+// The "paste and see" demo at the top of the home page. The component
+// (edge-try in docs/site.js) runs the real library in a worker; the first
+// cases are also in the static HTML so the card is never empty.
+function tryIt() {
+  const first = cases.filter((c) => c.generator === 'strings').slice(0, TRY_SHOWN);
+  const chip = ([fn, name]) => `<button type="button" class="type-chip" data-gen="${fn}" :class="{ 'is-on': gen === '${fn}' }" :aria-pressed="gen === '${fn}' ? 'true' : 'false'" @click="choose('${fn}', true)" aria-pressed="${fn === 'strings'}">${icon(fn, 'ic')}<span>${name}</span><span class="type-n">${counts[fn]}</span></button>`;
+  const staticCase = (c, k) => `<li class="try-case" style="--i:${k}" v-pre><div class="try-case-top"><span class="try-label">${esc(c.label)}</span></div><code class="try-value">${esc(c.value)}</code><p class="try-why">${esc(c.why)}</p></li>`;
+  return `<div class="try" v-component="edge-try">
+    <div class="try-controls">
+      <p class="try-step"><span class="try-n" aria-hidden="true">1</span>Pick a data type</p>
+      <div class="type-chips" role="group" aria-label="Data type">
+        ${TRY_TYPES.map(chip).join('\n        ')}
+      </div>
+      <label class="try-paste">
+        <span class="try-paste-label">or paste a value from your code</span>
+        <input type="text" class="input input-sm" v-model="sample" placeholder="ana@example.com, 42, 2026-03-08, C:\\Users" autocomplete="off" spellcheck="false" aria-describedby="try-detect">
+      </label>
+      <p id="try-detect" class="try-detect" role="status" v-cloak v-text="detectNote"></p>
+      <div class="try-dates" v-cloak v-if="gen === 'dates'">
+        <label><span>Time zone</span><input type="text" class="input input-sm" v-model="zone" list="try-zones" placeholder="Default: 7 tricky zones" autocomplete="off" spellcheck="false"></label>
+        <label><span>Year</span><input type="number" class="input input-sm" v-model="year" min="1970" max="2100" placeholder="2026"></label>
+        <datalist id="try-zones"><option value="Europe/Berlin"></option><option value="America/Sao_Paulo"></option><option value="America/New_York"></option><option value="Asia/Kathmandu"></option><option value="Australia/Lord_Howe"></option><option value="Pacific/Kiritimati"></option></datalist>
+      </div>
+      <div class="try-run">
+        <p class="try-step"><span class="try-n" aria-hidden="true">3</span>Run them on your function <span class="try-opt">optional</span></p>
+        <textarea class="textarea try-src" v-model="src" @input="edited = true" rows="3" spellcheck="false" aria-label="Your function, written as a JavaScript arrow function"></textarea>
+        <div class="try-run-row">
+          <button type="button" class="btn btn-primary btn-sm" @click="run()" :disabled="running">${icon('ui-terminal')}<span v-text="running ? 'Running' : 'Run on every case'">Run on every case</span></button>
+          <button type="button" class="btn btn-ghost btn-sm" v-cloak v-if="edited" @click="resetSrc()">Reset</button>
+        </div>
+        <p class="try-summary" role="status" v-cloak v-text="summary()"></p>
+        <p class="try-note">Runs in your browser, in a worker. Nothing is sent anywhere.</p>
       </div>
     </div>
-    <div class="intro-side">
-      ${shelf()}
-      <div class="stats intro-stats">
-        ${stat(total, 'specimens')}
-        ${stat(GENERATORS.length, 'generators')}
-        ${stat(tagTotal, 'tags')}
-        ${stat(0, 'dependencies')}
+    <div class="try-results">
+      <div class="try-results-head">
+        <p class="try-step"><span class="try-n" aria-hidden="true">2</span><span>See the edge cases</span><span class="badge badge-sm badge-soft badge-primary try-count" v-text="countText()">${counts.strings} cases</span></p>
+        <div class="try-tags" v-cloak v-if="tagList().length" role="group" aria-label="Filter by tag">
+          <button type="button" class="try-tag" v-for="t in tagList()" :key="t" :class="{ 'is-on': tags.includes(t) }" :aria-pressed="tags.includes(t) ? 'true' : 'false'" @click="toggleTag(t)" v-text="t"></button>
+        </div>
       </div>
+      <ol class="try-list" v-if="!cases.length">
+        ${first.map(staticCase).join('\n        ')}
+      </ol>
+      <ol class="try-list" v-cloak v-else :class="{ 'is-busy': loading }">
+        <li class="try-case" v-for="(c, k) in shown()" :key="nonce + ':' + c.label" :style="'--i:' + k" :class="'is-' + status(c.label)">
+          <div class="try-case-top"><span class="try-label" v-text="c.label"></span><span class="try-badge" v-if="res(c.label)" v-text="badge(c.label)"></span></div>
+          <code class="try-value" v-text="c.value"></code>
+          <p class="try-why" v-text="c.why"></p>
+          <p class="try-out" v-if="res(c.label)"><span class="try-out-k">Your function</span><code v-text="res(c.label).out"></code><span class="try-out-note" v-if="res(c.label).note" v-text="res(c.label).note"></span></p>
+        </li>
+      </ol>
+      <p class="try-empty" v-cloak v-if="failed" v-text="failed"></p>
+      <div class="try-more" v-cloak v-if="cases.length > ${TRY_SHOWN}">
+        <button type="button" class="btn btn-outline btn-neutral btn-sm" @click="all = !all" v-text="all ? 'Show fewer' : 'Show all ' + cases.length"></button>
+      </div>
+      <div class="ed ed-live try-code">
+        <div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="js" aria-hidden="true">JS</span><span class="ed-title">edge-cases.test.js</span></span><button type="button" class="copy-btn ed-copy" v-copy-from="#try-snippet" v-copy-label="Copied" aria-label="Copy this test">${icon('ui-copy')}${icon('ui-check')}<span>Copy</span></button></div>
+        <pre id="try-snippet" class="shiki numbered" tabindex="0"><code v-html="hl(snippet())"></code></pre>
+      </div>
+    </div>
+  </div>`;
+}
+
+function indexPage() {
+  const body = `
+<section id="try" class="hero" aria-labelledby="hero-h">
+  <div class="wrap">
+    <div class="hero-head">
+      <div class="hero-goat" aria-hidden="true">${mascot('./', 64)}</div>
+      <div>
+        <h1 id="hero-h">The inputs that break code, <span class="hl">ready for your tests</span></h1>
+        <p class="lede">${total} edge cases for JavaScript, each with the reason it breaks code. Pick a type and see them, then run them on your own function.</p>
+      </div>
+    </div>
+    ${tryIt()}
+    <div class="hero-actions">
+      <div class="mini-term">${code(INSTALL[0][1], 'sh', 'Terminal')}</div>
+      <a class="btn btn-outline btn-neutral" href="#catalog">Browse all ${total} in the lab ${icon('ui-arrow')}</a>
     </div>
   </div>
   ${ridge('ridge intro-ridge')}
@@ -687,7 +733,7 @@ function indexPage() {
 ${lab()}
 
 <div>
-<section id="quick-start" class="nb-section" aria-labelledby="qs-h">
+<section id="quick-start" class="nb-section reveal" aria-labelledby="qs-h">
   <div class="wrap nb-grid">
     <div class="nb-head">
       <p class="kicker">${icon('ui-terminal')}Procedure</p>
@@ -704,7 +750,7 @@ ${lab()}
   </div>
 </section>
 
-<section id="bugs" class="nb-section nb-alt" aria-labelledby="bugs-h">
+<section id="bugs" class="nb-section nb-alt reveal" aria-labelledby="bugs-h">
   <div class="wrap">
     <div class="nb-title">
       <p class="kicker">${icon('ui-bug')}Field samples</p>
@@ -717,7 +763,7 @@ ${lab()}
   </div>
 </section>
 
-<section id="guides" class="nb-section" aria-labelledby="guides-h">
+<section id="guides" class="nb-section reveal" aria-labelledby="guides-h">
   <div class="wrap">
     <div class="nb-title">
       <p class="kicker">${icon('ui-book')}Lab notes</p>
@@ -730,7 +776,7 @@ ${lab()}
   </div>
 </section>
 
-<section id="faq" class="nb-section nb-alt" aria-labelledby="faq-h">
+<section id="faq" class="nb-section nb-alt reveal" aria-labelledby="faq-h">
   <div class="wrap narrow">
     <div class="nb-title">
       <p class="kicker">${icon('ui-steps')}FAQ</p>
@@ -753,7 +799,6 @@ ${lab()}
         runtimePlatform: 'Node.js 18+, modern browsers',
         license: 'https://opensource.org/licenses/MIT',
         version: pkg.version,
-        keywords: pkg.keywords.join(', '),
         author: { '@type': 'Person', name: 'Alexandre Kohler', url: AUTHOR, sameAs: [AUTHOR, LINKEDIN] },
         image: `${SITE}og.png`,
       },
@@ -774,12 +819,12 @@ ${lab()}
   };
   return layout({
     slug: 'index.html',
-    title: 'edgegoat: edge case test inputs for JavaScript (time zones, DST, unicode, -0)',
-    description: `${total} documented edge cases for JavaScript tests: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON. Works with Vitest, Jest and node:test.`,
+    title: 'edgegoat: the inputs that break code, ready for your tests',
+    description: `${total} edge case inputs for JavaScript tests, each with the reason it breaks code.`,
     body,
     jsonld,
     type: 'website',
-    current: 'lab',
+    current: 'try',
   });
 }
 
@@ -848,7 +893,7 @@ ${guideTabs(g.slug)}
     </aside>
   </div>
   <section class="more-notes" aria-labelledby="more-h">
-    <h2 id="more-h">More lab notes</h2>
+    <h2 id="more-h">More guides</h2>
     <ul class="notes notes-sm">
       ${others}
     </ul>
@@ -942,6 +987,13 @@ write('docs/.nojekyll', '');
 mkdirSync(join(root, 'docs/assets'), { recursive: true });
 copyFileSync(join(root, 'assets/mascot.svg'), join(root, 'docs/assets/mascot.svg'));
 copyFileSync(join(root, 'assets/favicon.svg'), join(root, 'docs/favicon.svg'));
+// The "try it" demo runs the published build in a worker (docs/assets/try-worker.js).
+const minified = await transform(readFileSync(join(root, 'dist/index.js'), 'utf8'), { minify: true, format: 'esm', target: 'es2020', legalComments: 'none' });
+write('docs/assets/edgegoat.js', `/* edgegoat ${pkg.version}, MIT license, ${REPO} */
+${minified.code}`);
+// Seasonal art (scripts/season-art.mjs writes it to assets/seasons).
+rmSync(join(root, 'docs/assets/seasons'), { recursive: true, force: true });
+cpSync(join(root, 'assets/seasons'), join(root, 'docs/assets/seasons'), { recursive: true });
 // The site draws its icons inline (scripts/site-art.mjs); the old copies go.
 rmSync(join(root, 'docs/assets/icons'), { recursive: true, force: true });
 // Syntax highlighting is part of the build, so the generated docs check covers it.

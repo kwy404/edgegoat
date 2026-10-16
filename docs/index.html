@@ -5,23 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <script>(function(){try{var t=localStorage.getItem('voodoo:theme');if(t&&t.charAt(0)==='"')t=JSON.parse(t);var r=document.documentElement;if(t==='light'||t==='dark'){r.setAttribute('data-theme',t);r.style.colorScheme=t}}catch(e){}})();</script>
-<title>edgegoat: edge case test inputs for JavaScript (time zones, DST, unicode, -0)</title>
-<meta name="description" content="284 documented edge cases for JavaScript tests: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON. Works with Vitest, Jest and node:test.">
+<script src="seasons.js"></script>
+<title>edgegoat: the inputs that break code, ready for your tests</title>
+<meta name="description" content="284 edge case inputs for JavaScript tests, each with the reason it breaks code.">
 <link rel="canonical" href="https://kwy404.github.io/edgegoat/">
 <meta name="author" content="Alexandre Kohler">
 <meta name="theme-color" content="#0e8f9c">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="edgegoat">
-<meta property="og:title" content="edgegoat: edge case test inputs for JavaScript (time zones, DST, unicode, -0)">
-<meta property="og:description" content="284 documented edge cases for JavaScript tests: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON. Works with Vitest, Jest and node:test.">
+<meta property="og:title" content="edgegoat: the inputs that break code, ready for your tests">
+<meta property="og:description" content="284 edge case inputs for JavaScript tests, each with the reason it breaks code.">
 <meta property="og:url" content="https://kwy404.github.io/edgegoat/">
 <meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="edgegoat: edge case test inputs for JavaScript (time zones, DST, unicode, -0)">
-<meta name="twitter:description" content="284 documented edge cases for JavaScript tests: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON. Works with Vitest, Jest and node:test.">
+<meta name="twitter:title" content="edgegoat: the inputs that break code, ready for your tests">
+<meta name="twitter:description" content="284 edge case inputs for JavaScript tests, each with the reason it breaks code.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -37,7 +38,7 @@
     {
       "@type": "SoftwareSourceCode",
       "name": "edgegoat",
-      "description": "Edge case test inputs for JavaScript and TypeScript: time zones, daylight saving time, dates before 1970, unicode test strings, -0, NaN, URLs, paths and JSON, ready for Vitest, Jest, node:test and Mocha.",
+      "description": "Curated edge case inputs for JavaScript tests, each with the reason it breaks code.",
       "url": "https://kwy404.github.io/edgegoat/",
       "codeRepository": "https://github.com/kwy404/edgegoat",
       "programmingLanguage": [
@@ -47,7 +48,6 @@
       "runtimePlatform": "Node.js 18+, modern browsers",
       "license": "https://opensource.org/licenses/MIT",
       "version": "1.0.0",
-      "keywords": "edge cases, edge case testing, javascript edge cases, test timezone javascript, timezone testing, time zones, daylight saving time, daylight saving time jest, dst, mock date, mock date jest, freeze time, dates before 1970, unicode test strings, naughty strings, surrogate pairs, emoji, negative zero, nan, number edge cases, bigint, property based testing, test data, test cases, test.each, jest, vitest, node test, mocha, typescript",
       "author": {
         "@type": "Person",
         "name": "Alexandre Kohler",
@@ -118,14 +118,6 @@
             "@type": "Answer",
             "text": "So you can see exactly what is in each string. Invisible characters, combining marks and surrogate pairs look identical or empty when rendered, so the catalog prints code points such as \\u{1F600} instead."
           }
-        },
-        {
-          "@type": "Question",
-          "name": "Does it add weight to my bundle?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "It is a dev dependency with zero runtime dependencies, shipped as ESM and CommonJS with TypeScript types. It only runs in your tests."
-          }
         }
       ]
     }
@@ -178,14 +170,14 @@
     <a href="./" class="navbar-brand brand" aria-label="edgegoat home"><img src="./assets/mascot.svg" width="30" height="30" alt="" class="mascot"><span class="wordmark">edge<b>goat</b></span></a>
     <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md" class="badge badge-sm badge-outline ver" title="Changelog">v1.0.0</a>
   </div>
-  <nav class="navbar-center navbar-nav" aria-label="Main"><a href="./#catalog" class="navbar-link" aria-current="page">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="./catalog.json" class="navbar-link">catalog.json</a></nav>
+  <nav class="navbar-center navbar-nav" aria-label="Main"><a href="./#try" class="navbar-link" aria-current="page">Try it</a><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a></nav>
   <div class="navbar-end">
     <button type="button" class="search-btn" data-open-palette aria-haspopup="dialog" aria-controls="palette"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-search"></use></svg><span class="search-btn-label">Search</span><span class="kbd-pair" aria-hidden="true"><kbd class="kbd kbd-xs">Ctrl</kbd><kbd class="kbd kbd-xs">K</kbd></span></button>
     <a href="https://github.com/kwy404/edgegoat" class="icon-btn" aria-label="edgegoat on GitHub"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-github"></use></svg></a>
     <button type="button" class="icon-btn theme-btn" v-theme-toggle.cycle aria-label="Color theme: system, light or dark" title="Color theme">
       <span class="ti ti-system"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-system"></use></svg></span><span class="ti ti-light"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-sun"></use></svg></span><span class="ti ti-dark"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-moon"></use></svg></span>
     </button>
-    <details class="navbar-mobile"><summary class="navbar-burger" aria-label="Menu"></summary><nav class="navbar-mobile-panel" aria-label="Mobile"><a href="./#catalog" class="navbar-link" aria-current="page">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="./catalog.json" class="navbar-link">catalog.json</a><a href="https://github.com/kwy404/edgegoat" class="navbar-link">GitHub</a><a href="https://www.npmjs.com/package/edgegoat" class="navbar-link">npm</a></nav></details>
+    <details class="navbar-mobile"><summary class="navbar-burger" aria-label="Menu"></summary><nav class="navbar-mobile-panel" aria-label="Mobile"><a href="./#try" class="navbar-link" aria-current="page">Try it</a><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="https://github.com/kwy404/edgegoat" class="navbar-link">GitHub</a><a href="https://www.npmjs.com/package/edgegoat" class="navbar-link">npm</a></nav></details>
   </div>
 </header>
 <dialog id="palette" class="modal modal-top" aria-label="Search the lab">
@@ -220,14 +212,10 @@
       <a class="command-palette-item" href="./?tags=invalid#catalog" data-tag="invalid" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: invalid</span><span class="command-palette-shortcut">27</span></a>
       <a class="command-palette-item" href="./?tags=sparse#catalog" data-tag="sparse" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: sparse</span><span class="command-palette-shortcut">3</span></a>
       <p class="command-palette-heading">Guides</p>
-      <a class="command-palette-item" href="./test-timezones-javascript.html" data-keywords="guide time zones JavaScript Date Intl.DateTimeFormat unit testing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to test time zones in JavaScript</span></a>
-      <a class="command-palette-item" href="./test-daylight-saving-time-jest.html" data-keywords="guide daylight saving time Jest Vitest JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to test daylight saving time in Jest</span></a>
-      <a class="command-palette-item" href="./unicode-test-strings.html" data-keywords="guide Unicode UTF-16 surrogate pairs JavaScript strings"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Unicode test strings for JavaScript</span></a>
-      <a class="command-palette-item" href="./javascript-number-edge-cases.html" data-keywords="guide JavaScript numbers IEEE 754 NaN negative zero"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>JavaScript number edge cases to test</span></a>
-      <a class="command-palette-item" href="./test-dates-before-1970.html" data-keywords="guide Unix epoch negative timestamps JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Testing dates before 1970 in JavaScript</span></a>
-      <a class="command-palette-item" href="./javascript-negative-zero.html" data-keywords="guide negative zero IEEE 754 JavaScript numbers"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Negative zero in JavaScript: why -0 is different from 0</span></a>
-      <a class="command-palette-item" href="./mock-date-javascript.html" data-keywords="guide mocking JavaScript Date Jest Vitest"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to mock Date in JavaScript tests</span></a>
-      <a class="command-palette-item" href="./property-based-testing-edge-cases.html" data-keywords="guide property based testing fast-check edge cases fuzzing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Property based testing and curated edge cases in JavaScript</span></a>
+      <a class="command-palette-item" href="./test-timezones-javascript.html" data-keywords="guide time zones JavaScript Date Intl.DateTimeFormat unit testing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Testing time zones</span></a>
+      <a class="command-palette-item" href="./test-daylight-saving-time-jest.html" data-keywords="guide daylight saving time Jest Vitest JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Testing daylight saving time</span></a>
+      <a class="command-palette-item" href="./unicode-test-strings.html" data-keywords="guide Unicode UTF-16 surrogate pairs JavaScript strings"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Unicode strings</span></a>
+      <a class="command-palette-item" href="./javascript-number-edge-cases.html" data-keywords="guide JavaScript numbers IEEE 754 NaN negative zero"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Numbers</span></a>
       <p class="command-palette-heading">Links</p>
       <a class="command-palette-item" href="https://github.com/kwy404/edgegoat" data-keywords="source code repository"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-github"></use></svg><span>GitHub repository</span></a>
       <a class="command-palette-item" href="https://www.npmjs.com/package/edgegoat" data-keywords="package install"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-npm"></use></svg><span>edgegoat on npm</span></a>
@@ -241,96 +229,88 @@
 </dialog>
 <main id="main">
 
-<section class="intro" aria-labelledby="intro-h">
-  <div class="wrap intro-grid">
-    <div>
-      <p class="eyebrow"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-jar"></use></svg><span>Specimen catalog, v1.0.0</span></p>
-      <h1 id="intro-h">edgegoat: <span class="hl">edge case test inputs</span> for JavaScript</h1>
-      <p class="lede">The inputs that break code, ready to drop into your tests. Curated specimens for <strong>time zones</strong>, <strong>daylight saving time</strong>, <strong>dates before 1970</strong>, <strong>unicode test strings</strong>, <strong>-0 and NaN</strong>, URLs, paths and JSON, each with the reason it breaks code. For Vitest, Jest, node:test and Mocha.</p>
-      <div class="intro-actions">
-        <div class="mini-term"><div class="ed" data-lang="sh" data-title="Terminal"><div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="sh" aria-hidden="true">&gt;_</span><span class="ed-title">Terminal</span></span><button type="button" class="copy-btn ed-copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy Terminal code"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-copy"></use></svg><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-check"></use></svg><span>Copy</span></button></div><pre id="code-1" v-pre aria-label="Terminal code" class="shiki shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">npm</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> install</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6"> --save-dev</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> edgegoat</span></span></code></pre></div><!--/ed--></div>
-        <a class="btn btn-primary" href="#catalog">Open the lab <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-arrow"></use></svg></a>
-        <a class="btn btn-outline btn-neutral" href="test-timezones-javascript.html"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg>Read the guides</a>
+<section id="try" class="hero" aria-labelledby="hero-h">
+  <div class="wrap">
+    <div class="hero-head">
+      <div class="hero-goat" aria-hidden="true"><img src="./assets/mascot.svg" width="64" height="64" alt="" class="mascot"></div>
+      <div>
+        <h1 id="hero-h">The inputs that break code, <span class="hl">ready for your tests</span></h1>
+        <p class="lede">284 edge cases for JavaScript, each with the reason it breaks code. Pick a type and see them, then run them on your own function.</p>
       </div>
     </div>
-    <div class="intro-side">
-      <svg class="shelf-art" viewBox="0 0 560 240" role="img" aria-labelledby="shelf-t">
-  <title id="shelf-t">A lab shelf on a mountain ridge with specimen jars holding a clock, NaN, a face split in two and a file path, next to a flask of negative zero</title>
-  <defs>
-    <linearGradient id="shelf-fade-x"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".14" stop-color="#fff"/><stop offset=".86" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-    <mask id="shelf-fade" maskUnits="userSpaceOnUse" x="0" y="0" width="560" height="240"><rect width="560" height="240" fill="url(#shelf-fade-x)"/></mask>
-  </defs>
-  <g mask="url(#shelf-fade)">
-    <path class="ridge-far" d="M0 150 52 112l40 22 62-58 46 40 34-20 70 52 60-74 52 40 40-24 64 50 40-22V212H0z"/>
-    <path class="ridge-near" d="M0 186l46-26 36 14 58-38 44 30 52-16 62 34 72-48 48 28 54-20 46 22 42-12V212H0z"/>
-    <path class="ridge-line" d="M0 186l46-26 36 14 58-38 44 30 52-16 62 34 72-48 48 28 54-20 46 22 42-12" fill="none"/>
-  </g>
-  <g transform="translate(26 58)">
-    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path class="art-glass" d="M14 14v5c-8 3-13 9-13 17v58a12 12 0 0 0 12 12h50a12 12 0 0 0 12-12V36c0-8-5-14-13-17v-5"/>
-      <path class="art-liquid" d="M2 70c8-4 15 4 23 0s15-4 23 0 15 4 26 0v24a11 11 0 0 1-11 11H13A11 11 0 0 1 2 94z" stroke="none"/>
-      <rect x="9" y="2" width="58" height="12" rx="3" class="art-lid"/>
-      <path d="M18 2v12M27 2v12M36 2v12M45 2v12M54 2v12M63 2v12" class="art-hatch"/>
-      <path d="M8 40v26" class="art-shine"/>
-    </g>
-    <g class="art-specimen" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="38" cy="50" r="17"/><path d="M38 38v12l8 5"/><path d="M38 34.5v-1.5M38 67v-1.5M21.5 50H23M53 50h1.5"/><path d="M52 31.5a22 22 0 0 1 6 9" style="stroke:var(--art-accent)"/><path d="m58.6 36.4-.6 4.4-4.2-1.3" style="stroke:var(--art-accent)"/></g>
-    <rect x="16" y="82" width="44" height="14" rx="2" class="art-label" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="38" y="92.2" class="art-label-text" text-anchor="middle">TZ+0545</text>
-  </g>
-  <g transform="translate(132 58)">
-    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path class="art-glass" d="M14 14v5c-8 3-13 9-13 17v58a12 12 0 0 0 12 12h50a12 12 0 0 0 12-12V36c0-8-5-14-13-17v-5"/>
-      <path class="art-liquid" d="M2 70c8-4 15 4 23 0s15-4 23 0 15 4 26 0v24a11 11 0 0 1-11 11H13A11 11 0 0 1 2 94z" stroke="none"/>
-      <rect x="9" y="2" width="58" height="12" rx="3" class="art-lid"/>
-      <path d="M18 2v12M27 2v12M36 2v12M45 2v12M54 2v12M63 2v12" class="art-hatch"/>
-      <path d="M8 40v26" class="art-shine"/>
-    </g>
-    <g class="art-specimen" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 60V40l11 20V40"/><circle cx="39.5" cy="55" r="5" style="stroke:var(--art-accent)"/><path d="M44.5 50v10" style="stroke:var(--art-accent)"/><path d="M50 60V40l11 20V40"/></g>
-    <rect x="16" y="82" width="44" height="14" rx="2" class="art-label" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="38" y="92.2" class="art-label-text" text-anchor="middle">NaN</text>
-  </g>
-  <g transform="translate(262 50)">
-    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path class="art-glass" d="M18 8h22M22 8v28L4 92a8 8 0 0 0 7 12h36a8 8 0 0 0 7-12L36 36V8"/>
-      <path class="art-liquid" d="M12 72c6-3 11 3 17 0s11-3 17 0l8 20a8 8 0 0 1-7 12H11a8 8 0 0 1-7-12z" stroke="none"/>
-      <path d="M27 20v-8M31 26v-4" class="art-shine"/>
-    </g>
-    <g class="art-bubbles" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="62" r="2.4"/><circle cx="33" cy="52" r="1.7"/><circle cx="28" cy="40" r="1.2"/></g>
-    <text x="29" y="94" class="art-flask-text" text-anchor="middle">-0</text>
-  </g>
-  <g transform="translate(346 58)">
-    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path class="art-glass" d="M14 14v5c-8 3-13 9-13 17v58a12 12 0 0 0 12 12h50a12 12 0 0 0 12-12V36c0-8-5-14-13-17v-5"/>
-      <path class="art-liquid" d="M2 70c8-4 15 4 23 0s15-4 23 0 15 4 26 0v24a11 11 0 0 1-11 11H13A11 11 0 0 1 2 94z" stroke="none"/>
-      <rect x="9" y="2" width="58" height="12" rx="3" class="art-lid"/>
-      <path d="M18 2v12M27 2v12M36 2v12M45 2v12M54 2v12M63 2v12" class="art-hatch"/>
-      <path d="M8 40v26" class="art-shine"/>
-    </g>
-    <g class="art-specimen" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M37 33a17 17 0 0 0 0 34"/><path d="M40 33a17 17 0 0 1 0 34" style="stroke:var(--art-accent)"/><path d="M38.5 29v42" stroke-dasharray="2 3"/><circle cx="31" cy="46" r="1.6" style="fill:currentColor;stroke:none"/><circle cx="46" cy="46" r="1.6" style="fill:var(--art-accent);stroke:none"/><path d="M29 54a9 9 0 0 0 8 5"/><path d="M40 59a9 9 0 0 0 8-5" style="stroke:var(--art-accent)"/></g>
-    <rect x="16" y="82" width="44" height="14" rx="2" class="art-label" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="38" y="92.2" class="art-label-text" text-anchor="middle">U+D83D</text>
-  </g>
-  <g transform="translate(452 58)">
-    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path class="art-glass" d="M14 14v5c-8 3-13 9-13 17v58a12 12 0 0 0 12 12h50a12 12 0 0 0 12-12V36c0-8-5-14-13-17v-5"/>
-      <path class="art-liquid" d="M2 70c8-4 15 4 23 0s15-4 23 0 15 4 26 0v24a11 11 0 0 1-11 11H13A11 11 0 0 1 2 94z" stroke="none"/>
-      <rect x="9" y="2" width="58" height="12" rx="3" class="art-lid"/>
-      <path d="M18 2v12M27 2v12M36 2v12M45 2v12M54 2v12M63 2v12" class="art-hatch"/>
-      <path d="M8 40v26" class="art-shine"/>
-    </g>
-    <g class="art-specimen" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 40v20a3 3 0 0 0 3 3h30a3 3 0 0 0 3-3V45a3 3 0 0 0-3-3H39l-4-5H23a3 3 0 0 0-3 3z"/><path d="M30 58l5-11M37 58l5-11M45 58l5-11" style="stroke:var(--art-accent)"/></g>
-    <rect x="16" y="82" width="44" height="14" rx="2" class="art-label" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="38" y="92.2" class="art-label-text" text-anchor="middle">..\..\</text>
-  </g>
-  <path class="shelf-board" d="M14 212h532" fill="none"/>
-  <path class="shelf-leg" d="M60 214v14M500 214v14" fill="none"/>
-</svg>
-      <div class="stats intro-stats">
-        <div class="stat"><p class="stat-value">284</p><p class="stat-title">specimens</p></div>
-        <div class="stat"><p class="stat-value">11</p><p class="stat-title">generators</p></div>
-        <div class="stat"><p class="stat-value">137</p><p class="stat-title">tags</p></div>
-        <div class="stat"><p class="stat-value">0</p><p class="stat-title">dependencies</p></div>
+    <div class="try" v-component="edge-try">
+    <div class="try-controls">
+      <p class="try-step"><span class="try-n" aria-hidden="true">1</span>Pick a data type</p>
+      <div class="type-chips" role="group" aria-label="Data type">
+        <button type="button" class="type-chip" data-gen="strings" :class="{ 'is-on': gen === 'strings' }" :aria-pressed="gen === 'strings' ? 'true' : 'false'" @click="choose('strings', true)" aria-pressed="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg><span>Text</span><span class="type-n">49</span></button>
+        <button type="button" class="type-chip" data-gen="numbers" :class="{ 'is-on': gen === 'numbers' }" :aria-pressed="gen === 'numbers' ? 'true' : 'false'" @click="choose('numbers', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span>Numbers</span><span class="type-n">26</span></button>
+        <button type="button" class="type-chip" data-gen="dates" :class="{ 'is-on': gen === 'dates' }" :aria-pressed="gen === 'dates' ? 'true' : 'false'" @click="choose('dates', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span>Dates</span><span class="type-n">46</span></button>
+        <button type="button" class="type-chip" data-gen="emails" :class="{ 'is-on': gen === 'emails' }" :aria-pressed="gen === 'emails' ? 'true' : 'false'" @click="choose('emails', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-emails"></use></svg><span>Emails</span><span class="type-n">26</span></button>
+        <button type="button" class="type-chip" data-gen="urls" :class="{ 'is-on': gen === 'urls' }" :aria-pressed="gen === 'urls' ? 'true' : 'false'" @click="choose('urls', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-urls"></use></svg><span>URLs</span><span class="type-n">28</span></button>
+        <button type="button" class="type-chip" data-gen="paths" :class="{ 'is-on': gen === 'paths' }" :aria-pressed="gen === 'paths' ? 'true' : 'false'" @click="choose('paths', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-paths"></use></svg><span>File paths</span><span class="type-n">30</span></button>
+        <button type="button" class="type-chip" data-gen="json" :class="{ 'is-on': gen === 'json' }" :aria-pressed="gen === 'json' ? 'true' : 'false'" @click="choose('json', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-json"></use></svg><span>JSON</span><span class="type-n">22</span></button>
+        <button type="button" class="type-chip" data-gen="arrays" :class="{ 'is-on': gen === 'arrays' }" :aria-pressed="gen === 'arrays' ? 'true' : 'false'" @click="choose('arrays', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrays"></use></svg><span>Arrays</span><span class="type-n">14</span></button>
+        <button type="button" class="type-chip" data-gen="timeZones" :class="{ 'is-on': gen === 'timeZones' }" :aria-pressed="gen === 'timeZones' ? 'true' : 'false'" @click="choose('timeZones', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-timeZones"></use></svg><span>Time zones</span><span class="type-n">18</span></button>
+        <button type="button" class="type-chip" data-gen="numericStrings" :class="{ 'is-on': gen === 'numericStrings' }" :aria-pressed="gen === 'numericStrings' ? 'true' : 'false'" @click="choose('numericStrings', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-numericStrings"></use></svg><span>Numeric text</span><span class="type-n">17</span></button>
+        <button type="button" class="type-chip" data-gen="bigints" :class="{ 'is-on': gen === 'bigints' }" :aria-pressed="gen === 'bigints' ? 'true' : 'false'" @click="choose('bigints', true)" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-bigints"></use></svg><span>BigInts</span><span class="type-n">8</span></button>
       </div>
+      <label class="try-paste">
+        <span class="try-paste-label">or paste a value from your code</span>
+        <input type="text" class="input input-sm" v-model="sample" placeholder="ana@example.com, 42, 2026-03-08, C:\Users" autocomplete="off" spellcheck="false" aria-describedby="try-detect">
+      </label>
+      <p id="try-detect" class="try-detect" role="status" v-cloak v-text="detectNote"></p>
+      <div class="try-dates" v-cloak v-if="gen === 'dates'">
+        <label><span>Time zone</span><input type="text" class="input input-sm" v-model="zone" list="try-zones" placeholder="Default: 7 tricky zones" autocomplete="off" spellcheck="false"></label>
+        <label><span>Year</span><input type="number" class="input input-sm" v-model="year" min="1970" max="2100" placeholder="2026"></label>
+        <datalist id="try-zones"><option value="Europe/Berlin"></option><option value="America/Sao_Paulo"></option><option value="America/New_York"></option><option value="Asia/Kathmandu"></option><option value="Australia/Lord_Howe"></option><option value="Pacific/Kiritimati"></option></datalist>
+      </div>
+      <div class="try-run">
+        <p class="try-step"><span class="try-n" aria-hidden="true">3</span>Run them on your function <span class="try-opt">optional</span></p>
+        <textarea class="textarea try-src" v-model="src" @input="edited = true" rows="3" spellcheck="false" aria-label="Your function, written as a JavaScript arrow function"></textarea>
+        <div class="try-run-row">
+          <button type="button" class="btn btn-primary btn-sm" @click="run()" :disabled="running"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-terminal"></use></svg><span v-text="running ? 'Running' : 'Run on every case'">Run on every case</span></button>
+          <button type="button" class="btn btn-ghost btn-sm" v-cloak v-if="edited" @click="resetSrc()">Reset</button>
+        </div>
+        <p class="try-summary" role="status" v-cloak v-text="summary()"></p>
+        <p class="try-note">Runs in your browser, in a worker. Nothing is sent anywhere.</p>
+      </div>
+    </div>
+    <div class="try-results">
+      <div class="try-results-head">
+        <p class="try-step"><span class="try-n" aria-hidden="true">2</span><span>See the edge cases</span><span class="badge badge-sm badge-soft badge-primary try-count" v-text="countText()">49 cases</span></p>
+        <div class="try-tags" v-cloak v-if="tagList().length" role="group" aria-label="Filter by tag">
+          <button type="button" class="try-tag" v-for="t in tagList()" :key="t" :class="{ 'is-on': tags.includes(t) }" :aria-pressed="tags.includes(t) ? 'true' : 'false'" @click="toggleTag(t)" v-text="t"></button>
+        </div>
+      </div>
+      <ol class="try-list" v-if="!cases.length">
+        <li class="try-case" style="--i:0" v-pre><div class="try-case-top"><span class="try-label">empty string</span></div><code class="try-value">&quot;&quot;</code><p class="try-why">Falsy, length 0: `if (!name)` and `str[0].toUpperCase()` both misbehave.</p></li>
+        <li class="try-case" style="--i:1" v-pre><div class="try-case-top"><span class="try-label">single space</span></div><code class="try-value">&quot; &quot;</code><p class="try-why">Truthy but blank: passes `if (str)` checks and fails after trim().</p></li>
+        <li class="try-case" style="--i:2" v-pre><div class="try-case-top"><span class="try-label">mixed ASCII whitespace</span></div><code class="try-value">&quot; \t\n\r\u000B\u000C &quot;</code><p class="try-why">Every ASCII whitespace character; trim() returns an empty string but `str.length &gt; 0` validators accept it.</p></li>
+        <li class="try-case" style="--i:3" v-pre><div class="try-case-top"><span class="try-label">no-break space (U+00A0)</span></div><code class="try-value">&quot;a\u00A0b&quot;</code><p class="try-why">Arrives from HTML &amp;nbsp; and copy paste; \s and trim() treat it as whitespace but split(&quot; &quot;) and many tokenizers do not.</p></li>
+        <li class="try-case" style="--i:4" v-pre><div class="try-case-top"><span class="try-label">ideographic space (U+3000)</span></div><code class="try-value">&quot;\u3000\u65E5\u672C\u3000&quot;</code><p class="try-why">Full width space used in CJK text; trim() removes it, byte based or ASCII only trimming does not.</p></li>
+        <li class="try-case" style="--i:5" v-pre><div class="try-case-top"><span class="try-label">zero width space (U+200B)</span></div><code class="try-value">&quot;foo\u200Bbar&quot;</code><p class="try-why">Invisible and not whitespace for trim() or \s, so it looks identical to &quot;foobar&quot; but is not equal to it.</p></li>
+      </ol>
+      <ol class="try-list" v-cloak v-else :class="{ 'is-busy': loading }">
+        <li class="try-case" v-for="(c, k) in shown()" :key="nonce + ':' + c.label" :style="'--i:' + k" :class="'is-' + status(c.label)">
+          <div class="try-case-top"><span class="try-label" v-text="c.label"></span><span class="try-badge" v-if="res(c.label)" v-text="badge(c.label)"></span></div>
+          <code class="try-value" v-text="c.value"></code>
+          <p class="try-why" v-text="c.why"></p>
+          <p class="try-out" v-if="res(c.label)"><span class="try-out-k">Your function</span><code v-text="res(c.label).out"></code><span class="try-out-note" v-if="res(c.label).note" v-text="res(c.label).note"></span></p>
+        </li>
+      </ol>
+      <p class="try-empty" v-cloak v-if="failed" v-text="failed"></p>
+      <div class="try-more" v-cloak v-if="cases.length > 6">
+        <button type="button" class="btn btn-outline btn-neutral btn-sm" @click="all = !all" v-text="all ? 'Show fewer' : 'Show all ' + cases.length"></button>
+      </div>
+      <div class="ed ed-live try-code">
+        <div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="js" aria-hidden="true">JS</span><span class="ed-title">edge-cases.test.js</span></span><button type="button" class="copy-btn ed-copy" v-copy-from="#try-snippet" v-copy-label="Copied" aria-label="Copy this test"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-copy"></use></svg><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-check"></use></svg><span>Copy</span></button></div>
+        <pre id="try-snippet" class="shiki numbered" tabindex="0"><code v-html="hl(snippet())"></code></pre>
+      </div>
+    </div>
+  </div>
+    <div class="hero-actions">
+      <div class="mini-term"><div class="ed" data-lang="sh" data-title="Terminal"><div class="ed-bar"><span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ed-tab"><span class="ed-file" data-lang="sh" aria-hidden="true">&gt;_</span><span class="ed-title">Terminal</span></span><button type="button" class="copy-btn ed-copy" v-cloak v-copy-from="#code-1" v-copy-label="Copied" aria-label="Copy Terminal code"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-copy"></use></svg><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-check"></use></svg><span>Copy</span></button></div><pre id="code-1" v-pre aria-label="Terminal code" class="shiki shiki-themes light-plus dark-plus" style="--shiki-light:#000000;--shiki-dark:#D4D4D4;--shiki-light-bg:#FFFFFF;--shiki-dark-bg:#1E1E1E" tabindex="0"><code><span class="line"><span style="--shiki-light:#795E26;--shiki-dark:#DCDCAA">npm</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> install</span><span style="--shiki-light:#0000FF;--shiki-dark:#569CD6"> --save-dev</span><span style="--shiki-light:#A31515;--shiki-dark:#CE9178"> edgegoat</span></span></code></pre></div><!--/ed--></div>
+      <a class="btn btn-outline btn-neutral" href="#catalog">Browse all 284 in the lab <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-arrow"></use></svg></a>
     </div>
   </div>
   <svg class="ridge intro-ridge" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true" focusable="false">
@@ -2178,7 +2158,7 @@
 </section>
 
 <div>
-<section id="quick-start" class="nb-section" aria-labelledby="qs-h">
+<section id="quick-start" class="nb-section reveal" aria-labelledby="qs-h">
   <div class="wrap nb-grid">
     <div class="nb-head">
       <p class="kicker"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-terminal"></use></svg>Procedure</p>
@@ -2224,7 +2204,7 @@
   </div>
 </section>
 
-<section id="bugs" class="nb-section nb-alt" aria-labelledby="bugs-h">
+<section id="bugs" class="nb-section nb-alt reveal" aria-labelledby="bugs-h">
   <div class="wrap">
     <div class="nb-title">
       <p class="kicker"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-bug"></use></svg>Field samples</p>
@@ -2237,12 +2217,11 @@
       <li class="sample"><div class="sample-head"><svg class="ic sample-ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg><span class="sample-no">Sample C</span></div><a href="https://github.com/google/budoux/pull/1411" class="sample-link">google/budoux#1411</a><p>Text segmentation could split a surrogate pair, producing half an emoji.</p></li>
       <li class="sample"><div class="sample-head"><svg class="ic sample-ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg><span class="sample-no">Sample D</span></div><a href="https://github.com/microsoft/vscode-js-debug/pull/2423" class="sample-link">microsoft/vscode-js-debug#2423</a><p>trimEnd style truncation could cut a surrogate pair in half.</p></li>
       <li class="sample"><div class="sample-head"><svg class="ic sample-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="sample-no">Sample E</span></div><a href="https://github.com/salesforce/tough-cookie/pull/644" class="sample-link">salesforce/tough-cookie#644</a><p>A cookie with an infinite max-age has to be treated as never expiring.</p></li>
-      <li class="sample"><div class="sample-head"><svg class="ic sample-ic" aria-hidden="true" focusable="false"><use href="#i-urls"></use></svg><span class="sample-no">Sample F</span></div><a href="https://github.com/vuejs/core/pull/15618" class="sample-link">vuejs/core#15618</a><p>A fix in the Vue 3 compat build.</p></li>
     </ul>
   </div>
 </section>
 
-<section id="guides" class="nb-section" aria-labelledby="guides-h">
+<section id="guides" class="nb-section reveal" aria-labelledby="guides-h">
   <div class="wrap">
     <div class="nb-title">
       <p class="kicker"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg>Lab notes</p>
@@ -2250,19 +2229,15 @@
       <p>One bug class per guide: the bug explained, a naive implementation that fails, and the edgegoat test that catches it.</p>
     </div>
     <ul class="notes">
-      <li><a href="test-timezones-javascript.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to test time zones in JavaScript</strong><span class="note-desc">Test JavaScript date code in any time zone: run tests under TZ, switch zones per test with withTimeZone, and catch New Year and UTC offset bugs with ready made edge cases.</span><span class="note-n">18 specimens</span></a></li>
-      <li><a href="test-daylight-saving-time-jest.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to test daylight saving time in Jest</strong><span class="note-desc">Test DST transitions in Jest: real spring forward gaps and fall back overlaps for New York, London, Sao Paulo and Lord Howe, computed from Intl, plus mocking the date without fake timers.</span><span class="note-n">16 specimens</span></a></li>
-      <li><a href="unicode-test-strings.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg><span class="note-cat">Unicode</span><strong>Unicode test strings for JavaScript</strong><span class="note-desc">Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.</span><span class="note-n">23 specimens</span></a></li>
-      <li><a href="javascript-number-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>JavaScript number edge cases to test</strong><span class="note-desc">Test JavaScript number handling with -0, NaN, Infinity, MAX_SAFE_INTEGER + 1, 0.1 + 0.2, 1e21 and values between -1 and 0, plus numeric strings and BigInt limits.</span><span class="note-n">26 specimens</span></a></li>
-      <li><a href="test-dates-before-1970.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>Testing dates before 1970 in JavaScript</strong><span class="note-desc">Dates before the Unix epoch have negative timestamps, and fractional seconds round the wrong way with Math.trunc and %. Test pre-1970 dates, local mean time and year 0 with edgegoat.</span><span class="note-n">8 specimens</span></a></li>
-      <li><a href="javascript-negative-zero.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>Negative zero in JavaScript: why -0 is different from 0</strong><span class="note-desc">-0 === 0 is true, yet 1 / -0 is -Infinity and Object.is(-0, 0) is false. Learn where -0 comes from, which code it breaks, and how to test it.</span><span class="note-n">4 specimens</span></a></li>
-      <li><a href="mock-date-javascript.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to mock Date in JavaScript tests</strong><span class="note-desc">Freeze new Date() and Date.now() in Vitest, Jest, node:test or Mocha with a tiny helper, combine it with a time zone, and test New Year and DST edge instants.</span><span class="note-n">12 specimens</span></a></li>
-      <li><a href="property-based-testing-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg><span class="note-cat">Method</span><strong>Property based testing and curated edge cases in JavaScript</strong><span class="note-desc">Property based testing finds bugs with random inputs; curated edge cases find the known ones every time. How to combine fast-check with edgegoat's labeled inputs in Vitest or Jest.</span><span class="note-n">8 specimens</span></a></li>
+      <li><a href="test-timezones-javascript.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>Testing time zones</strong><span class="note-desc">Run date code in zones that disagree with UTC and catch the New Year bug before your users do.</span><span class="note-n">18 specimens</span></a></li>
+      <li><a href="test-daylight-saving-time-jest.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>Testing daylight saving time</strong><span class="note-desc">Use real spring forward and fall back instants to test code that adds days, hours or intervals.</span><span class="note-n">16 specimens</span></a></li>
+      <li><a href="unicode-test-strings.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg><span class="note-cat">Unicode</span><strong>Unicode strings</strong><span class="note-desc">Why slicing, counting and comparing text by code unit breaks, and the strings that show it.</span><span class="note-n">23 specimens</span></a></li>
+      <li><a href="javascript-number-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>Numbers</strong><span class="note-desc">Two zeros, a value not equal to itself and integers that stop being exact: how numbers break formatting and parsing.</span><span class="note-n">26 specimens</span></a></li>
     </ul>
   </div>
 </section>
 
-<section id="faq" class="nb-section nb-alt" aria-labelledby="faq-h">
+<section id="faq" class="nb-section nb-alt reveal" aria-labelledby="faq-h">
   <div class="wrap narrow">
     <div class="nb-title">
       <p class="kicker"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-steps"></use></svg>FAQ</p>
@@ -2274,7 +2249,6 @@
     <details class="collapse" name="faq"><summary class="collapse-title">Does edgegoat generate random data?</summary><div class="collapse-content"><p>No. Every call returns the same cases, so failures are reproducible. DST instants are computed from the runtime tz database, so they are deterministic for a given Node.js version.</p></div></details>
     <details class="collapse" name="faq"><summary class="collapse-title">How do I run a test in another time zone?</summary><div class="collapse-content"><p>Wrap it in <code>withTimeZone(zone, fn)</code>. In Node.js it sets <code>process.env.TZ</code>, which applies to <code>Date</code> and <code>Intl</code> immediately, and restores the previous zone afterwards, even when the function throws.</p></div></details>
     <details class="collapse" name="faq"><summary class="collapse-title">Why are emoji shown as escapes in the catalog?</summary><div class="collapse-content"><p>So you can see exactly what is in each string. Invisible characters, combining marks and surrogate pairs look identical or empty when rendered, so the catalog prints code points such as <code>\u{1F600}</code> instead.</p></div></details>
-    <details class="collapse" name="faq"><summary class="collapse-title">Does it add weight to my bundle?</summary><div class="collapse-content"><p>It is a dev dependency with zero runtime dependencies, shipped as ESM and CommonJS with TypeScript types. It only runs in your tests.</p></div></details>
   </div>
   </div>
 </section>
@@ -2294,16 +2268,12 @@
         <p class="built">Built with <a href="https://kwy404.github.io/monsoon/">Monsoon</a>. Interactive parts built with <a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a>.</p>
       </div>
       <nav aria-label="Guides">
-        <p class="footer-title">Lab notes</p>
+        <p class="footer-title">Guides</p>
         <ul class="footer-links">
           <li><a href="./test-timezones-javascript.html">Time zones</a></li>
-          <li><a href="./test-daylight-saving-time-jest.html">DST in Jest</a></li>
+          <li><a href="./test-daylight-saving-time-jest.html">Daylight saving time</a></li>
           <li><a href="./unicode-test-strings.html">Unicode strings</a></li>
-          <li><a href="./javascript-number-edge-cases.html">Number edge cases</a></li>
-          <li><a href="./test-dates-before-1970.html">Dates before 1970</a></li>
-          <li><a href="./javascript-negative-zero.html">Negative zero</a></li>
-          <li><a href="./mock-date-javascript.html">Mock Date</a></li>
-          <li><a href="./property-based-testing-edge-cases.html">Property based testing</a></li>
+          <li><a href="./javascript-number-edge-cases.html">Numbers</a></li>
         </ul>
       </nav>
       <nav aria-label="Project">

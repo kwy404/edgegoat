@@ -5,7 +5,9 @@
 //    filters them, keeps the filter in the URL, fills the inspector and writes
 //    copy ready tests. Case data comes from catalog.json through
 //    v-resource="cat:./catalog.json".
-// 2. Small page wiring on every page: the search button opens the Monsoon
+// 2. The "try it" demo at the top of index.html (edge-try), backed by a
+//    worker that runs the real library (assets/try-worker.js).
+// 3. Small page wiring on every page: the search button opens the Monsoon
 //    command palette, palette entries filter the lab in place, "/" focuses
 //    the lab search.
 /* global V */
@@ -375,12 +377,342 @@
         var c = this.current();
         if (!c) return '';
         return testBody({
-          imports: 'import { ' + c.generator + " } from 'edgegoat';",
-          setup: 'const cases = ' + c.generator + '().filter((c) => c.label === ' + lit(c.label) + ');',
+          imports: 'import { pick, ' + c.generator + " } from 'edgegoat';",
+          setup: 'const cases = pick(' + c.generator + '(), ' + lit(c.label) + ');',
         });
       },
     },
   });
+
+  // ---------------------------------------------------------------- try it
+  // The "paste and see" demo on the home page. The real library runs in a
+  // module worker (assets/try-worker.js), so DST scans and slow functions
+  // never block the page; a function that hangs is stopped after a few
+  // seconds by terminating the worker.
+  var RUN_LIMIT = 4000;
+  var SHOWN = 6;
+  var DEFAULT_FN = {
+    strings: '(name) => name[0].toUpperCase()',
+    numbers: "(n) => '$' + n.toFixed(2)",
+    dates: '(d) => d.toISOString().slice(0, 10)',
+    emails: "(email) => email.split('@')[1].toLowerCase()",
+    urls: '(u) => new URL(u).hostname',
+    paths: '(p) => p.match(/\\.([a-z0-9]+)$/i)[1]',
+    json: '(text) => Object.keys(JSON.parse(text)).length',
+    arrays: '(list) => list.at(-1).toString()',
+    timeZones: "(tz) => Number(new Intl.DateTimeFormat('en', { timeZone: tz, timeZoneName: 'shortOffset' }).format(0).split('GMT')[1] || 0)",
+    numericStrings: '(s) => parseInt(s, 10) * 2',
+    bigints: '(n) => JSON.stringify({ id: n })',
+  };
+  var worker = null;
+  var seq = 0;
+  var pending = {};
+  function settleAll(error) {
+    Object.keys(pending).forEach(function (id) {
+      var p = pending[id];
+      delete pending[id];
+      clearTimeout(p.timer);
+      p.reject(error);
+    });
+  }
+  function stopWorker(error) {
+    if (worker) worker.terminate();
+    worker = null;
+    settleAll(error || new Error('stopped'));
+  }
+  function getWorker() {
+    if (worker) return worker;
+    worker = new Worker(new URL('assets/try-worker.js', document.baseURI), { type: 'module' });
+    worker.onmessage = function (e) {
+      var d = e.data || {};
+      var p = pending[d.id];
+      if (!p) return;
+      delete pending[d.id];
+      clearTimeout(p.timer);
+      if (d.ok) p.resolve(d);
+      else p.reject(new Error(d.error));
+    };
+    worker.onerror = function (e) {
+      if (e && e.preventDefault) e.preventDefault();
+      stopWorker(new Error('The demo could not start in this browser.'));
+    };
+    return worker;
+  }
+  function ask(msg, limit) {
+    return new Promise(function (resolve, reject) {
+      var id = ++seq;
+      msg.id = id;
+      var p = { resolve: resolve, reject: reject, timer: 0 };
+      pending[id] = p;
+      if (limit) {
+        p.timer = setTimeout(function () {
+          var err = new Error('timeout');
+          err.timeout = true;
+          stopWorker(err);
+        }, limit);
+      }
+      try {
+        getWorker().postMessage(msg);
+      } catch (error) {
+        delete pending[id];
+        reject(error);
+      }
+    });
+  }
+  // Without module workers, fall back to the catalog (default options only).
+  var catalog = null;
+  function fromCatalog(gen) {
+    catalog = catalog || fetch('catalog.json').then(function (r) { return r.json(); });
+    return catalog.then(function (data) {
+      return data.cases.filter(function (c) { return c.generator === gen; });
+    });
+  }
+  function optionsText(gen, tags, zone, year) {
+    var parts = [];
+    if (tags.length) parts.push('tags: ' + quoteTags(tags));
+    if (gen === 'dates' && zone) parts.push('zone: ' + lit(zone));
+    if (gen === 'dates' && year) parts.push('year: ' + Number(year));
+    return parts.length ? '{ ' + parts.join(', ') + ' }' : '';
+  }
+  function later(fn, ms) {
+    var t = 0;
+    return function () {
+      var self = this;
+      clearTimeout(t);
+      t = setTimeout(function () { fn.call(self); }, ms);
+    };
+  }
+
+  V.component('edge-try', {
+    state: function () {
+      return {
+        gen: 'strings',
+        sample: '',
+        detectNote: '',
+        zone: '',
+        year: '',
+        tags: [],
+        baseTags: [],
+        cases: [],
+        loading: false,
+        failed: '',
+        all: false,
+        nonce: 0,
+        src: DEFAULT_FN.strings,
+        edited: false,
+        results: null,
+        running: false,
+        runNote: '',
+      };
+    },
+
+    watch: {
+      sample: function () { this.detectSoon(); },
+      zone: function () { this.loadSoon(); },
+      year: function () { this.loadSoon(); },
+    },
+
+    mounted: function () {
+      this.load();
+    },
+
+    methods: {
+      detectSoon: later(function () { this.detect(); }, 180),
+      loadSoon: later(function () { this.load(); }, 260),
+      options: function () {
+        return { tags: this.tags.slice(), zone: String(this.zone || '').trim(), year: this.year ? Number(this.year) : '' };
+      },
+      choose: function (gen, fromUser) {
+        if (fromUser) this.sample = '';
+        if (gen === this.gen) return;
+        this.gen = gen;
+        this.tags = [];
+        this.baseTags = [];
+        this.all = false;
+        this.results = null;
+        this.runNote = '';
+        if (!this.edited) this.src = DEFAULT_FN[gen];
+        this.load();
+      },
+      load: function () {
+        var self = this;
+        var gen = this.gen;
+        var key = ++loadKey;
+        this.loading = true;
+        this.failed = '';
+        ask({ type: 'cases', gen: gen, options: this.options() })
+          .then(function (d) { return d.cases; }, function (error) {
+            if (/could not start/.test(error.message)) return fromCatalog(gen);
+            throw error;
+          })
+          .then(function (list) {
+            if (key !== loadKey) return;
+            self.cases = list;
+            self.nonce++;
+            if (!self.tags.length) self.baseTags = self.topTags(list);
+            if (!list.length) self.failed = 'No case matches these options. Clear a tag or try another zone.';
+          }, function (error) {
+            if (key !== loadKey) return;
+            // A run that hung stops the worker; ask again on a fresh one.
+            if (error.timeout || error.message === 'stopped') {
+              self.loadSoon();
+              return;
+            }
+            self.cases = [];
+            self.failed = error.message;
+          })
+          .then(function () { if (key === loadKey) self.loading = false; });
+      },
+      detect: function () {
+        var self = this;
+        var text = this.sample;
+        if (!text.trim()) {
+          this.detectNote = '';
+          return;
+        }
+        ask({ type: 'detect', text: text }).then(function (d) {
+          if (text !== self.sample) return;
+          if (!d.gen) {
+            self.detectNote = 'edgegoat has no cases for that kind of value yet.';
+            return;
+          }
+          self.detectNote = 'Looks like ' + d.kind + ', so here are the ' + d.gen + '() cases.';
+          self.choose(d.gen, false);
+        }, function () {
+          self.detectNote = '';
+        });
+      },
+      topTags: function (list) {
+        var counts = {};
+        list.forEach(function (c) { c.tags.forEach(function (t) { counts[t] = (counts[t] || 0) + 1; }); });
+        return Object.keys(counts)
+          .filter(function (t) { return counts[t] < list.length; })
+          .sort(function (a, b) { return counts[b] - counts[a] || (a < b ? -1 : 1); })
+          .slice(0, 7);
+      },
+      tagList: function () {
+        var list = this.baseTags.slice();
+        this.tags.forEach(function (t) { if (list.indexOf(t) === -1) list.push(t); });
+        return list;
+      },
+      toggleTag: function (t) {
+        var i = this.tags.indexOf(t);
+        this.tags = i === -1 ? this.tags.concat([t]) : this.tags.filter(function (x) { return x !== t; });
+        this.results = null;
+        this.runNote = '';
+        this.load();
+      },
+      countText: function () {
+        var n = this.cases.length;
+        if (!n && !this.failed) {
+          // Still loading: show the published count for this type.
+          var el = document.querySelector('.type-chip[data-gen="' + this.gen + '"] .type-n');
+          if (el) n = Number(el.textContent);
+        }
+        return n === 1 ? '1 case' : n + ' cases';
+      },
+      res: function (label) {
+        return this.results ? this.results[label] || null : null;
+      },
+      status: function (label) {
+        var r = this.res(label);
+        return r ? r.status : 'idle';
+      },
+      badge: function (label) {
+        var r = this.res(label);
+        if (!r) return '';
+        return r.status === 'threw' ? 'Threw' : r.status === 'odd' ? 'Check this' : 'Passed';
+      },
+      // Problems first once a run is done, so the interesting cases are on top.
+      shown: function () {
+        var list = this.cases;
+        if (this.results) {
+          var rank = { threw: 0, odd: 1, ok: 2, idle: 3 };
+          var self = this;
+          list = list.slice().sort(function (a, b) { return rank[self.status(a.label)] - rank[self.status(b.label)]; });
+        }
+        return this.all ? list : list.slice(0, SHOWN);
+      },
+      resetSrc: function () {
+        this.src = DEFAULT_FN[this.gen];
+        this.edited = false;
+        this.results = null;
+        this.runNote = '';
+      },
+      run: function () {
+        var self = this;
+        if (this.running) return;
+        this.running = true;
+        this.runNote = '';
+        ask({ type: 'run', gen: this.gen, options: this.options(), src: this.src }, RUN_LIMIT)
+          .then(function (d) {
+            var map = {};
+            d.results.forEach(function (r) { map[r.label] = r; });
+            self.results = map;
+            self.nonce++;
+          }, function (error) {
+            self.results = null;
+            self.runNote = error.timeout
+              ? 'Your function ran for more than ' + RUN_LIMIT / 1000 + ' seconds, so it was stopped. Is there an endless loop?'
+              : error.message;
+          })
+          .then(function () { self.running = false; });
+      },
+      summary: function () {
+        if (this.runNote) return this.runNote;
+        if (!this.results) return '';
+        var threw = 0;
+        var odd = 0;
+        var total = 0;
+        var map = this.results;
+        Object.keys(map).forEach(function (k) {
+          total++;
+          if (map[k].status === 'threw') threw++;
+          else if (map[k].status === 'odd') odd++;
+        });
+        if (!threw && !odd) return 'All ' + total + ' cases passed without throwing.';
+        var parts = [];
+        if (threw) parts.push(threw + ' threw');
+        if (odd) parts.push(odd + ' returned something suspicious');
+        return parts.join(' and ') + ', out of ' + total + ' cases. They are listed first.';
+      },
+      hl: hl,
+      snippet: function () {
+        var opts = optionsText(this.gen, this.tags, String(this.zone || '').trim(), this.year);
+        var fn = String(this.src || '').trim().replace(/[^\x20-\x7e\n]/g, '?') || '(value) => value';
+        return [
+          "import { test, expect } from 'vitest';",
+          'import { ' + this.gen + " } from 'edgegoat';",
+          '',
+          'const myFunction = ' + fn + ';',
+          '',
+          'test.each(' + this.gen + '(' + opts + "))('$label', ({ value }) => {",
+          '  expect(() => myFunction(value)).not.toThrow();',
+          '});',
+        ].join('\n');
+      },
+    },
+  });
+  var loadKey = 0;
+
+  // ---------------------------------------------------------------- reveal
+  // Sections fade in as they scroll into view. Only with motion allowed, and
+  // only once JavaScript runs, so nothing is ever hidden without it.
+  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('can-reveal');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    var watchReveal = function () {
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchReveal);
+    else watchReveal();
+  }
 
   // ---------------------------------------------------------------- page wiring
   function openPalette() {

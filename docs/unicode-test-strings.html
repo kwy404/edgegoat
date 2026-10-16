@@ -5,23 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <script>(function(){try{var t=localStorage.getItem('voodoo:theme');if(t&&t.charAt(0)==='"')t=JSON.parse(t);var r=document.documentElement;if(t==='light'||t==='dark'){r.setAttribute('data-theme',t);r.style.colorScheme=t}}catch(e){}})();</script>
-<title>Unicode test strings for JavaScript: emoji, surrogate pairs, RTL | edgegoat</title>
-<meta name="description" content="Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.">
+<script src="seasons.js"></script>
+<title>Unicode strings | edgegoat</title>
+<meta name="description" content="Why slicing, counting and comparing text by code unit breaks, and the strings that show it.">
 <link rel="canonical" href="https://kwy404.github.io/edgegoat/unicode-test-strings.html">
 <meta name="author" content="Alexandre Kohler">
 <meta name="theme-color" content="#0e8f9c">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="edgegoat">
-<meta property="og:title" content="Unicode test strings for JavaScript: emoji, surrogate pairs, RTL | edgegoat">
-<meta property="og:description" content="Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.">
+<meta property="og:title" content="Unicode strings | edgegoat">
+<meta property="og:description" content="Why slicing, counting and comparing text by code unit breaks, and the strings that show it.">
 <meta property="og:url" content="https://kwy404.github.io/edgegoat/unicode-test-strings.html">
 <meta property="og:image" content="https://kwy404.github.io/edgegoat/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Ledge the mountain goat on a cliff edge next to the edgegoat name and tagline">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Unicode test strings for JavaScript: emoji, surrogate pairs, RTL | edgegoat">
-<meta name="twitter:description" content="Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.">
+<meta name="twitter:title" content="Unicode strings | edgegoat">
+<meta name="twitter:description" content="Why slicing, counting and comparing text by code unit breaks, and the strings that show it.">
 <meta name="twitter:image" content="https://kwy404.github.io/edgegoat/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -36,8 +37,8 @@
   "@graph": [
     {
       "@type": "TechArticle",
-      "headline": "Unicode test strings for JavaScript",
-      "description": "Ready to use unicode test strings for JavaScript: ZWJ emoji, flags, lone surrogates, NFC vs NFD, bidi controls, invisible spaces and Turkish i, each with the reason it breaks code.",
+      "headline": "Unicode strings",
+      "description": "Why slicing, counting and comparing text by code unit breaks, and the strings that show it.",
       "url": "https://kwy404.github.io/edgegoat/unicode-test-strings.html",
       "image": "https://kwy404.github.io/edgegoat/og.png",
       "datePublished": "2026-10-12",
@@ -94,14 +95,6 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What are good unicode test strings?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Strings that break assumptions about length, equality and display: emoji outside the BMP, ZWJ sequences, NFC vs NFD pairs, right to left text, invisible spaces, lone surrogates and locale sensitive casing. strings() returns 49 of them with the reason each one breaks code."
-          }
-        },
-        {
-          "@type": "Question",
           "name": "What is a surrogate pair?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -114,14 +107,6 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "s.length counts UTF-16 code units, [...s].length counts code points, and [...new Intl.Segmenter().segment(s)].length counts grapheme clusters, which is what users perceive as characters."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is this different from the big list of naughty strings?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The big list of naughty strings is a large raw list, great for fuzzing. edgegoat is smaller and curated: every string has a label, a one line reason and tags, plus typed generators for dates, numbers and URLs. They work well together."
           }
         }
       ]
@@ -175,14 +160,14 @@
     <a href="./" class="navbar-brand brand" aria-label="edgegoat home"><img src="./assets/mascot.svg" width="30" height="30" alt="" class="mascot"><span class="wordmark">edge<b>goat</b></span></a>
     <a href="https://github.com/kwy404/edgegoat/blob/main/CHANGELOG.md" class="badge badge-sm badge-outline ver" title="Changelog">v1.0.0</a>
   </div>
-  <nav class="navbar-center navbar-nav" aria-label="Main"><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link" aria-current="page">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="./catalog.json" class="navbar-link">catalog.json</a></nav>
+  <nav class="navbar-center navbar-nav" aria-label="Main"><a href="./#try" class="navbar-link">Try it</a><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link" aria-current="page">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a></nav>
   <div class="navbar-end">
     <button type="button" class="search-btn" data-open-palette aria-haspopup="dialog" aria-controls="palette"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-search"></use></svg><span class="search-btn-label">Search</span><span class="kbd-pair" aria-hidden="true"><kbd class="kbd kbd-xs">Ctrl</kbd><kbd class="kbd kbd-xs">K</kbd></span></button>
     <a href="https://github.com/kwy404/edgegoat" class="icon-btn" aria-label="edgegoat on GitHub"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-github"></use></svg></a>
     <button type="button" class="icon-btn theme-btn" v-theme-toggle.cycle aria-label="Color theme: system, light or dark" title="Color theme">
       <span class="ti ti-system"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-system"></use></svg></span><span class="ti ti-light"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-sun"></use></svg></span><span class="ti ti-dark"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-moon"></use></svg></span>
     </button>
-    <details class="navbar-mobile"><summary class="navbar-burger" aria-label="Menu"></summary><nav class="navbar-mobile-panel" aria-label="Mobile"><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link" aria-current="page">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="./catalog.json" class="navbar-link">catalog.json</a><a href="https://github.com/kwy404/edgegoat" class="navbar-link">GitHub</a><a href="https://www.npmjs.com/package/edgegoat" class="navbar-link">npm</a></nav></details>
+    <details class="navbar-mobile"><summary class="navbar-burger" aria-label="Menu"></summary><nav class="navbar-mobile-panel" aria-label="Mobile"><a href="./#try" class="navbar-link">Try it</a><a href="./#catalog" class="navbar-link">Lab</a><a href="./test-timezones-javascript.html" class="navbar-link" aria-current="page">Guides</a><a href="./#quick-start" class="navbar-link">Quick start</a><a href="https://github.com/kwy404/edgegoat" class="navbar-link">GitHub</a><a href="https://www.npmjs.com/package/edgegoat" class="navbar-link">npm</a></nav></details>
   </div>
 </header>
 <dialog id="palette" class="modal modal-top" aria-label="Search the lab">
@@ -217,14 +202,10 @@
       <a class="command-palette-item" href="./?tags=invalid#catalog" data-tag="invalid" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: invalid</span><span class="command-palette-shortcut">27</span></a>
       <a class="command-palette-item" href="./?tags=sparse#catalog" data-tag="sparse" data-keywords="tag filter"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-tag"></use></svg><span>Tag: sparse</span><span class="command-palette-shortcut">3</span></a>
       <p class="command-palette-heading">Guides</p>
-      <a class="command-palette-item" href="./test-timezones-javascript.html" data-keywords="guide time zones JavaScript Date Intl.DateTimeFormat unit testing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to test time zones in JavaScript</span></a>
-      <a class="command-palette-item" href="./test-daylight-saving-time-jest.html" data-keywords="guide daylight saving time Jest Vitest JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to test daylight saving time in Jest</span></a>
-      <a class="command-palette-item" href="./unicode-test-strings.html" data-keywords="guide Unicode UTF-16 surrogate pairs JavaScript strings"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Unicode test strings for JavaScript</span></a>
-      <a class="command-palette-item" href="./javascript-number-edge-cases.html" data-keywords="guide JavaScript numbers IEEE 754 NaN negative zero"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>JavaScript number edge cases to test</span></a>
-      <a class="command-palette-item" href="./test-dates-before-1970.html" data-keywords="guide Unix epoch negative timestamps JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Testing dates before 1970 in JavaScript</span></a>
-      <a class="command-palette-item" href="./javascript-negative-zero.html" data-keywords="guide negative zero IEEE 754 JavaScript numbers"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Negative zero in JavaScript: why -0 is different from 0</span></a>
-      <a class="command-palette-item" href="./mock-date-javascript.html" data-keywords="guide mocking JavaScript Date Jest Vitest"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>How to mock Date in JavaScript tests</span></a>
-      <a class="command-palette-item" href="./property-based-testing-edge-cases.html" data-keywords="guide property based testing fast-check edge cases fuzzing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Property based testing and curated edge cases in JavaScript</span></a>
+      <a class="command-palette-item" href="./test-timezones-javascript.html" data-keywords="guide time zones JavaScript Date Intl.DateTimeFormat unit testing"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Testing time zones</span></a>
+      <a class="command-palette-item" href="./test-daylight-saving-time-jest.html" data-keywords="guide daylight saving time Jest Vitest JavaScript Date"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Testing daylight saving time</span></a>
+      <a class="command-palette-item" href="./unicode-test-strings.html" data-keywords="guide Unicode UTF-16 surrogate pairs JavaScript strings"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Unicode strings</span></a>
+      <a class="command-palette-item" href="./javascript-number-edge-cases.html" data-keywords="guide JavaScript numbers IEEE 754 NaN negative zero"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-ui-book"></use></svg><span>Numbers</span></a>
       <p class="command-palette-heading">Links</p>
       <a class="command-palette-item" href="https://github.com/kwy404/edgegoat" data-keywords="source code repository"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-github"></use></svg><span>GitHub repository</span></a>
       <a class="command-palette-item" href="https://www.npmjs.com/package/edgegoat" data-keywords="package install"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-brand-npm"></use></svg><span>edgegoat on npm</span></a>
@@ -240,14 +221,14 @@
 
 <div class="dash-tabs">
   <div class="wrap">
-    <nav class="tabs tabs-line cat-tabs" aria-label="Guide categories"><a href="./#catalog" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg>Lab</a><a href="test-timezones-javascript.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg>Time<span class="badge badge-xs">4</span></a><a href="unicode-test-strings.html" class="tab" aria-current="page"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg>Unicode<span class="badge badge-xs badge-primary">1</span></a><a href="javascript-number-edge-cases.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg>Numbers<span class="badge badge-xs">2</span></a><a href="property-based-testing-edge-cases.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg>Method<span class="badge badge-xs">1</span></a></nav>
+    <nav class="tabs tabs-line cat-tabs" aria-label="Guide categories"><a href="./#catalog" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg>Lab</a><a href="test-timezones-javascript.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg>Time<span class="badge badge-xs">2</span></a><a href="unicode-test-strings.html" class="tab" aria-current="page"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-strings"></use></svg>Unicode<span class="badge badge-xs badge-primary">1</span></a><a href="javascript-number-edge-cases.html" class="tab"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg>Numbers<span class="badge badge-xs">1</span></a></nav>
     <nav class="tabs tabs-pills tabs-sm sub-tabs" aria-label="Unicode guides"><a href="unicode-test-strings.html" class="tab" aria-current="page">Unicode strings</a></nav>
   </div>
 </div>
 <div class="wrap dash">
   <header class="dash-head">
     <nav aria-label="Breadcrumb"><ol class="breadcrumbs"><li><a href="./">edgegoat</a></li><li><a href="unicode-test-strings.html">Unicode</a></li><li><span aria-current="page">Unicode strings</span></li></ol></nav>
-    <h1>Unicode test strings for JavaScript</h1>
+    <h1>Unicode strings</h1>
     <p class="lede" v-pre>JavaScript strings are sequences of UTF-16 code units, not characters. Anything that slices, counts, reverses or compares text by code unit will eventually split an emoji or treat two identical looking strings as different.</p>
     <div class="stats dash-stats">
       <div class="stat"><p class="stat-title">Specimens</p><p class="stat-value">23</p><p class="stat-desc">strings(), 5 tags</p></div>
@@ -303,10 +284,8 @@
 </section>
       <section id="faq" class="dash-card" aria-labelledby="faq-h"><h2 id="faq-h">FAQ</h2>
         <div class="accordion collapse-plus faq" v-pre>
-    <details class="collapse" name="faq" open><summary class="collapse-title">What are good unicode test strings?</summary><div class="collapse-content"><p>Strings that break assumptions about length, equality and display: emoji outside the BMP, ZWJ sequences, NFC vs NFD pairs, right to left text, invisible spaces, lone surrogates and locale sensitive casing. <code>strings()</code> returns 49 of them with the reason each one breaks code.</p></div></details>
-    <details class="collapse" name="faq"><summary class="collapse-title">What is a surrogate pair?</summary><div class="collapse-content"><p>UTF-16 encodes code points above U+FFFF as two 16 bit code units, a high surrogate followed by a low surrogate. JavaScript string indexes count code units, so one emoji has <code>length</code> 2 and can be cut in half.</p></div></details>
+    <details class="collapse" name="faq" open><summary class="collapse-title">What is a surrogate pair?</summary><div class="collapse-content"><p>UTF-16 encodes code points above U+FFFF as two 16 bit code units, a high surrogate followed by a low surrogate. JavaScript string indexes count code units, so one emoji has <code>length</code> 2 and can be cut in half.</p></div></details>
     <details class="collapse" name="faq"><summary class="collapse-title">How do I count characters in a JavaScript string?</summary><div class="collapse-content"><p><code>s.length</code> counts UTF-16 code units, <code>[...s].length</code> counts code points, and <code>[...new Intl.Segmenter().segment(s)].length</code> counts grapheme clusters, which is what users perceive as characters.</p></div></details>
-    <details class="collapse" name="faq"><summary class="collapse-title">How is this different from the big list of naughty strings?</summary><div class="collapse-content"><p>The big list of naughty strings is a large raw list, great for fuzzing. edgegoat is smaller and curated: every string has a label, a one line reason and tags, plus typed generators for dates, numbers and URLs. They work well together.</p></div></details>
   </div>
       </section>
     </article>
@@ -348,15 +327,11 @@
     </aside>
   </div>
   <section class="more-notes" aria-labelledby="more-h">
-    <h2 id="more-h">More lab notes</h2>
+    <h2 id="more-h">More guides</h2>
     <ul class="notes notes-sm">
-      <li><a href="test-timezones-javascript.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to test time zones in JavaScript</strong></a></li>
-      <li><a href="test-daylight-saving-time-jest.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to test daylight saving time in Jest</strong></a></li>
-      <li><a href="javascript-number-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>JavaScript number edge cases to test</strong></a></li>
-      <li><a href="test-dates-before-1970.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>Testing dates before 1970 in JavaScript</strong></a></li>
-      <li><a href="javascript-negative-zero.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>Negative zero in JavaScript: why -0 is different from 0</strong></a></li>
-      <li><a href="mock-date-javascript.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>How to mock Date in JavaScript tests</strong></a></li>
-      <li><a href="property-based-testing-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-all"></use></svg><span class="note-cat">Method</span><strong>Property based testing and curated edge cases in JavaScript</strong></a></li>
+      <li><a href="test-timezones-javascript.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>Testing time zones</strong></a></li>
+      <li><a href="test-daylight-saving-time-jest.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-dates"></use></svg><span class="note-cat">Time</span><strong>Testing daylight saving time</strong></a></li>
+      <li><a href="javascript-number-edge-cases.html" class="note"><svg class="ic note-ic" aria-hidden="true" focusable="false"><use href="#i-numbers"></use></svg><span class="note-cat">Numbers</span><strong>Numbers</strong></a></li>
     </ul>
   </section>
 </div>
@@ -375,16 +350,12 @@
         <p class="built">Built with <a href="https://kwy404.github.io/monsoon/">Monsoon</a>. Interactive parts built with <a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a>.</p>
       </div>
       <nav aria-label="Guides">
-        <p class="footer-title">Lab notes</p>
+        <p class="footer-title">Guides</p>
         <ul class="footer-links">
           <li><a href="./test-timezones-javascript.html">Time zones</a></li>
-          <li><a href="./test-daylight-saving-time-jest.html">DST in Jest</a></li>
+          <li><a href="./test-daylight-saving-time-jest.html">Daylight saving time</a></li>
           <li><a href="./unicode-test-strings.html">Unicode strings</a></li>
-          <li><a href="./javascript-number-edge-cases.html">Number edge cases</a></li>
-          <li><a href="./test-dates-before-1970.html">Dates before 1970</a></li>
-          <li><a href="./javascript-negative-zero.html">Negative zero</a></li>
-          <li><a href="./mock-date-javascript.html">Mock Date</a></li>
-          <li><a href="./property-based-testing-edge-cases.html">Property based testing</a></li>
+          <li><a href="./javascript-number-edge-cases.html">Numbers</a></li>
         </ul>
       </nav>
       <nav aria-label="Project">
