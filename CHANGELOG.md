@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `generatorFor(sample)` names the generator for a kind of value: `Date`, number, bigint,
+  array, and strings by shape (JSON text, URL, email, IANA time zone, numeric string, path,
+  plain text). Returns `undefined` when there is none.
+- `casesFor(sample, options?)` returns the edge cases for inputs like `sample`, so
+  `test.each(casesFor(user.email))` works without knowing the generator name.
+- `pick(cases, ...labels)` keeps the named cases in order and throws on a missing label,
+  so a typo never runs zero cases.
+- `values(cases)` returns just the values, for loops and property based testing.
+
 ## [1.0.0] - 2026-10-13
 
 ### Changed

@@ -11,7 +11,10 @@ export { emails } from './generators/emails';
 export { paths } from './generators/paths';
 export { json } from './generators/json';
 export { arrays } from './generators/arrays';
+export { generatorFor, casesFor } from './generators/detect';
+export type { GeneratorName } from './generators/detect';
 
 export { withTimeZone } from './helpers/withTimeZone';
 export { withFrozenTime } from './helpers/withFrozenTime';
 export { check, assertNoThrow } from './helpers/check';
+export { pick, values } from './helpers/select';
