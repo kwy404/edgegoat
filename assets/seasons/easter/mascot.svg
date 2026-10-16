@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-labelledby="t d">
+  <title id="t">Ledge, the edgegoat mascot</title>
+  <desc id="d">Ledge the goat with a flower on its horn next to a basket of painted eggs</desc>
+  <defs><clipPath id="b"><circle cx="200" cy="200" r="192"/></clipPath></defs>
+  <circle cx="200" cy="200" r="192" fill="#2E9C8A"/>
+  <g clip-path="url(#b)">
+    <circle cx="104" cy="112" r="38" fill="#F2A93B"/><circle cx="330.0" cy="83.0" r="6.5" fill="#FFFFFF" stroke="#22303C" stroke-width="2.5"/><circle cx="338.6" cy="89.2" r="6.5" fill="#FFFFFF" stroke="#22303C" stroke-width="2.5"/><circle cx="335.3" cy="99.3" r="6.5" fill="#FFFFFF" stroke="#22303C" stroke-width="2.5"/><circle cx="324.7" cy="99.3" r="6.5" fill="#FFFFFF" stroke="#22303C" stroke-width="2.5"/><circle cx="321.4" cy="89.2" r="6.5" fill="#FFFFFF" stroke="#22303C" stroke-width="2.5"/><circle cx="330" cy="92" r="5.6" fill="#E8B04B" stroke="#22303C" stroke-width="2.5"/>
+    <path d="M0 292 H268 L276 300 L268 330 L282 366 L276 400 H0 Z" fill="#22303C"/>
+    <path d="M40 318 H120 M70 344 H190 M30 372 H96" stroke="#2E9C8A" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+    <circle cx="300" cy="338" r="6" fill="#22303C"/><circle cx="312" cy="372" r="4" fill="#22303C"/>
+    
+  </g>
+  <g stroke="#22303C" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="138" y="232" width="20" height="58" rx="9" fill="#FBF7EE"/>
+    <rect x="224" y="232" width="20" height="58" rx="9" fill="#FBF7EE"/>
+    <path d="M112 196 Q96 186 100 172 Q112 178 118 190" fill="#FBF7EE"/>
+    <path d="M226 196 L246 140 L284 146 L266 212 Z" fill="#FBF7EE"/>
+    <path d="M110 214 Q108 180 146 178 L232 178 Q262 180 262 214 Q262 250 232 252 L222 260 L212 252 L172 252 L162 260 L152 252 L142 252 Q110 250 110 214 Z" fill="#FBF7EE"/>
+    <rect x="118" y="236" width="20" height="54" rx="9" fill="#FBF7EE"/>
+    <rect x="244" y="236" width="20" height="54" rx="9" fill="#FBF7EE"/>
+    <path d="M240 122 Q258 112 284 124 L316 154 Q322 166 308 172 L274 170 Q250 168 240 150 Z" fill="#FBF7EE"/>
+    <path d="M276 168 L300 170 L288 204 Z" fill="#FBF7EE"/>
+    <path d="M244 134 Q222 128 212 140 Q228 148 246 146 Z" fill="#FBF7EE"/>
+  </g>
+  <g fill="#22303C">
+    <rect x="114" y="278" width="28" height="14" rx="5"/><rect x="134" y="278" width="28" height="14" rx="5"/>
+    <rect x="220" y="278" width="28" height="14" rx="5"/><rect x="240" y="278" width="28" height="14" rx="5"/>
+  </g>
+  <path d="M252 120 Q244 86 214 82" fill="none" stroke="#22303C" stroke-width="12" stroke-linecap="round"/>
+  <path d="M266 120 Q262 92 238 80" fill="none" stroke="#22303C" stroke-width="9" stroke-linecap="round"/>
+  <g stroke="#22303C" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M30 248 Q66 190 102 248" fill="none" stroke="#8A5A2B" stroke-width="8"/>
+    <g transform="translate(46 246) scale(0.9)"><path d="M0 -20 C12 -20 16 0 16 8 C16 18 9 23 0 23 C-9 23 -16 18 -16 8 C-16 0 -12 -20 0 -20Z" fill="#F4B6C2" stroke="#22303C" stroke-width="5"/><path d="M-15 4 l5 -5 l5 5 l5 -5 l5 5 l5 -5 l5 5" fill="none" stroke="#C7B6F4" stroke-width="4" stroke-linejoin="round"/></g><g transform="translate(68 240) scale(1)"><path d="M0 -20 C12 -20 16 0 16 8 C16 18 9 23 0 23 C-9 23 -16 18 -16 8 C-16 0 -12 -20 0 -20Z" fill="#F7DC8F" stroke="#22303C" stroke-width="5"/><path d="M-15 4 l5 -5 l5 5 l5 -5 l5 5 l5 -5 l5 5" fill="none" stroke="#F4B6C2" stroke-width="4" stroke-linejoin="round"/></g><g transform="translate(88 248) scale(0.85)"><path d="M0 -20 C12 -20 16 0 16 8 C16 18 9 23 0 23 C-9 23 -16 18 -16 8 C-16 0 -12 -20 0 -20Z" fill="#B6E3C6" stroke="#22303C" stroke-width="5"/><path d="M-15 4 l5 -5 l5 5 l5 -5 l5 5 l5 -5 l5 5" fill="none" stroke="#C7B6F4" stroke-width="4" stroke-linejoin="round"/></g>
+    <path d="M24 252 H110 L100 288 H34Z" fill="#E9C46A"/>
+    <path d="M30 266 H104 M36 278 H98" stroke="#8A5A2B" stroke-width="4"/>
+  </g>
+  <circle cx="226.0" cy="77.0" r="5.0" fill="#FFFFFF" stroke="#22303C" stroke-width="3"/><circle cx="232.7" cy="81.8" r="5.0" fill="#FFFFFF" stroke="#22303C" stroke-width="3"/><circle cx="230.1" cy="89.7" r="5.0" fill="#FFFFFF" stroke="#22303C" stroke-width="3"/><circle cx="221.9" cy="89.7" r="5.0" fill="#FFFFFF" stroke="#22303C" stroke-width="3"/><circle cx="219.3" cy="81.8" r="5.0" fill="#FFFFFF" stroke="#22303C" stroke-width="3"/><circle cx="226" cy="84" r="4.3" fill="#E8B04B" stroke="#22303C" stroke-width="3"/>
+  <circle cx="278" cy="140" r="6" fill="#22303C"/><circle cx="280" cy="138" r="2" fill="#FBF7EE"/><circle cx="312" cy="158" r="4" fill="#22303C"/>
+</svg>

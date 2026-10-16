@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-labelledby="t d">
+  <title id="t">Ledge, the edgegoat mascot</title>
+  <desc id="d">Ledge the goat in a striped party hat, with fireworks in the sky</desc>
+  <defs><clipPath id="b"><circle cx="200" cy="200" r="192"/></clipPath></defs>
+  <circle cx="200" cy="200" r="192" fill="#2E9C8A"/>
+  <g clip-path="url(#b)">
+    <path d="M114.0 104.0L140.0 104.0M112.1 111.0L134.6 124.0M107.0 116.1L120.0 138.6M100.0 118.0L100.0 144.0M93.0 116.1L80.0 138.6M87.9 111.0L65.4 124.0M86.0 104.0L60.0 104.0M87.9 97.0L65.4 84.0M93.0 91.9L80.0 69.4M100.0 90.0L100.0 64.0M107.0 91.9L120.0 69.4M112.1 97.0L134.6 84.0" stroke="#E8B04B" stroke-width="4.444444444444445" stroke-linecap="round" fill="none"/><circle cx="100" cy="104" r="4.444444444444445" fill="#E8B04B"/><path d="M186.4 58.0L202.0 58.0M184.8 62.9L197.4 72.1M180.6 66.0L185.4 80.8M175.4 66.0L170.6 80.8M171.2 62.9L158.6 72.1M169.6 58.0L154.0 58.0M171.2 53.1L158.6 43.9M175.4 50.0L170.6 35.2M180.6 50.0L185.4 35.2M184.8 53.1L197.4 43.9" stroke="#FFFFFF" stroke-width="2.6666666666666665" stroke-linecap="round" fill="none"/><circle cx="178" cy="58" r="2.6666666666666665" fill="#FFFFFF"/><path d="M337.7 86.0L352.0 86.0M336.2 90.5L347.8 98.9M332.4 93.3L336.8 106.9M327.6 93.3L323.2 106.9M323.8 90.5L312.2 98.9M322.3 86.0L308.0 86.0M323.8 81.5L312.2 73.1M327.6 78.7L323.2 65.1M332.4 78.7L336.8 65.1M336.2 81.5L347.8 73.1" stroke="#E0607E" stroke-width="2.4444444444444446" stroke-linecap="round" fill="none"/><circle cx="330" cy="86" r="2.4444444444444446" fill="#E0607E"/>
+    <circle cx="60" cy="180" r="3" fill="#E8B04B"/><circle cx="214" cy="120" r="2.5" fill="#FFFFFF"/>
+    <path d="M0 292 H268 L276 300 L268 330 L282 366 L276 400 H0 Z" fill="#22303C"/>
+    <path d="M40 318 H120 M70 344 H190 M30 372 H96" stroke="#2E9C8A" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+    <circle cx="300" cy="338" r="6" fill="#22303C"/><circle cx="312" cy="372" r="4" fill="#22303C"/>
+    
+  </g>
+  <g stroke="#22303C" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="138" y="232" width="20" height="58" rx="9" fill="#FBF7EE"/>
+    <rect x="224" y="232" width="20" height="58" rx="9" fill="#FBF7EE"/>
+    <path d="M112 196 Q96 186 100 172 Q112 178 118 190" fill="#FBF7EE"/>
+    <path d="M226 196 L246 140 L284 146 L266 212 Z" fill="#FBF7EE"/>
+    <path d="M110 214 Q108 180 146 178 L232 178 Q262 180 262 214 Q262 250 232 252 L222 260 L212 252 L172 252 L162 260 L152 252 L142 252 Q110 250 110 214 Z" fill="#FBF7EE"/>
+    <rect x="118" y="236" width="20" height="54" rx="9" fill="#FBF7EE"/>
+    <rect x="244" y="236" width="20" height="54" rx="9" fill="#FBF7EE"/>
+    <path d="M240 122 Q258 112 284 124 L316 154 Q322 166 308 172 L274 170 Q250 168 240 150 Z" fill="#FBF7EE"/>
+    <path d="M276 168 L300 170 L288 204 Z" fill="#FBF7EE"/>
+    <path d="M244 134 Q222 128 212 140 Q228 148 246 146 Z" fill="#FBF7EE"/>
+  </g>
+  <g fill="#22303C">
+    <rect x="114" y="278" width="28" height="14" rx="5"/><rect x="134" y="278" width="28" height="14" rx="5"/>
+    <rect x="220" y="278" width="28" height="14" rx="5"/><rect x="240" y="278" width="28" height="14" rx="5"/>
+  </g>
+  <path d="M252 120 Q244 86 214 82" fill="none" stroke="#22303C" stroke-width="12" stroke-linecap="round"/>
+  <path d="M266 120 Q262 92 238 80" fill="none" stroke="#22303C" stroke-width="9" stroke-linecap="round"/>
+  <g stroke="#22303C" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M238 118 L266 44 L296 112 Q268 124 238 118Z" fill="#7B61FF"/>
+    <path d="M250 86 L284 84 M244 102 L290 100 M258 66 L276 64" stroke="#E8B04B" stroke-width="7"/>
+    <circle cx="266" cy="42" r="9" fill="#E8B04B"/>
+  </g>
+  <circle cx="278" cy="140" r="6" fill="#22303C"/><circle cx="280" cy="138" r="2" fill="#FBF7EE"/><circle cx="312" cy="158" r="4" fill="#22303C"/>
+</svg>

@@ -59,8 +59,9 @@
     "examples:node-test": "node --test examples/node-test/edge-cases.test.mjs",
     "size": "node scripts/size.mjs",
     "prepublishOnly": "npm run build && npm test",
-    "docs": "npm run build && node scripts/build-assets.mjs && node scripts/build-docs.mjs",
-    "docs:highlight": "node scripts/highlight-docs.mjs"
+    "docs": "npm run build && node scripts/build-assets.mjs && node scripts/season-art.mjs && node scripts/build-docs.mjs",
+    "docs:highlight": "node scripts/highlight-docs.mjs",
+    "docs:seasons": "node scripts/season-art.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
