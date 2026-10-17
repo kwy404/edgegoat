@@ -22,7 +22,7 @@ const REPO = 'https://github.com/kwy404/edgegoat';
 const NPM = 'https://www.npmjs.com/package/edgegoat';
 const CDN = 'https://cdn.jsdelivr.net/gh/kwy404/edgegoat@main/';
 const PUBLISHED = '2026-10-12';
-const UPDATED = '2026-10-13';
+const UPDATED = '2026-10-17';
 const BS = String.fromCharCode(92);
 
 const write = (file, text) => {

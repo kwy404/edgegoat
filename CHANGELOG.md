@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-17
+
 ### Added
 
 - `generatorFor(sample)` names the generator for a kind of value: `Date`, number, bigint,
@@ -16,6 +18,18 @@ All notable changes to this project are documented here. The format follows
 - `pick(cases, ...labels)` keeps the named cases in order and throws on a missing label,
   so a typo never runs zero cases.
 - `values(cases)` returns just the values, for loops and property based testing.
+
+### Changed
+
+- The documentation site is rebuilt with Monsoon and Voodoo.js 1.0.0. The home page is the
+  catalog explorer: a generator rail with live counts, a searchable grid of every case and an
+  inspector with the code points, the reason it breaks code and a ready `test.each`.
+- A try it demo at the top of the site: pick a generator or paste a value from your code and
+  see its edge cases, computed by the real library in a worker.
+- Seasonal themes on the site, with Ledge in costume for each season.
+- The site keeps four guides with plain titles, and both READMEs are shorter.
+- Shorter package description and keywords.
+- "More from kwy404" lists the newest projects.
 
 ## [1.0.0] - 2026-10-13
 
@@ -51,5 +65,7 @@ No changes to the library API or to the cases.
 - Helpers: `withTimeZone()`, `withFrozenTime()`, `check()` and `assertNoThrow()`.
 - ESM and CommonJS builds with type declarations, zero runtime dependencies.
 
+[1.1.0]: https://github.com/kwy404/edgegoat/releases/tag/v1.1.0
+[1.0.0]: https://github.com/kwy404/edgegoat/releases/tag/v1.0.0
 [0.1.1]: https://github.com/kwy404/edgegoat/releases/tag/v0.1.1
 [0.1.0]: https://github.com/kwy404/edgegoat/releases/tag/v0.1.0
